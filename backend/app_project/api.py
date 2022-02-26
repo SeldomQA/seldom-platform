@@ -9,11 +9,96 @@ from utils.response import response, Error
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from seldom.utils import file
+from ninja import Schema
+from app_project.models import Project
+from django.forms.models import model_to_dict
 
 # seldom自动化项目用例路径（seldom-web-testing）
 TEST_DIR = os.path.join(file.dir_dir_dir, "seldom-web-testing", "test_dir")
 
 router = Router(tags=["project"])
+
+
+class ProjectItems(Schema):
+    name: str
+    project_name: str
+
+
+@router.post('/create')
+def create_project(request, project: ProjectItems):
+    """
+    创建项目
+    """
+    project_obj = Project.objects.create(name=project.name, project_name=project.project_name)
+    return response(data=model_to_dict(project_obj))
+
+
+@router.get('/list')
+def get_projects(request):
+    """
+    获取项目列表
+    """
+    projects = Project.objects.filter(is_delete=False)
+    project_list = []
+    for project in projects:
+        project_list.append(model_to_dict(project))
+    return response(data=project_list)
+
+
+@router.get('/{project_id}/')
+def get_project(request, project_id: int):
+    """
+    通过项目ID查询项目
+    """
+    try:
+        project = Project.objects.get(id=project_id, is_delete=False)
+    except Project.DoesNotExist:
+        return response(success=False, error=Error.PROJECT_OBJECT_NULL)
+    return response(data=model_to_dict(project))
+
+
+@router.put('/{project_id}/')
+def update_project(request, project_id: int, project: ProjectItems):
+    """
+    通过项目ID更新项目
+    """
+    try:
+        project_obj = Project.objects.get(id=project_id, is_delete=False)
+    except Project.DoesNotExist:
+        return response(success=False, error=Error.PROJECT_OBJECT_NULL)
+    else:
+        project_obj.name = project.name
+        project_obj.project_name = project.project_name
+        project_obj.save()
+    return response(data=model_to_dict(project_obj))
+
+
+@router.delete('/{project_id}/')
+def delete_project(request, project_id: int):
+    """
+    通过项目ID删除项目
+    """
+    try:
+        project_obj = Project.objects.get(id=project_id)
+    except Project.DoesNotExist:
+        return response(success=False, error=Error.PROJECT_DELETE_ERROR)
+    else:
+        project_obj.is_delete = True
+        project_obj.save()
+    return response()
+
+
+@router.get("update")
+def update_project_cases(request):
+    """
+    同步项目用例
+    """
+    # 开启收集测试用例
+    SeldomTestLoader.collectCaseInfo = True
+    # 收集测试用例信息
+    main_extend = TestMainExtend(path=TEST_DIR)
+    case_info = main_extend.collect_cases()
+    file_tree = _get_file_list(case_info)
 
 
 def _get_file_list(data):

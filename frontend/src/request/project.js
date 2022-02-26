@@ -1,24 +1,25 @@
 import request from '@/HttpCommon.js'
 
 class ProjectApi {
+
+  createProject(data) {
+    return request.post('/api/project/create', data)
+  }
+
   getProjects(data) {
-    return request.get('/api/v1/projects/list', data)
+    return request.get('/api/project/list', data)
   }
 
   getProject(pid) {
-    return request.get('/api/v1/project/detail', { id: pid })
+    return request.get('/api/project/' + pid + '/')
+  }
+
+  updateProject(pid, data) {
+    return request.put('/api/project/' + pid + '/', data)
   }
 
   deleteProject(pid) {
-    return request.post('/api/v1/project/delete', { id: pid })
-  }
-
-  createProject(data) {
-    return request.post('/api/v1/project/create', data)
-  }
-
-  updateProject(data) {
-    return request.put('/api/v1/project/update', data)
+    return request.delete('/api/project/' + pid + '/')
   }
 
   getProjectTree() {
