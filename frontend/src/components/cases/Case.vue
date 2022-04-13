@@ -63,6 +63,7 @@ export default {
   data() {
     return {
       loading: true,
+      projectId: 0,
       fileData: [],
       caseData: [],
       defaultProps: {
@@ -80,7 +81,7 @@ export default {
   methods: {
     // 初始化项目列表
     async initProject() {
-      const resp = await ProjectApi.getProjectTree()
+      const resp = await ProjectApi.getProjectTree(this.projectId)
       if (resp.success === true) {
         this.fileData = resp.data
       } else {
@@ -91,7 +92,7 @@ export default {
 
     handleNodeClick(data) {
       console.log(data.label)
-      ProjectApi.getProjectClass(data.label).then(resp => {
+      ProjectApi.getProjectClass(this.projectId, data.label).then(resp => {
         if (resp.success === true) {
           this.$message.success('获取用例成功')
           console.log(resp.data)

@@ -124,11 +124,12 @@ def _get_file_list(data):
     return files
 
 
-@router.get('/files/')
-def get_project_files(request):
+@router.get('/{project_id}/files/')
+def get_project_files(request, project_id: int):
     """
     获取项目测试用例文件
     """
+    print("项目id", project_id)
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
     # 收集测试用例信息
@@ -154,11 +155,12 @@ def _get_case_list(data, file_name):
     return case_list
 
 
-@router.get('/cases/')
-def get_project_cases(request, file_name: str):
+@router.get('/{project_id}/cases/')
+def get_project_cases(request, project_id: int, file_name: str):
     """
     获取项目测试用例
     """
+    print("项目id", project_id)
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
     # 收集测试用例信息

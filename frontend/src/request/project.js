@@ -22,12 +22,12 @@ class ProjectApi {
     return request.delete('/api/project/' + pid + '/')
   }
 
-  getProjectTree() {
-    return request.get('/api/project/files/')
+  getProjectTree(pid) {
+    return request.get('/api/project/' + pid + '/files/')
   }
 
-  getProjectClass(file) {
-    return request.get('/api/project/cases/', { file_name: file })
+  getProjectClass(pid, file) {
+    return request.get('/api/project/' + pid + '/cases/', { file_name: file })
   }
 
 }
