@@ -4,14 +4,16 @@ date: 2022-02-07
 function: 项目管理
 """
 import os
+from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
 from ninja import Router
 from utils.response import response, Error
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from seldom.utils import file
 from ninja import Schema
-from app_project.models import Project
-from django.forms.models import model_to_dict
+from app_project.models import Project, Case
+
 
 # seldom自动化项目用例路径（seldom-web-testing）
 TEST_DIR = os.path.join(file.dir_dir_dir, "seldom-web-testing", "test_dir")
@@ -88,17 +90,34 @@ def delete_project(request, project_id: int):
     return response()
 
 
-@router.get("update")
-def update_project_cases(request):
+@router.get("/{project_id}/sync")
+def update_project_cases(request, project_id: int):
     """
     同步项目用例
     """
+    project_obj = get_object_or_404(Project, pk=project_id)
+    # 项目本地目录
+    test_dir = os.path.join(project_obj.address, "test_dir")
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
     # 收集测试用例信息
-    main_extend = TestMainExtend(path=TEST_DIR)
+    main_extend = TestMainExtend(path=test_dir)
     case_info = main_extend.collect_cases()
-    file_tree = _get_file_list(case_info)
+    print("case info\n", case_info)
+    # 删除旧用例
+    project_case = Case.objects.filter(project=project_obj)
+    project_case.delete()
+    # 创建用例
+    for case in case_info:
+        Case.objects.create(
+            project_id=project_id,
+            file_name=case["file"],
+            class_name=case["class"]["name"],
+            class_doc=case["class"]["doc"],
+            case_name=case["method"]["name"],
+            case_doc=case["method"]["doc"],
+        )
+    return response()
 
 
 def _get_file_list(data):

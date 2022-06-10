@@ -15,23 +15,12 @@ class Project(models.Model):
         return self.name
 
 
-class File(models.Model):
-    """
-    测试目录&文件
-    """
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    name = models.CharField("名称", max_length=100, null=False, default="")
-    create_time = models.DateTimeField("创建时间", auto_now_add=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Case(models.Model):
     """
     测试类&用例
     """
-    file = models.ForeignKey(File, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    file_name = models.CharField("文件名", max_length=200, null=False, default="")
     class_name = models.CharField("类名", max_length=100, null=False, default="")
     class_doc = models.TextField("类描述", null=True, blank=True, default="")
     case_name = models.CharField("方法名", max_length=100, null=False, default="")
@@ -40,5 +29,3 @@ class Case(models.Model):
 
     def __str__(self):
         return self.case_name
-
-

@@ -22,6 +22,10 @@ class ProjectApi {
     return request.delete('/api/project/' + pid + '/')
   }
 
+  syncProjectCase(pid) {
+    return request.get('/api/project/' + pid + '/sync')
+  }
+
   getProjectTree(pid) {
     return request.get('/api/project/' + pid + '/files/')
   }

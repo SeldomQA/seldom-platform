@@ -1,7 +1,7 @@
 <!--
 /**
-* @author huzhiheng
-* @date 2022-02-11
+* @author bugmaster
+* @date 2022-06-11
 * @desc 首页/用例管理
 */
 -->
@@ -9,7 +9,7 @@
   <div class="workbench">
     <div style="padding-bottom: 20px; height: 30px;">
       <span class="span-left">
-        <span class="page-title">工作台</span>
+        <span class="page-title">用例管理</span>
       </span>
       <span class="span-breadcrumb">
         <el-breadcrumb separator="/">
@@ -19,6 +19,23 @@
       </span>
     </div>
     <el-card class="main-card">
+      <div style="text-align: left;">
+      <el-form :inline="true">
+        <el-form-item label="项目">
+          <el-select v-model="projectId" placeholder="选择项目" size="small">
+            <el-option
+              v-for="item in projectOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="syncProject" size="small">同步</el-button>
+        </el-form-item>
+      </el-form>
+      </div>
       <h1>用例列表</h1>
       <div style="min-height: 300px;">
       <span style="width: 20%; float: left">
@@ -63,22 +80,42 @@ export default {
   data() {
     return {
       loading: true,
-      projectId: 0,
+      projectId: '',
       fileData: [],
       caseData: [],
       defaultProps: {
         children: 'children',
         label: 'label'
-      }
+      },
+      projectOptions: [],
     }
   },
 
   mounted() {
     // 初始化方法
-    this.initProject()
+    this.initProjectList()
   },
 
   methods: {
+    // 获取项目列表
+    async initProjectList() {
+      this.loading = true
+      const resp = await ProjectApi.getProjects()
+      if (resp.success === true) {
+        // this.tableData = resp.data
+        for (let i = 0; i < resp.data.length; i++) {
+          this.projectOptions.push({
+            value: resp.data[i].id,
+            label: resp.data[i].name
+          })
+        }
+
+      } else {
+        this.$message.error(resp.error.message)
+      }
+      this.loading = false
+    },
+
     // 初始化项目列表
     async initProject() {
       const resp = await ProjectApi.getProjectTree(this.projectId)
@@ -87,7 +124,6 @@ export default {
       } else {
         this.$message.error(resp.error.message)
       }
-      this.loading = false
     },
 
     handleNodeClick(data) {
@@ -102,6 +138,20 @@ export default {
           this.$message.error(resp.error.message)
         }
       })
+    },
+
+    async syncProject() {
+      console.log('submit!');
+      if (this.projectId === '') {
+        this.$message.error('请选择项目')
+        return
+      }
+      const resp = await ProjectApi.syncProjectCase(this.projectId)
+      if (resp.success === true) {
+        this.$message.success('同步成功')
+      } else {
+        this.$message.error(resp.error.message)
+      }
     }
 
   }
