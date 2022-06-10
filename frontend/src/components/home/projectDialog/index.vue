@@ -5,9 +5,9 @@
         <el-form-item label="名称" prop="name">
           <el-input cy-data="project-name" v-model="form.name"></el-input>
         </el-form-item>
-        <el-form-item label="关联项目" prop="project_name">
-          <el-input cy-data="project-desc"  v-model="form.project_name"></el-input>
-          <el-alert title="关联项目：使用seldom开发的自动化项目" type="success" :closable="false"></el-alert>
+        <el-form-item label="关联项目" prop="address">
+          <el-input cy-data="project-address"  v-model="form.address"></el-input>
+          <el-alert title="关联项目：使用seldom开发的自动化项目路径" type="success" :closable="false"></el-alert>
         </el-form-item>
         <el-form-item>
           <div class="dialog-footer">
@@ -31,14 +31,14 @@ export default {
       showTitle: '',
       form: {
         name: '',
-        project_name: ''
+        address: ''
       },
       rules: {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' }
         ],
-        project_name: [
-          { required: true, message: '请输入关联项目名称', trigger: 'blur' }
+        address: [
+          { required: true, message: '请输入项目地址', trigger: 'blur' }
         ]
       },
       inResize: true

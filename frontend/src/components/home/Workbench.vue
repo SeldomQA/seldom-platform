@@ -9,7 +9,7 @@
   <div class="workbench">
     <div style="padding-bottom: 20px; height: 30px;">
       <span class="span-left">
-        <span class="page-title">工作台</span>
+        <span class="page-title">项目管理</span>
       </span>
       <span class="span-breadcrumb">
         <el-breadcrumb separator="/">
@@ -30,7 +30,7 @@
                 <el-avatar shape="square" :size="100" fit="fill" :src="url"></el-avatar>
               </div>
               <div style="margin-top: 10px;">
-                <el-tag>{{item.project_name}}</el-tag>
+                <el-tag>{{item.address}}</el-tag>
               </div>
               <div slot="header" class="clearfix">
                 <span>{{item.id}} - {{item.name}} </span>

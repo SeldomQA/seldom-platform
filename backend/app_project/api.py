@@ -21,7 +21,7 @@ router = Router(tags=["project"])
 
 class ProjectItems(Schema):
     name: str
-    project_name: str
+    address: str
 
 
 @router.post('/create')
@@ -29,7 +29,7 @@ def create_project(request, project: ProjectItems):
     """
     创建项目
     """
-    project_obj = Project.objects.create(name=project.name, project_name=project.project_name)
+    project_obj = Project.objects.create(name=project.name, address=project.address)
     return response(data=model_to_dict(project_obj))
 
 
@@ -68,7 +68,7 @@ def update_project(request, project_id: int, project: ProjectItems):
         return response(success=False, error=Error.PROJECT_OBJECT_NULL)
     else:
         project_obj.name = project.name
-        project_obj.project_name = project.project_name
+        project_obj.address = project.address
         project_obj.save()
     return response(data=model_to_dict(project_obj))
 
