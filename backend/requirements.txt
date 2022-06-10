@@ -1,3 +1,3 @@
-django==4.0.2
-django-ninja==0.16.2
-seldom==2.5.0
+django==4.0.5
+django-ninja==0.18.0
+seldom==2.10.1
