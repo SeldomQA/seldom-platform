@@ -6,22 +6,27 @@
 
 ## ToDo
 - [x] 项目管理 ✔️
-- [ ] 项目用例管理 ⌛
-- [ ] 执行选中的项目用例
-- [ ] 展示测试报告
-- [ ] 测试报告统计分析
+- [x] 用例管理 ✔️
+- [ ] 测试任务 ⌛
+- [ ] 测试报告
+- [ ] 测试统计分析
 
 
 ## Function
 
-* 项目管理：
+* 项目管理
 
 ![](./img/seldom-project-ui.png)
 
-* 通过平台展示、执行seldom项目用例。
+* seldom项目代码。
 
 ![](./img/seldom-project.png)
 
+* 平台解析seldom项目（文件、类、方法）
+
 ![](./img/seldom-platfrom.png)
 
+* 单个用例执行报告
+
+![](./img/seldom-report.png)
 
