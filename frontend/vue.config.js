@@ -32,6 +32,14 @@ module.exports = {
         pathRewrite: {
           '^/api': ''
         }
+      },
+      '/reports': { // 配置到接口包含api使用该代理
+        target: 'http://127.0.0.1:8000/reports', // 定义后端的接口
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/reports': ''
+        }
       }
     }
   },

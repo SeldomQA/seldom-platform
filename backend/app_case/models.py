@@ -12,6 +12,7 @@ class TestCase(models.Model):
     class_doc = models.TextField("类描述", null=True, blank=True, default="")
     case_name = models.CharField("方法名", max_length=100, null=False, default="")
     case_doc = models.TextField("方法描述", null=True, blank=True, default="")
+    report = models.CharField("报告", max_length=50, null=True, default="")
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
 
     def __str__(self):

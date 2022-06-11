@@ -31,7 +31,7 @@ class ProjectApi {
   }
 
   getProjectCases(pid, file_name) {
-    return request.get('/api/project/' + pid + '/cases', { file_name: file_name })
+    return request.get('/api/project/' + pid + '/cases', { file_name })
   }
 
 }

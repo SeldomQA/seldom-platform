@@ -20,54 +20,56 @@
     </div>
     <el-card class="main-card">
       <div style="text-align: left;">
-      <el-form :inline="true">
-        <el-form-item label="项目">
-          <el-select v-model="projectId" placeholder="选择项目" size="small" @change="changeProject()">
-            <el-option
-              v-for="item in projectOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="syncProject" size="small">同步</el-button>
-        </el-form-item>
-      </el-form>
-      </div>
-      <h1>用例列表</h1>
-      <div style="min-height: 300px;">
-      <span style="width: 20%; float: left">
-        <el-card>
-        <el-tree
-          :data="fileData"
-          node-key="id"
-          ref="tree"
-          highlight-current
-          :props="defaultProps"
-          @node-click="handleNodeClick">
-        </el-tree>
-        </el-card>
-      </span>
-      <span>
-        <el-table :data="caseData" border style="width: 80%">
-          <el-table-column type="selection" width="55"> </el-table-column>
-          <el-table-column prop="id" label="ID" width="100"> </el-table-column>
-          <el-table-column prop="class_name" label="测试类"> </el-table-column>
-          <el-table-column prop="class_doc" label="测试类描述"> </el-table-column>
-          <el-table-column prop="case_name" label="测试方法"> </el-table-column>
-          <el-table-column prop="case_doc" label="测试方法描述"> </el-table-column>
-          <el-table-column label="操作" width="120">
-            <template slot-scope="scope">
-             <el-button type="success" size="mini" @click="runCase(scope.row)">执行</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </span>
-      </div>
-      <div style="float: left; margin-top: 10px;">
-        <el-button type="primary" size="small">运行测试</el-button>
+        <el-form :inline="true">
+          <el-form-item label="项目">
+            <el-select v-model="projectId" placeholder="选择项目" size="small" @change="changeProject()">
+              <el-option
+                v-for="item in projectOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="syncProject" size="small">同步</el-button>
+          </el-form-item>
+        </el-form>
+        </div>
+        <h1>用例列表</h1>
+        <div style="min-height: 300px;">
+        <span style="width: 20%; float: left">
+          <el-card>
+          <el-tree
+            :data="fileData"
+            node-key="id"
+            ref="tree"
+            highlight-current
+            :props="defaultProps"
+            @node-click="handleNodeClick">
+          </el-tree>
+          </el-card>
+        </span>
+        <span>
+          <el-table :data="caseData" border style="width: 80%">
+            <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
+            <el-table-column prop="id" label="ID" width="100"> </el-table-column>
+            <el-table-column prop="class_name" label="测试类"> </el-table-column>
+            <el-table-column prop="class_doc" label="测试类描述"> </el-table-column>
+            <el-table-column prop="case_name" label="测试方法"> </el-table-column>
+            <el-table-column prop="case_doc" label="测试方法描述"> </el-table-column>
+            <el-table-column prop="report" label="报告">
+              <template slot-scope="scope">
+                <el-button type="text" size="mini" @click="openReport(scope.row)">{{scope.row.report}}</el-button>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="120">
+              <template slot-scope="scope">
+              <el-button type="success" size="mini" @click="runCase(scope.row)">执行</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </span>
       </div>
     </el-card>
   </div>
@@ -121,7 +123,7 @@ export default {
       this.loading = false
     },
 
-    // 初始化项目列表
+    // 初始化项目文件列表
     async initProjectFile() {
       const resp = await ProjectApi.getProjectTree(this.projectId)
       if (resp.success === true) {
@@ -143,10 +145,9 @@ export default {
           this.$message.error(resp.error.message)
         }
       })
-    },  
+    },
 
     async syncProject() {
-      console.log('submit!');
       if (this.projectId === '') {
         this.$message.error('请选择项目')
         return
@@ -168,10 +169,16 @@ export default {
       const resp = await CaseApi.runningCase(row.id)
       if (resp.success === true) {
         this.fileData = resp.data
-        this.$message.error('运行成功')
+        this.$message.success('开始执行')
       } else {
         this.$message.error('运行失败')
       }
+      this.initProjectFile()
+    },
+
+    // 打开报告
+    openReport(row) {
+      window.open('/reports/' + row.report)
     }
 
   }
