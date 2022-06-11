@@ -27,11 +27,11 @@ class ProjectApi {
   }
 
   getProjectTree(pid) {
-    return request.get('/api/project/' + pid + '/files/')
+    return request.get('/api/project/' + pid + '/files')
   }
 
-  getProjectClass(pid, file) {
-    return request.get('/api/project/' + pid + '/cases/', { file_name: file })
+  getProjectCases(pid, file_name) {
+    return request.get('/api/project/' + pid + '/cases', { file_name: file_name })
   }
 
 }

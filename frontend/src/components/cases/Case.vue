@@ -60,7 +60,7 @@
           <el-table-column prop="case_doc" label="测试方法描述"> </el-table-column>
           <el-table-column label="操作" width="120">
             <template slot-scope="scope">
-             <el-button type="success" size="mini" @click="handleEdit(scope.$index, scope.row)">执行</el-button>
+             <el-button type="success" size="mini" @click="runCase(scope.row)">执行</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -75,6 +75,7 @@
 
 <script>
 import ProjectApi from '../../request/project'
+import CaseApi from '../../request/case'
 
 export default {
   name: 'Workbench',
@@ -160,6 +161,17 @@ export default {
 
     changeProject() {
       this.initProjectFile()
+    },
+
+    // 运行用例
+    async runCase(row) {
+      const resp = await CaseApi.runningCase(row.id)
+      if (resp.success === true) {
+        this.fileData = resp.data
+        this.$message.error('运行成功')
+      } else {
+        this.$message.error('运行失败')
+      }
     }
 
   }

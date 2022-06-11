@@ -11,7 +11,8 @@ from utils.response import response, Error
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from ninja import Schema
-from app_project.models import Project, Case
+from app_project.models import Project
+from app_case.models import TestCase
 
 
 router = Router(tags=["project"])
@@ -48,11 +49,8 @@ def get_project(request, project_id: int):
     """
     通过项目ID查询项目
     """
-    try:
-        project = Project.objects.get(id=project_id, is_delete=False)
-    except Project.DoesNotExist:
-        return response(success=False, error=Error.PROJECT_OBJECT_NULL)
-    return response(data=model_to_dict(project))
+    project_obj = get_object_or_404(Project, pk=project_id, is_delete=False)
+    return response(data=model_to_dict(project_obj))
 
 
 @router.put('/{project_id}/')
@@ -60,14 +58,10 @@ def update_project(request, project_id: int, project: ProjectItems):
     """
     通过项目ID更新项目
     """
-    try:
-        project_obj = Project.objects.get(id=project_id, is_delete=False)
-    except Project.DoesNotExist:
-        return response(success=False, error=Error.PROJECT_OBJECT_NULL)
-    else:
-        project_obj.name = project.name
-        project_obj.address = project.address
-        project_obj.save()
+    project_obj = get_object_or_404(Project, pk=project_id)
+    project_obj.name = project.name
+    project_obj.address = project.address
+    project_obj.save()
     return response(data=model_to_dict(project_obj))
 
 
@@ -76,13 +70,9 @@ def delete_project(request, project_id: int):
     """
     通过项目ID删除项目
     """
-    try:
-        project_obj = Project.objects.get(id=project_id)
-    except Project.DoesNotExist:
-        return response(success=False, error=Error.PROJECT_DELETE_ERROR)
-    else:
-        project_obj.is_delete = True
-        project_obj.save()
+    project_obj = get_object_or_404(Project, pk=project_id)
+    project_obj.is_delete = True
+    project_obj.save()
     return response()
 
 
@@ -101,11 +91,11 @@ def update_project_cases(request, project_id: int):
     case_info = main_extend.collect_cases()
     print("case info\n", case_info)
     # 删除旧用例
-    project_case = Case.objects.filter(project=project_obj)
+    project_case = TestCase.objects.filter(project=project_obj)
     project_case.delete()
     # 创建用例
     for case in case_info:
-        Case.objects.create(
+        TestCase.objects.create(
             project_id=project_id,
             file_name=case["file"],
             class_name=case["class"]["name"],
@@ -121,7 +111,7 @@ def get_project_files(request, project_id: int):
     """
     获取项目用例文件列表
     """
-    project_cases = Case.objects.filter(project_id=project_id)
+    project_cases = TestCase.objects.filter(project_id=project_id)
 
     files = []
     files_name = []
@@ -150,27 +140,12 @@ def get_project_files(request, project_id: int):
     return response(data=files)
 
 
-def _get_case_list(data, file_name):
-    """
-    获取文件中的用例列表
-    """
-    case_list = []
-    case_name = []
-    for d in data:
-        case_class_method = d["class"]["name"] + "." + d["method"]["name"]
-        if d["file"] == file_name and case_class_method not in case_name:
-            case_list.append(d)
-            case_name.append(case_class_method)
-
-    return case_list
-
-
 @router.get('/{project_id}/cases')
 def get_project_cases(request, project_id: int, file_name: str):
     """
     获取项目测试用例
     """
-    file_cases = Case.objects.filter(project_id=project_id, file_name=file_name)
+    file_cases = TestCase.objects.filter(project_id=project_id, file_name=file_name)
     case_list = []
     for case in file_cases:
         case_list.append(model_to_dict(case))
