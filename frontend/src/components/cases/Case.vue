@@ -22,7 +22,7 @@
       <div style="text-align: left;">
       <el-form :inline="true">
         <el-form-item label="项目">
-          <el-select v-model="projectId" placeholder="选择项目" size="small">
+          <el-select v-model="projectId" placeholder="选择项目" size="small" @change="changeProject()">
             <el-option
               v-for="item in projectOptions"
               :key="item.value"
@@ -42,8 +42,6 @@
         <el-card>
         <el-tree
           :data="fileData"
-          show-checkbox
-          default-expand-all
           node-key="id"
           ref="tree"
           highlight-current
@@ -55,10 +53,16 @@
       <span>
         <el-table :data="caseData" border style="width: 80%">
           <el-table-column type="selection" width="55"> </el-table-column>
-          <el-table-column prop="class.name" label="测试类"> </el-table-column>
-          <el-table-column prop="class.doc" label="测试类描述"> </el-table-column>
-          <el-table-column prop="method.name" label="测试方法"> </el-table-column>
-          <el-table-column prop="method.doc" label="测试方法描述"> </el-table-column>
+          <el-table-column prop="id" label="ID" width="100"> </el-table-column>
+          <el-table-column prop="class_name" label="测试类"> </el-table-column>
+          <el-table-column prop="class_doc" label="测试类描述"> </el-table-column>
+          <el-table-column prop="case_name" label="测试方法"> </el-table-column>
+          <el-table-column prop="case_doc" label="测试方法描述"> </el-table-column>
+          <el-table-column label="操作" width="120">
+            <template slot-scope="scope">
+             <el-button type="success" size="mini" @click="handleEdit(scope.$index, scope.row)">执行</el-button>
+            </template>
+          </el-table-column>
         </el-table>
       </span>
       </div>
@@ -87,7 +91,7 @@ export default {
         children: 'children',
         label: 'label'
       },
-      projectOptions: [],
+      projectOptions: []
     }
   },
 
@@ -117,7 +121,7 @@ export default {
     },
 
     // 初始化项目列表
-    async initProject() {
+    async initProjectFile() {
       const resp = await ProjectApi.getProjectTree(this.projectId)
       if (resp.success === true) {
         this.fileData = resp.data
@@ -126,9 +130,9 @@ export default {
       }
     },
 
+    // 点击项目文件
     handleNodeClick(data) {
-      console.log(data.label)
-      ProjectApi.getProjectClass(this.projectId, data.label).then(resp => {
+      ProjectApi.getProjectCases(this.projectId, data.label).then(resp => {
         if (resp.success === true) {
           this.$message.success('获取用例成功')
           console.log(resp.data)
@@ -138,7 +142,7 @@ export default {
           this.$message.error(resp.error.message)
         }
       })
-    },
+    },  
 
     async syncProject() {
       console.log('submit!');
@@ -152,6 +156,10 @@ export default {
       } else {
         this.$message.error(resp.error.message)
       }
+    },
+
+    changeProject() {
+      this.initProjectFile()
     }
 
   }

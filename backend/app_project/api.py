@@ -10,13 +10,9 @@ from ninja import Router
 from utils.response import response, Error
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
-from seldom.utils import file
 from ninja import Schema
 from app_project.models import Project, Case
 
-
-# seldom自动化项目用例路径（seldom-web-testing）
-TEST_DIR = os.path.join(file.dir_dir_dir, "seldom-web-testing", "test_dir")
 
 router = Router(tags=["project"])
 
@@ -120,43 +116,38 @@ def update_project_cases(request, project_id: int):
     return response()
 
 
-def _get_file_list(data):
-    """
-    获取用例文件列表
-    """
-    files = []
-    files_name = []
-    for index, d in enumerate(data):
-        print("index:", index)
-        print("d:", d)
-        case_file = {
-            "id": index, "label": d["file"], "children": []
-        }
-        if len(files) == 0:
-            files.append(case_file)
-            files_name.append(d["file"])
-        else:
-            if d["file"] not in files_name:
-                files.append(case_file)
-                files_name.append(d["file"])
-
-    return files
-
-
-@router.get('/{project_id}/files/')
+@router.get("/{project_id}/files")
 def get_project_files(request, project_id: int):
     """
-    获取项目测试用例文件
+    获取项目用例文件列表
     """
-    print("项目id", project_id)
-    # 开启收集测试用例
-    SeldomTestLoader.collectCaseInfo = True
-    # 收集测试用例信息
-    main_extend = TestMainExtend(path=TEST_DIR)
-    case_info = main_extend.collect_cases()
-    file_tree = _get_file_list(case_info)
-    # 通过接口返回
-    return response(data=file_tree)
+    project_cases = Case.objects.filter(project_id=project_id)
+
+    files = []
+    files_name = []
+    for case in project_cases:
+        case_file = {
+            "label": case.file_name, "children": []
+        }
+        if case.file_name not in files_name:
+            files_name.append(case.file_name)
+
+            # file_cases = Case.objects.filter(project_id=project_id, file_name=case.file_name)
+            #
+            # class_list = []
+            # class_name = []
+            # for case2 in file_cases:
+            #     if case2.file_name not in class_name:
+            #         class_name.append(case2.file_name)
+            #
+            #         class_list.append({
+            #             "label": case2.class_name,
+            #         })
+            #
+            # case_file["children"] = class_list
+            files.append(case_file)
+
+    return response(data=files)
 
 
 def _get_case_list(data, file_name):
@@ -174,17 +165,14 @@ def _get_case_list(data, file_name):
     return case_list
 
 
-@router.get('/{project_id}/cases/')
+@router.get('/{project_id}/cases')
 def get_project_cases(request, project_id: int, file_name: str):
     """
     获取项目测试用例
     """
-    print("项目id", project_id)
-    # 开启收集测试用例
-    SeldomTestLoader.collectCaseInfo = True
-    # 收集测试用例信息
-    main_extend = TestMainExtend(path=TEST_DIR)
-    case_info = main_extend.collect_cases()
-    cases = _get_case_list(case_info, file_name)
+    file_cases = Case.objects.filter(project_id=project_id, file_name=file_name)
+    case_list = []
+    for case in file_cases:
+        case_list.append(model_to_dict(case))
     # 通过接口返回
-    return response(data=cases)
+    return response(data=case_list)
