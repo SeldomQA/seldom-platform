@@ -1,7 +1,7 @@
 <!--
 /**
-* @author huzhiheng
-* @date 2021-10-20
+* @author bugmaster
+* @date 2022-05-20
 * @desc 页面导航组件
 */
 -->
@@ -17,7 +17,7 @@
             <router-link to="/">
               <el-menu-item index="1" class="menu-option">
                 <i class="el-icon-s-home"></i>
-                <template #title> 首页</template>
+                <template #title>项目管理</template>
               </el-menu-item>
             </router-link>
             <router-link to="/cases">
@@ -54,7 +54,6 @@
         </el-container>
       </el-container>
     </el-container>
-
   </div>
 </template>
 

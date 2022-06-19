@@ -47,6 +47,11 @@
             highlight-current
             :props="defaultProps"
             @node-click="handleNodeClick">
+            <span class="custom-tree-node" slot-scope="{ node, data }">
+              <span>
+                <i :class="data.icon"></i> {{ data.label }}
+              </span>
+            </span>
           </el-tree>
           </el-card>
         </span>

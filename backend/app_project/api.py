@@ -28,7 +28,8 @@ def create_project(request, project: ProjectItems):
     """
     创建项目
     """
-    project_obj = Project.objects.create(name=project.name, address=project.address)
+    project_obj = Project.objects.create(
+        name=project.name, address=project.address)
     return response(data=model_to_dict(project_obj))
 
 
@@ -111,41 +112,60 @@ def get_project_files(request, project_id: int):
     """
     获取项目用例文件列表
     """
-    project_cases = TestCase.objects.filter(project_id=project_id)
+    cases = TestCase.objects.filter(project_id=project_id)
 
     files = []
     files_name = []
-    for case in project_cases:
+    for case in cases:
+        f_name = case.file_name.replace(".", " / ")
+
         case_file = {
-            "label": case.file_name, "children": []
+            "label": f_name + ".py",
+            "icon": "el-icon-tickets",
+            "children": []
         }
         if case.file_name not in files_name:
             files_name.append(case.file_name)
 
-            # file_cases = Case.objects.filter(project_id=project_id, file_name=case.file_name)
+            # if "." in case.file_name:
+            #     file_tree = case.file_name.split(".")
+            # else:
+            #     file_tree = [case.file_name + ".py"]
             #
-            # class_list = []
-            # class_name = []
-            # for case2 in file_cases:
-            #     if case2.file_name not in class_name:
-            #         class_name.append(case2.file_name)
-            #
-            #         class_list.append({
-            #             "label": case2.class_name,
-            #         })
-            #
-            # case_file["children"] = class_list
+            # print("..>", file_tree)
+            # if len(file_tree) == 1:
+            #     print(len(file_tree), file_tree)
+            #     files.append({
+            #         "label": file_tree[0],
+            #         "icon": "el-icon-tickets",
+            #         "children": []
+            #     })
+            # if len(file_tree) == 2:
+            #     print(len(file_tree), file_tree)
+            #     files.append({
+            #         "label": file_tree[0],
+            #         "icon": "el-icon-folder",
+            #         "children": [{
+            #             "label": file_tree[1],
+            #             "icon": "el-icon-tickets"
+            #         }]
+            #     })
+
             files.append(case_file)
 
     return response(data=files)
 
 
-@router.get('/{project_id}/cases')
+@ router.get('/{project_id}/cases')
 def get_project_cases(request, project_id: int, file_name: str):
     """
     获取项目测试用例
     """
-    file_cases = TestCase.objects.filter(project_id=project_id, file_name=file_name)
+    f_name = file_name.replace(" / ", ".")
+    file_cases = TestCase.objects.filter(
+        project_id=project_id,
+        file_name=f_name[0:-3]
+    )
     case_list = []
     for case in file_cases:
         case_list.append(model_to_dict(case))
