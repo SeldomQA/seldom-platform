@@ -34,6 +34,10 @@ class ProjectApi {
     return request.get('/api/project/' + pid + '/cases', { file_name })
   }
 
+  getProjectSubdirectory(pid, file_name) {
+    return request.get('/api/project/' + pid + '/subdirectory', { file_name })
+  }
+
 }
 
 export default new ProjectApi()

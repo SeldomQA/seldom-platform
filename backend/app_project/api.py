@@ -117,57 +117,88 @@ def get_project_files(request, project_id: int):
     files = []
     files_name = []
     for case in cases:
-        f_name = case.file_name.replace(".", " / ")
+        if "." in case.file_name:
+            case_path = case.file_name.split('.')
+        else:
+            case_path = [case.file_name + ".py"]
 
-        case_file = {
-            "label": f_name + ".py",
-            "icon": "el-icon-tickets",
-            "children": []
-        }
-        if case.file_name not in files_name:
-            files_name.append(case.file_name)
+        print(case_path)
+        # f_name = case.file_name.replace(".", " / ")
 
-            # if "." in case.file_name:
-            #     file_tree = case.file_name.split(".")
-            # else:
-            #     file_tree = [case.file_name + ".py"]
-            #
-            # print("..>", file_tree)
-            # if len(file_tree) == 1:
-            #     print(len(file_tree), file_tree)
-            #     files.append({
-            #         "label": file_tree[0],
-            #         "icon": "el-icon-tickets",
-            #         "children": []
-            #     })
-            # if len(file_tree) == 2:
-            #     print(len(file_tree), file_tree)
-            #     files.append({
-            #         "label": file_tree[0],
-            #         "icon": "el-icon-folder",
-            #         "children": [{
-            #             "label": file_tree[1],
-            #             "icon": "el-icon-tickets"
-            #         }]
-            #     })
+        if case_path[0] not in files_name:
+            files_name.append(case_path[0])
+            if ".py" in case_path[0]:
+                case_level_one = {
+                    "label": case_path[0],
+                    "full_name": case_path[0],
+                    "icon": "el-icon-tickets",
+                    "children": []
+                }
+            else:
+                case_level_one = {
+                    "label": case_path[0],
+                    "full_name": case_path[0],
+                    "icon": "el-icon-folder",
+                    "children": []
+                }
 
-            files.append(case_file)
+            files.append(case_level_one)
 
     return response(data=files)
 
 
-@ router.get('/{project_id}/cases')
-def get_project_cases(request, project_id: int, file_name: str):
+@router.get('/{project_id}/cases')
+def get_project_file_cases(request, project_id: int, file_name: str):
     """
-    获取项目测试用例
+    获取文件下面的测试用例
     """
-    f_name = file_name.replace(" / ", ".")
-    file_cases = TestCase.objects.filter(
-        project_id=project_id,
-        file_name=f_name[0:-3]
-    )
-    case_list = []
-    for case in file_cases:
-        case_list.append(model_to_dict(case))
-    # 通过接口返回
-    return response(data=case_list)
+    # 如果是文件，直接取文件的类、方法
+    if ".py" in file_name:
+        file_cases = TestCase.objects.filter(
+            project_id=project_id,
+            file_name=file_name[0:-3]
+        )
+        case_list = []
+        for case in file_cases:
+            case_list.append(model_to_dict(case))
+        # 通过接口返回
+        return response(data=case_list)
+    else:
+        return response(data=[])
+
+
+@router.get('/{project_id}/subdirectory')
+def get_project_subdirectory(request, project_id: int, file_name: str):
+    """
+    获取子目录
+    """
+    all_cases = TestCase.objects.filter(project_id=project_id)
+    files_name = []
+    for case in all_cases:
+        print("all", case.file_name, case.file_name.startswith(file_name + "."))
+        if case.file_name.startswith(file_name + ".") is True:
+            print(len(file_name + "."))
+            if case.file_name[len(file_name + "."):] not in files_name:
+                files_name.append(case.file_name[len(file_name + "."):])
+
+    case_name = []
+    for f_name in files_name:
+        if "." in f_name:
+            case_path = f_name.split('.')
+            case_level_two = {
+                "label": case_path[0],
+                "full_name": file_name + "." + case_path[0],
+                "icon": "el-icon-folder",
+                "children": []
+            }
+        else:
+            case_path = [f_name + ".py"]
+            case_level_two = {
+                "label": case_path[0],
+                "full_name": file_name + "." + case_path[0],
+                "icon": "el-icon-tickets",
+                "children": []
+            }
+        case_name.append(case_level_two)
+
+    return response(data=case_name)
