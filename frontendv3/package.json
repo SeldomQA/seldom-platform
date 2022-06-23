@@ -8,7 +8,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "naive-ui": "^2.30.6",
+    "qs": "^6.10.5",
     "vue": "^3.2.25",
     "vue-router": "4"
   },

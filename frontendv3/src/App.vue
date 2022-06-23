@@ -5,7 +5,9 @@ import Default from './layouts/default.vue';
 </script>
 
 <template>
-  <Default />
+  <n-message-provider>
+    <Default />
+  </n-message-provider>
 </template>
 
 <style>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Sidebar from "./sidebar.vue";
+import Header from "./header.vue";
 </script>
 
 <template>
@@ -9,8 +10,10 @@ import Sidebar from "./sidebar.vue";
         <Sidebar></Sidebar>
       </n-layout-sider>
       <n-layout>
-        <n-layout-header bordered>颐和园路</n-layout-header>
-        <n-layout-content content-style="padding: 24px;">
+        <n-layout-header bordered>
+          <Header></Header>
+        </n-layout-header>
+        <n-layout-content content-style="padding: 24px;" style="min-height:auto">
           <router-view></router-view>
         </n-layout-content>
         <n-layout-footer bordered>成府路</n-layout-footer>
@@ -22,7 +25,7 @@ import Sidebar from "./sidebar.vue";
 <style scoped>
 .n-layout-header,
 .n-layout-footer {
-  background: rgba(128, 128, 128, 0.2);
+  /* background: rgba(128, 128, 128, 0.2); */
   padding: 24px;
 }
 
@@ -31,6 +34,6 @@ import Sidebar from "./sidebar.vue";
 }
 
 .n-layout-content {
-  background: rgba(128, 128, 128, 0.4);
+  background: #e9eef3;
 }
 </style>
