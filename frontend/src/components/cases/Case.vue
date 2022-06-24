@@ -44,6 +44,7 @@
             :data="fileData"
             node-key="id"
             ref="tree"
+            lazy
             highlight-current
             :props="defaultProps"
             @node-click="handleNodeClick">
@@ -139,17 +140,35 @@ export default {
     },
 
     // 点击项目文件
-    handleNodeClick(data) {
-      ProjectApi.getProjectCases(this.projectId, data.label).then(resp => {
-        if (resp.success === true) {
-          this.$message.success('获取用例成功')
-          console.log(resp.data)
-          this.caseData = resp.data
-          // this.initProject()
-        } else {
-          this.$message.error(resp.error.message)
-        }
-      })
+    handleNodeClick(data, node) {
+      console.log('data', data)
+      console.log('node', node)
+      if (data.label.match('.py')) {
+        ProjectApi.getProjectCases(this.projectId, data.full_name).then(resp => {
+          if (resp.success === true) {
+            this.$message.success('获取用例成功')
+            console.log(resp.data)
+            this.caseData = resp.data
+            // this.initProject()
+          } else {
+            this.$message.error(resp.error.message)
+          }
+        })
+      } else {
+        console.log('不包含', data.full_name, data.label)
+        data.children = []
+        ProjectApi.getProjectSubdirectory(this.projectId, data.full_name).then(resp => {
+          if (resp.success === true) {
+            this.$message.success('获取用例成功')
+            console.log(resp.data)
+            data.children = resp.data
+            // this.caseData = resp.data
+            // this.initProject()
+          } else {
+            this.$message.error(resp.error.message)
+          }
+        })
+      }
     },
 
     async syncProject() {
