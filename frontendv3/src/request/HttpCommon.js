@@ -30,7 +30,7 @@ function makeRequest(
     header["x-account-email"] = "yuchou.zou@klook.com";
     header["x-account-fullname"] = "yuchou.zou";
   } else {
-    header["Access-Control-Allow-Origin"] = "*";
+    // header["Access-Control-Allow-Origin"] = "*";
   }
 
   Object.keys(additionalHeader).forEach((key) => {
