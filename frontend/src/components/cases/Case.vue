@@ -140,9 +140,8 @@ export default {
     },
 
     // 点击项目文件
-    handleNodeClick(data, node) {
-      console.log('data', data)
-      console.log('node', node)
+    handleNodeClick(data) {
+      // 如果是文件返回 类&方法
       if (data.label.match('.py')) {
         ProjectApi.getProjectCases(this.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
@@ -155,8 +154,11 @@ export default {
           }
         })
       } else {
-        console.log('不包含', data.full_name, data.label)
-        data.children = []
+        // 如果目录返回下一级 目录&文件
+        if (data.children.length > 0) {
+          // 下一级不为空，直接返回
+          return
+        }
         ProjectApi.getProjectSubdirectory(this.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
             this.$message.success('获取用例成功')
