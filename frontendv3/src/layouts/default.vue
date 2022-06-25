@@ -31,7 +31,9 @@ const changeTheme = () => {
           <n-layout-content content-style="padding: 24px;" style="min-height:auto">
             <router-view></router-view>
           </n-layout-content>
-          <n-layout-footer bordered>成府路</n-layout-footer>
+          <n-layout-footer bordered>
+            © 2022 Powered by SeldomQA Team
+          </n-layout-footer>
         </n-layout>
       </n-layout>
     </n-space>
