@@ -1,25 +1,41 @@
 <script setup lang="ts">
 import Sidebar from "./sidebar.vue";
 import Header from "./header.vue";
+import { darkTheme } from 'naive-ui'
+import type { GlobalTheme } from 'naive-ui'
+import { ref } from 'vue'
+
+const theme = ref<GlobalTheme | null>(null)
+
+const changeTheme = () => {
+  if (theme.value == null) {
+    theme.value = darkTheme
+  } else {
+    theme.value = null
+  }
+}
+
 </script>
 
 <template>
-  <n-space vertical size="large">
-    <n-layout has-sider>
-      <n-layout-sider bordered content-style="padding: 24px;">
-        <Sidebar></Sidebar>
-      </n-layout-sider>
-      <n-layout>
-        <n-layout-header bordered>
-          <Header></Header>
-        </n-layout-header>
-        <n-layout-content content-style="padding: 24px;" style="min-height:auto">
-          <router-view></router-view>
-        </n-layout-content>
-        <n-layout-footer bordered>成府路</n-layout-footer>
+  <n-config-provider :theme="theme">
+    <n-space vertical size="large">
+      <n-layout has-sider>
+        <n-layout-sider bordered content-style="padding: 24px;">
+          <Sidebar></Sidebar>
+        </n-layout-sider>
+        <n-layout>
+          <n-layout-header bordered>
+            <Header @changeThemeSignal="changeTheme"></Header>
+          </n-layout-header>
+          <n-layout-content content-style="padding: 24px;" style="min-height:auto">
+            <router-view></router-view>
+          </n-layout-content>
+          <n-layout-footer bordered>成府路</n-layout-footer>
+        </n-layout>
       </n-layout>
-    </n-layout>
-  </n-space>
+    </n-space>
+  </n-config-provider>
 </template>
 
 <style scoped>
@@ -34,6 +50,6 @@ import Header from "./header.vue";
 }
 
 .n-layout-content {
-  background: #e9eef3;
+  /* background: #e9eef3; */
 }
 </style>

@@ -41,7 +41,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "index",
+            name: "Case",
             params: {
               lang: "zh-CN",
             },
@@ -49,7 +49,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "用例管理" }
       ),
-    key: "go-back-home",
+    key: "go-back-case",
     icon: renderIcon(FolderOpenOutline),
   },
   {

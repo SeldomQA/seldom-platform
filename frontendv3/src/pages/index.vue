@@ -3,7 +3,7 @@ import { reactive, onMounted } from "vue";
 import { useMessage } from "naive-ui";
 import { SettingsOutline } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
-import ProjectDialog from "~/components/projectDialog.vue";
+import ProjectDialog from "@/projectDialog.vue";
 
 const message = useMessage();
 
@@ -94,9 +94,10 @@ onMounted(() => {
         </n-breadcrumb>
       </n-space>
     </div>
-    <div class="main" style="background: white">
+    <n-card class="main">
       <div class="filter-line">
-        <n-button cy-data="create-project" @click="showCreate()">创建</n-button>
+        <n-space>
+        <n-button cy-data="create-project" @click="showCreate()">创建</n-button></n-space>
       </div>
       <div class="card-group">
         <n-space>
@@ -121,7 +122,7 @@ onMounted(() => {
           </div>
         </n-space>
       </div>
-    </div>
+    </n-card>
     <n-modal
       v-model:show="datas.showDailog"
       :pid="datas.projectId"
@@ -154,8 +155,11 @@ onMounted(() => {
 </template>
 
 <style>
+.filter-line{
+  padding-bottom: 24px;
+}
 .n-card {
-  max-width: 300px;
+
 }
 .main {
   padding: 20px;

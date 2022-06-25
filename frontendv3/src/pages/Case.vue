@@ -1,0 +1,287 @@
+<script lang="ts">
+import ProjectApi from '~/request/project'
+import CaseApi from '~/request/case'
+import { reactive, onMounted, h, defineComponent, ref } from 'vue'
+import { NButton, useMessage, TreeOption, SelectOption } from 'naive-ui'
+import type { DataTableColumns } from 'naive-ui'
+
+
+type Song = {
+  no: number
+  title: string
+  length: string
+}
+
+const createColumns = ({
+  play
+}: {
+  play: (row: Song) => void
+}): DataTableColumns<Song> => {
+  return [
+    {
+      title: 'ID',
+      key: 'id'
+    },
+    {
+      title: '测试类',
+      key: 'class_name'
+    },
+    {
+      title: '测试类描述',
+      key: 'class_doc'
+    },
+    {
+      title: '测试方法',
+      key: 'case_name'
+    },
+    {
+      title: '测试方法描述',
+      key: 'case_doc'
+    },
+    {
+      title: '报告',
+      key: 'report'
+    },
+    {
+      title: '操作',
+      key: 'actions',
+      render(row) {
+        return h(
+          NButton,
+          {
+            strong: true,
+            tertiary: true,
+            size: 'small',
+            onClick: () => play(row)
+          },
+          { default: () => '执行' }
+        )
+      }
+    }
+  ]
+}
+
+const caseData: Song[] = []
+
+
+export default defineComponent({
+  setup() {
+    const datas = reactive({
+      loading: true,
+      projectId: '',
+      fileData: [],
+      caseData: [],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
+
+    })
+
+    const treeDatas = [{
+      label: "1",
+      key: "1",
+      children: [{
+        label: "1-1",
+        key: "1-1",
+      }]
+    }, {
+      label: "2",
+      key: "2",
+      children: [{
+        label: "2-1",
+        key: "2-1"
+      }]
+    }]
+
+    const message = useMessage()
+
+    const model = ref({
+      projectOptions: []
+    })
+
+    // 获取项目列表
+    const initProjectList = async () => {
+      datas.loading = true
+      const resp = await ProjectApi.getProjects()
+      if (resp.success === true) {
+        // datas.tableData = resp.data
+        for (let i = 0; i < resp.data.length; i++) {
+          model.value.projectOptions.push({
+            value: resp.data[i].id,
+            label: resp.data[i].name
+          })
+        }
+
+      } else {
+        message.error(resp.error.message)
+      }
+      datas.loading = false
+    }
+
+    // 初始化项目文件列表
+    const initProjectFile = async () => {
+      console.log(datas.projectId);
+      const resp = await ProjectApi.getProjectTree(datas.projectId)
+      if (resp.success === true) {
+        datas.fileData = resp.data
+      } else {
+        message.error(resp.error.message)
+      }
+    }
+
+    // 点击项目文件
+    const handleNodeClick = (data, node) => {
+      console.log('data', data)
+      console.log('node', node)
+      if (data.label.match('.py')) {
+        ProjectApi.getProjectCases(datas.projectId, data.full_name).then(resp => {
+          if (resp.success === true) {
+            message.success('获取用例成功')
+            console.log(resp.data)
+            datas.caseData = resp.data
+            // datas.initProject()
+          } else {
+            message.error(resp.error.message)
+          }
+        })
+      } else {
+        console.log('不包含', data.full_name, data.label)
+        data.children = []
+        ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name).then(resp => {
+          if (resp.success === true) {
+            message.success('获取用例成功')
+            console.log(resp.data)
+            data.children = resp.data
+            // datas.caseData = resp.data
+            // datas.initProject()
+          } else {
+            message.error(resp.error.message)
+          }
+        })
+      }
+    }
+
+    const syncProject = async () => {
+      if (datas.projectId === '') {
+        message.error('请选择项目')
+        return
+      }
+      const resp = await ProjectApi.syncProjectCase(datas.projectId)
+      if (resp.success === true) {
+        message.success('同步成功')
+      } else {
+        message.error(resp.error.message)
+      }
+    }
+
+    const changeProject = (value: string, option: SelectOption) => {
+      // message.info('value: ' + JSON.stringify(value))
+      // message.info('option: ' + JSON.stringify(option))
+      datas.projectId = value
+      initProjectFile()
+    }
+
+    // 运行用例
+    const runCase = async (row) => {
+      const resp = await CaseApi.runningCase(row.id)
+      if (resp.success === true) {
+        datas.fileData = resp.data
+        message.success('开始执行')
+      } else {
+        message.error('运行失败')
+      }
+      initProjectFile()
+    }
+
+    // 打开报告
+    const openReport = (row) => {
+      window.open('/reports/' + row.report)
+    }
+
+    onMounted(() => {
+      initProjectList()
+    })
+
+    return {
+      datas, treeDatas, model,
+      caseData,
+      columns: createColumns({
+        play(row: Song) {
+          message.info(`Play ${row.title}`)
+        }
+      }),
+      pagination: false as const,
+      changeProject, syncProject, handleNodeClick,
+      nodeProps: ({ option }: { option: TreeOption }) => {
+        return {
+          onClick() {
+            message.info('[Click] ' + option.label)
+          }
+        }
+      },
+      defaultExpandedKeys: ref(['40', '41']),
+    }
+  }
+})
+
+</script>
+
+<template>
+  <div class="body">
+    <div class="pageheader">
+      <n-space justify="space-between">
+        <span>用例管理</span>
+        <n-breadcrumb separator=">">
+          <n-breadcrumb-item>首页</n-breadcrumb-item>
+          <n-breadcrumb-item>用例管理</n-breadcrumb-item>
+        </n-breadcrumb>
+      </n-space>
+    </div>
+    <n-card class="main-card">
+      <div>
+        <n-form inline :model="model" label-placement="left">
+          <n-form-item label="项目">
+            <n-select style="width:200px" :options="model.projectOptions" placeholder="选择项目"
+              @update:value="changeProject">
+            </n-select>
+          </n-form-item>
+          <n-form-item>
+            <n-button type="primary" @click="syncProject" size="small">同步</n-button>
+          </n-form-item>
+        </n-form>
+      </div>
+      <h1>用例列表</h1>
+      <div style="min-height: 300px;">
+        <n-grid x-gap="16" :cols="6">
+          <n-gi>
+            <n-tree block-line expand-on-click="true" :data="treeDatas" :default-expanded-keys="defaultExpandedKeys" :node-props="nodeProps" />
+          </n-gi>
+          <n-gi span="5">
+            <n-data-table :columns="columns" :data="caseData" :pagination="pagination" :bordered="false" />
+          </n-gi>
+          <!-- <n-table :data="caseData" border style="width: 80%">
+            <n-table-column prop="id" label="ID" width="100"> </n-table-column>
+            <n-table-column prop="class_name" label="测试类"> </n-table-column>
+            <n-table-column prop="class_doc" label="测试类描述"> </n-table-column>
+            <n-table-column prop="case_name" label="测试方法"> </n-table-column>
+            <n-table-column prop="case_doc" label="测试方法描述"> </n-table-column>
+            <n-table-column prop="report" label="报告">
+              <template slot-scope="scope">
+                <n-button type="text" size="mini" @click="openReport(scope.row)">{{ scope.row.report }}</n-button>
+              </template>
+            </n-table-column>
+            <n-table-column label="操作" width="120">
+              <template slot-scope="scope">
+                <n-button type="success" size="mini" @click="runCase(scope.row)">执行</n-button>
+              </template>
+            </n-table-column>
+          </n-table> -->
+        </n-grid>
+      </div>
+    </n-card>
+  </div>
+</template>
+
+<style>
+</style>
