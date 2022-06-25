@@ -78,22 +78,6 @@ export default defineComponent({
 
     })
 
-    const treeDatas = [{
-      label: "1",
-      key: "1",
-      children: [{
-        label: "1-1",
-        key: "1-1",
-      }]
-    }, {
-      label: "2",
-      key: "2",
-      children: [{
-        label: "2-1",
-        key: "2-1"
-      }]
-    }]
-
     const message = useMessage()
 
     const model = ref({
@@ -112,7 +96,6 @@ export default defineComponent({
             label: resp.data[i].name
           })
         }
-
       } else {
         message.error(resp.error.message)
       }
@@ -125,15 +108,15 @@ export default defineComponent({
       const resp = await ProjectApi.getProjectTree(datas.projectId)
       if (resp.success === true) {
         datas.fileData = resp.data
+        console.log(datas.fileData);
       } else {
         message.error(resp.error.message)
       }
     }
 
     // 点击项目文件
-    const handleNodeClick = (data, node) => {
-      console.log('data', data)
-      console.log('node', node)
+    const handleNodeClick = (data) => {
+      // 如果是文件返回 类&方法
       if (data.label.match('.py')) {
         ProjectApi.getProjectCases(datas.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
@@ -146,8 +129,11 @@ export default defineComponent({
           }
         })
       } else {
-        console.log('不包含', data.full_name, data.label)
-        data.children = []
+        // 如果目录返回下一级 目录&文件
+        if (data.children.length > 0) {
+          // 下一级不为空，直接返回
+          return
+        }
         ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
             message.success('获取用例成功')
@@ -204,11 +190,11 @@ export default defineComponent({
     })
 
     return {
-      datas, treeDatas, model,
+      datas, model,
       caseData,
       columns: createColumns({
         play(row: Song) {
-          message.info(`Play ${row.title}`)
+          runCase(row)
         }
       }),
       pagination: false as const,
@@ -216,7 +202,7 @@ export default defineComponent({
       nodeProps: ({ option }: { option: TreeOption }) => {
         return {
           onClick() {
-            message.info('[Click] ' + option.label)
+            handleNodeClick(option)
           }
         }
       },
@@ -255,10 +241,11 @@ export default defineComponent({
       <div style="min-height: 300px;">
         <n-grid x-gap="16" :cols="6">
           <n-gi>
-            <n-tree block-line expand-on-click="true" :data="treeDatas" :default-expanded-keys="defaultExpandedKeys" :node-props="nodeProps" />
+            <n-tree block-line expand-on-click :data="datas.fileData" :default-expanded-keys="defaultExpandedKeys" key-field='label'
+              :node-props="nodeProps" />
           </n-gi>
           <n-gi span="5">
-            <n-data-table :columns="columns" :data="caseData" :pagination="pagination" :bordered="false" />
+            <n-data-table :columns="columns" :data="datas.caseData" :pagination="pagination" :bordered="false" />
           </n-gi>
           <!-- <n-table :data="caseData" border style="width: 80%">
             <n-table-column prop="id" label="ID" width="100"> </n-table-column>
