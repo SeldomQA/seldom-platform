@@ -15,7 +15,7 @@ type Song = {
 const createColumns = ({
   play
 }: {
-  play: (row: Song) => void
+  play: (row: Song, action: String) => void
 }): DataTableColumns<Song> => {
   return [
     {
@@ -40,7 +40,19 @@ const createColumns = ({
     },
     {
       title: '报告',
-      key: 'report'
+      key: 'report',
+      render(row) {
+        return h(
+          NButton,
+          {
+            // strong: true,
+            // tertiary: true,
+            size: 'small',
+            onClick: () => play(row, "report")
+          },
+          { default: () => row.report }
+        )
+      }
     },
     {
       title: '操作',
@@ -52,7 +64,7 @@ const createColumns = ({
             strong: true,
             tertiary: true,
             size: 'small',
-            onClick: () => play(row)
+            onClick: () => play(row, "run")
           },
           { default: () => '执行' }
         )
@@ -71,6 +83,7 @@ export default defineComponent({
       projectId: '',
       fileData: [],
       caseData: [],
+      caseNumber: 0,
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -104,10 +117,10 @@ export default defineComponent({
 
     // 初始化项目文件列表
     const initProjectFile = async () => {
-      console.log(datas.projectId);
       const resp = await ProjectApi.getProjectTree(datas.projectId)
       if (resp.success === true) {
-        datas.fileData = resp.data
+        datas.fileData = resp.data.files
+        datas.caseNumber = resp.data.case_number
         console.log(datas.fileData);
       } else {
         message.error(resp.error.message)
@@ -148,6 +161,7 @@ export default defineComponent({
       }
     }
 
+    // 同步项目用例
     const syncProject = async () => {
       if (datas.projectId === '') {
         message.error('请选择项目')
@@ -155,6 +169,7 @@ export default defineComponent({
       }
       const resp = await ProjectApi.syncProjectCase(datas.projectId)
       if (resp.success === true) {
+        initProjectFile()
         message.success('同步成功')
       } else {
         message.error(resp.error.message)
@@ -162,8 +177,6 @@ export default defineComponent({
     }
 
     const changeProject = (value: string, option: SelectOption) => {
-      // message.info('value: ' + JSON.stringify(value))
-      // message.info('option: ' + JSON.stringify(option))
       datas.projectId = value
       initProjectFile()
     }
@@ -172,12 +185,12 @@ export default defineComponent({
     const runCase = async (row) => {
       const resp = await CaseApi.runningCase(row.id)
       if (resp.success === true) {
-        datas.fileData = resp.data
+        // datas.fileData = resp.data
         message.success('开始执行')
       } else {
         message.error('运行失败')
       }
-      initProjectFile()
+      // initProjectFile()
     }
 
     // 打开报告
@@ -193,8 +206,16 @@ export default defineComponent({
       datas, model,
       caseData,
       columns: createColumns({
-        play(row: Song) {
-          runCase(row)
+        play(row: Song, action: String) {
+          switch (action) {
+            case "run":
+              runCase(row)
+              break
+            case "report":
+              openReport(row)
+              break
+          }
+
         }
       }),
       pagination: false as const,
@@ -226,23 +247,28 @@ export default defineComponent({
     </div>
     <n-card class="main-card">
       <div>
-        <n-form inline :model="model" label-placement="left">
-          <n-form-item label="项目">
-            <n-select style="width:200px" :options="model.projectOptions" placeholder="选择项目"
-              @update:value="changeProject">
-            </n-select>
+        <n-space justify="space-between">
+          <n-form inline :model="model" label-placement="left">
+            <n-form-item label="项目">
+              <n-select style="width:200px" :options="model.projectOptions" placeholder="选择项目"
+                @update:value="changeProject">
+              </n-select>
+            </n-form-item>
+            <n-form-item>
+              <n-button type="primary" @click="syncProject" size="small">同步</n-button>
+            </n-form-item>
+          </n-form>
+          <n-form-item label="用例" label-placement="left">
+            <n-tag type="info" style="margin-right:12px">{{ datas.caseNumber }}</n-tag> 条
           </n-form-item>
-          <n-form-item>
-            <n-button type="primary" @click="syncProject" size="small">同步</n-button>
-          </n-form-item>
-        </n-form>
+        </n-space>
       </div>
       <h1>用例列表</h1>
       <div style="min-height: 300px;">
         <n-grid x-gap="16" :cols="6">
           <n-gi>
-            <n-tree block-line expand-on-click :data="datas.fileData" :default-expanded-keys="defaultExpandedKeys" key-field='label'
-              :node-props="nodeProps" />
+            <n-tree class="filetree" block-line expand-on-click :data="datas.fileData"
+              :default-expanded-keys="defaultExpandedKeys" key-field='label' :node-props="nodeProps" />
           </n-gi>
           <n-gi span="5">
             <n-data-table :columns="columns" :data="datas.caseData" :pagination="pagination" :bordered="false" />
@@ -271,4 +297,7 @@ export default defineComponent({
 </template>
 
 <style>
+.filetree {
+  border: solid 1px var(--n-border-color);
+}
 </style>
