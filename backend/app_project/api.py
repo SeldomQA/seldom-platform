@@ -113,7 +113,7 @@ def get_project_files(request, project_id: int):
     获取项目用例文件列表
     """
     cases = TestCase.objects.filter(project_id=project_id)
-
+    case_number = len(cases)
     files = []
     files_name = []
     for case in cases:
@@ -144,7 +144,7 @@ def get_project_files(request, project_id: int):
 
             files.append(case_level_one)
 
-    return response(data=files)
+    return response(data={"case_number": case_number, "files": files})
 
 
 @router.get('/{project_id}/cases')
