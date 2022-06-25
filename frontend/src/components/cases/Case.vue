@@ -34,30 +34,34 @@
           <el-form-item>
             <el-button type="primary" @click="syncProject" size="small">同步</el-button>
           </el-form-item>
+          <el-form-item label="用例" style="float: right;">
+           <el-tag>{{caseNumber}}</el-tag> 条
+          </el-form-item>
         </el-form>
-        </div>
-        <h1>用例列表</h1>
-        <div style="min-height: 300px;">
-        <span style="width: 20%; float: left">
-          <el-card>
-          <el-tree
-            :data="fileData"
-            node-key="id"
-            ref="tree"
-            lazy
-            highlight-current
-            :props="defaultProps"
-            @node-click="handleNodeClick">
-            <span class="custom-tree-node" slot-scope="{ node, data }">
-              <span>
-                <i :class="data.icon"></i> {{ data.label }}
+      </div>
+      <h1>用例列表</h1>
+      <div style="min-height: 600px;">
+        <div style="width: 20%; float: left;">
+          <el-card style="min-height: 500px; overflow: scroll;">
+            <el-tree
+              :data="fileData"
+              node-key="id"
+              ref="tree"
+              lazy
+              highlight-current
+              :props="defaultProps"
+              @node-click="handleNodeClick"
+              >
+              <span class="custom-tree-node" slot-scope="{ node, data }">
+                <span>
+                  <i :class="data.icon"></i> {{ data.label }}
+                </span>
               </span>
-            </span>
-          </el-tree>
+            </el-tree>
           </el-card>
-        </span>
-        <span>
-          <el-table :data="caseData" border style="width: 80%">
+        </div>
+        <div style="width: 78%; float: right">
+          <el-table :data="caseData" border >
             <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
             <el-table-column prop="id" label="ID" width="100"> </el-table-column>
             <el-table-column prop="class_name" label="测试类"> </el-table-column>
@@ -75,7 +79,7 @@
               </template>
             </el-table-column>
           </el-table>
-        </span>
+        </div>
       </div>
     </el-card>
   </div>
@@ -94,6 +98,7 @@ export default {
     return {
       loading: true,
       projectId: '',
+      caseNumber: 0,
       fileData: [],
       caseData: [],
       defaultProps: {
@@ -133,7 +138,8 @@ export default {
     async initProjectFile() {
       const resp = await ProjectApi.getProjectTree(this.projectId)
       if (resp.success === true) {
-        this.fileData = resp.data
+        this.fileData = resp.data.files
+        this.caseNumber = resp.data.case_number
       } else {
         this.$message.error(resp.error.message)
       }
@@ -173,6 +179,7 @@ export default {
       }
     },
 
+    // 同步项目用例
     async syncProject() {
       if (this.projectId === '') {
         this.$message.error('请选择项目')
@@ -180,6 +187,7 @@ export default {
       }
       const resp = await ProjectApi.syncProjectCase(this.projectId)
       if (resp.success === true) {
+        this.initProjectFile()
         this.$message.success('同步成功')
       } else {
         this.$message.error(resp.error.message)
@@ -194,12 +202,12 @@ export default {
     async runCase(row) {
       const resp = await CaseApi.runningCase(row.id)
       if (resp.success === true) {
-        this.fileData = resp.data
+        // this.fileData = resp.data
         this.$message.success('开始执行')
       } else {
         this.$message.error('运行失败')
       }
-      this.initProjectFile()
+      // this.initProjectFile()
     },
 
     // 打开报告
