@@ -4,7 +4,7 @@ import CaseApi from '~/request/case'
 import { reactive, onMounted, h, defineComponent, ref } from 'vue'
 import { NButton, useMessage, TreeOption, SelectOption } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
-
+import baseUrl from "~/config/base-url";
 
 type Song = {
   no: number
@@ -45,8 +45,9 @@ const createColumns = ({
         return h(
           NButton,
           {
-            // strong: true,
+            strong: true,
             // tertiary: true,
+            text: true,
             size: 'small',
             onClick: () => play(row, "report")
           },
@@ -195,7 +196,7 @@ export default defineComponent({
 
     // 打开报告
     const openReport = (row) => {
-      window.open('/reports/' + row.report)
+      window.open(baseUrl + '/reports/' + row.report)
     }
 
     onMounted(() => {
