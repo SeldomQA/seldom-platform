@@ -14,12 +14,12 @@ const changeTheme = () => {
     theme.value = null
   }
 }
-
 </script>
 
 <template>
-  <n-config-provider :theme="theme">
-    <n-space vertical size="large">
+  <n-config-provider :theme="theme" class="dflayout">
+    <div class="dflayout">
+
       <n-layout has-sider>
         <n-layout-sider bordered content-style="padding: 24px;">
           <Sidebar></Sidebar>
@@ -28,7 +28,7 @@ const changeTheme = () => {
           <n-layout-header bordered>
             <Header @changeThemeSignal="changeTheme"></Header>
           </n-layout-header>
-          <n-layout-content content-style="padding: 24px;" style="min-height:auto">
+          <n-layout-content content-style="padding: 24px;">
             <router-view></router-view>
           </n-layout-content>
           <n-layout-footer bordered>
@@ -36,7 +36,8 @@ const changeTheme = () => {
           </n-layout-footer>
         </n-layout>
       </n-layout>
-    </n-space>
+
+    </div>
   </n-config-provider>
 </template>
 
@@ -49,9 +50,23 @@ const changeTheme = () => {
 
 .n-layout-sider {
   /* background: rgba(128, 128, 128, 0.3); */
+  /* height: 100vh; */
 }
 
 .n-layout-content {
   /* background: #e9eef3; */
+  /* height: 100vh; */
 }
+
+.dflayout {
+  height: 100%;
+}
+
+.n-layout {
+  height: 100%;
+}
+
+/* * {
+  box-sizing: border-box
+} */
 </style>

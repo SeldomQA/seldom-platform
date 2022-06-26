@@ -241,7 +241,7 @@ export default defineComponent({
       <n-space justify="space-between">
         <span>用例管理</span>
         <n-breadcrumb separator=">">
-          <n-breadcrumb-item>首页</n-breadcrumb-item>
+          <n-breadcrumb-item href="/" >首页</n-breadcrumb-item>
           <n-breadcrumb-item>用例管理</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
@@ -265,7 +265,7 @@ export default defineComponent({
         </n-space>
       </div>
       <h1>用例列表</h1>
-      <div style="min-height: 300px;">
+      <div>
         <n-grid x-gap="16" :cols="6">
           <n-gi>
             <n-tree class="filetree" block-line expand-on-click :data="datas.fileData"
@@ -274,23 +274,6 @@ export default defineComponent({
           <n-gi span="5">
             <n-data-table :columns="columns" :data="datas.caseData" :pagination="pagination" :bordered="false" />
           </n-gi>
-          <!-- <n-table :data="caseData" border style="width: 80%">
-            <n-table-column prop="id" label="ID" width="100"> </n-table-column>
-            <n-table-column prop="class_name" label="测试类"> </n-table-column>
-            <n-table-column prop="class_doc" label="测试类描述"> </n-table-column>
-            <n-table-column prop="case_name" label="测试方法"> </n-table-column>
-            <n-table-column prop="case_doc" label="测试方法描述"> </n-table-column>
-            <n-table-column prop="report" label="报告">
-              <template slot-scope="scope">
-                <n-button type="text" size="mini" @click="openReport(scope.row)">{{ scope.row.report }}</n-button>
-              </template>
-            </n-table-column>
-            <n-table-column label="操作" width="120">
-              <template slot-scope="scope">
-                <n-button type="success" size="mini" @click="runCase(scope.row)">执行</n-button>
-              </template>
-            </n-table-column>
-          </n-table> -->
         </n-grid>
       </div>
     </n-card>

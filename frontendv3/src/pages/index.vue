@@ -89,7 +89,7 @@ onMounted(() => {
       <n-space justify="space-between">
         <span>项目管理</span>
         <n-breadcrumb separator=">">
-          <n-breadcrumb-item>首页</n-breadcrumb-item>
+          <n-breadcrumb-item href="/">首页</n-breadcrumb-item>
           <n-breadcrumb-item>项目管理</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
@@ -97,7 +97,7 @@ onMounted(() => {
     <n-card class="main">
       <div class="filter-line">
         <n-space>
-        <n-button cy-data="create-project" @click="showCreate()">创建</n-button></n-space>
+        <n-button cy-data="create-project" type="primary" @click="showCreate()">创建</n-button></n-space>
       </div>
       <div class="card-group">
         <n-space>

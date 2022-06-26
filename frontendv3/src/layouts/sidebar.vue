@@ -58,7 +58,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "index",
+            name: "Report",
             params: {
               lang: "zh-CN",
             },
@@ -66,7 +66,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => "报告管理" }
       ),
-    key: "go-back-home",
+    key: "go-back-report",
     icon: renderIcon(DocumentTextOutline),
   },
 ];
