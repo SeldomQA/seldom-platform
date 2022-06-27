@@ -284,4 +284,7 @@ export default defineComponent({
 .filetree {
   border: solid 1px var(--n-border-color);
 }
+.n-tree-node-content {
+  text-align: left;
+}
 </style>
