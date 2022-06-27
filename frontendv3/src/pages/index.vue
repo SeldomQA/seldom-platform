@@ -20,7 +20,6 @@ const initProjects = async () => {
   const resp = await ProjectApi.getProjects();
   if (resp.success === true) {
     datas.tableData = resp.data;
-    console.log("tadfasd", datas.tableData);
   } else {
     message.error(resp.error.message);
   }

@@ -3,9 +3,10 @@ import Sidebar from "./sidebar.vue";
 import Header from "./header.vue";
 import { darkTheme } from "naive-ui";
 import type { GlobalTheme } from "naive-ui";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const theme = ref<GlobalTheme | null>(null);
+const localStorage = window.localStorage;
 
 const changeTheme = () => {
   if (theme.value == null) {
@@ -14,10 +15,24 @@ const changeTheme = () => {
     theme.value = null;
   }
 };
+
+onMounted(() => {
+  const mode = localStorage.getItem("themeMode");
+  const mainhtml = document.getElementsByTagName("html");
+
+  if (mode == "light" || mode == null) {
+    theme.value = darkTheme;
+    mainhtml[0].classList.remove("dark");
+  } else {
+    theme.value = null;
+    mainhtml[0].classList.add("dark");
+  }
+  changeTheme();
+});
 </script>
 
 <template>
-  <n-config-provider :theme="theme" >
+  <n-config-provider :theme="theme">
     <n-layout class="dflayout" has-sider position="absolute">
       <n-layout-sider bordered content-style="padding: 24px;">
         <Sidebar></Sidebar>

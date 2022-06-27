@@ -1,4 +1,5 @@
 <template>
+  <h1 class="tagline">Seldom<span class="accent"> Platform</span></h1>
   <n-menu :options="menuOptions" @update:value="handleUpdateValue" />
 </template>
 
@@ -83,3 +84,23 @@ export default defineComponent({
   },
 });
 </script>
+
+<style>
+.tagline {
+  font-size: 26px;
+  line-height: 1.25;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  max-width: 960px;
+  margin: 0px auto;
+}
+
+html:not(.dark) .accent,
+.dark .tagline {
+  background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);
+  /* background: -webkit-linear-gradient(315deg, #fa8072 25%, #8470ff); */
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+</style>
