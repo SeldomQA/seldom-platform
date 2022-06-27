@@ -35,6 +35,6 @@ export default defineComponent({
 
 <style>
 .header {
-    display: right;
+    display: left;
 }
 </style>

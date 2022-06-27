@@ -5,11 +5,9 @@ import Default from './layouts/default.vue';
 </script>
 
 <template>
-
     <n-message-provider>
       <Default />
     </n-message-provider>
-
 </template>
 
 <style>
@@ -20,17 +18,5 @@ body{margin:0}
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  height: 100%;
 }
-
-body {
-  margin: 0px 0px 0px;
-}
-
-html,
-body {
-  height: 100%;
-}
-
-
 </style>

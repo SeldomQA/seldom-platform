@@ -1,43 +1,41 @@
 <script setup lang="ts">
 import Sidebar from "./sidebar.vue";
 import Header from "./header.vue";
-import { darkTheme } from 'naive-ui'
-import type { GlobalTheme } from 'naive-ui'
-import { ref } from 'vue'
+import { darkTheme } from "naive-ui";
+import type { GlobalTheme } from "naive-ui";
+import { ref } from "vue";
 
-const theme = ref<GlobalTheme | null>(null)
+const theme = ref<GlobalTheme | null>(null);
 
 const changeTheme = () => {
   if (theme.value == null) {
-    theme.value = darkTheme
+    theme.value = darkTheme;
   } else {
-    theme.value = null
+    theme.value = null;
   }
-}
+};
 </script>
 
 <template>
-  <n-config-provider :theme="theme" class="dflayout">
-    <div class="dflayout">
-
-      <n-layout has-sider>
-        <n-layout-sider bordered content-style="padding: 24px;">
-          <Sidebar></Sidebar>
-        </n-layout-sider>
-        <n-layout>
-          <n-layout-header bordered>
-            <Header @changeThemeSignal="changeTheme"></Header>
-          </n-layout-header>
-          <n-layout-content content-style="padding: 24px;">
+  <n-config-provider :theme="theme" >
+    <n-layout class="dflayout" has-sider position="absolute">
+      <n-layout-sider bordered content-style="padding: 24px;">
+        <Sidebar></Sidebar>
+      </n-layout-sider>
+      <n-layout>
+        <n-layout-header bordered>
+          <Header @changeThemeSignal="changeTheme"></Header>
+        </n-layout-header>
+        <n-layout position="absolute" style="top: 76px; bottom: 64px">
+          <n-layout content-style="padding: 24px;">
             <router-view></router-view>
-          </n-layout-content>
-          <n-layout-footer bordered>
-            © 2022 Powered by SeldomQA Team
-          </n-layout-footer>
+          </n-layout>
         </n-layout>
+        <n-layout-footer bordered position="absolute">
+          © 2022 Powered by SeldomQA Team
+        </n-layout-footer>
       </n-layout>
-
-    </div>
+    </n-layout>
   </n-config-provider>
 </template>
 
@@ -45,28 +43,18 @@ const changeTheme = () => {
 .n-layout-header,
 .n-layout-footer {
   /* background: rgba(128, 128, 128, 0.2); */
-  padding: 24px;
+  padding: 20px;
 }
 
 .n-layout-sider {
   /* background: rgba(128, 128, 128, 0.3); */
-  /* height: 100vh; */
 }
 
 .n-layout-content {
   /* background: #e9eef3; */
-  /* height: 100vh; */
 }
 
 .dflayout {
-  height: 100%;
+  /* height: 100%; */
 }
-
-.n-layout {
-  height: 100%;
-}
-
-/* * {
-  box-sizing: border-box
-} */
 </style>
