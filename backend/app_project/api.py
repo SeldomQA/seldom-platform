@@ -182,9 +182,14 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
                 files_name.append(case.file_name[len(file_name + "."):])
 
     case_name = []
+    dir_name = []
     for f_name in files_name:
         if "." in f_name:
             case_path = f_name.split('.')
+            if case_path[0] not in dir_name:
+                dir_name.append(case_path[0])
+            else:
+                continue
             case_level_two = {
                 "label": case_path[0],
                 "full_name": file_name + "." + case_path[0],
