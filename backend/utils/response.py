@@ -18,6 +18,9 @@ class Error:
     PROJECT_OBJECT_NULL = {"10021": "通过id查询项目不存在"}
     PROJECT_DELETE_ERROR = {"10023": "项目删除失败"}
 
+    FILE_TYPE_ERROR = {"10031": "文件类型错误"}
+    FILE_SIZE_ERROR = {"10032": "超出文件大小"}
+
 
 def response(success: bool = True, error: dict = None, data: any = None):
     """

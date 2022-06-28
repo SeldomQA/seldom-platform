@@ -4,16 +4,22 @@ date: 2022-02-07
 function: 项目管理
 """
 import os
+import hashlib
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 from ninja import Router
+from ninja import File
+from ninja.files import UploadedFile
 from utils.response import response, Error
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from ninja import Schema
 from app_project.models import Project
 from app_case.models import TestCase
+from backend.settings import BASE_DIR
 
+# upload image
+IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
 
 router = Router(tags=["project"])
 
@@ -75,6 +81,33 @@ def delete_project(request, project_id: int):
     project_obj.is_delete = True
     project_obj.save()
     return response()
+
+
+@router.post("/upload", auth=None)
+def upload_project_image(request, file: UploadedFile = File(...)):
+    """
+    项目图片上传
+    """
+    # 判断文件后缀名
+    suffix = file.name.split(".")[-1]
+    if suffix not in ["png", "jpg", "jpeg", "gif"]:
+        return response(error=Error.FILE_TYPE_ERROR)
+
+    # 判断文件大小 1024 * 1024 * 2 = 2MB
+    if file.size > 2097152:
+        return response(error=Error.FILE_SIZE_ERROR)
+
+    # 文件名生成md5
+    file_md5 = hashlib.md5(bytes(file.name, encoding="utf8")).hexdigest()
+    file_name = file_md5 + "." + suffix
+
+    # 保存到本地
+    upload_file = os.path.join(IMAGE_DIR, file_name)
+    with open(upload_file, 'wb+') as f:
+        for chunk in file.chunks():
+            f.write(chunk)
+
+    return response(data={"name": file_name})
 
 
 @router.get("/{project_id}/sync")
