@@ -65,8 +65,7 @@
           </el-card>
         </div>
         <div style="width: 78%; float: right">
-          <el-table :data="caseData" border >
-            <!-- <el-table-column type="selection" width="55"> </el-table-column> -->
+          <el-table :data="caseData" border style="width: 100%"  height="500">
             <el-table-column prop="id" label="ID" width="100"> </el-table-column>
             <el-table-column prop="class_name" label="测试类"> </el-table-column>
             <el-table-column prop="class_doc" label="测试类描述"> </el-table-column>
