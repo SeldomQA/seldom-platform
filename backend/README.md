@@ -18,3 +18,9 @@
 > python .\manage.py runserver
 ```
 
+## 查看接口
+
+* 浏览器访问：http://localhost:8000/api/docs
+
+![](./api.png)
+
