@@ -131,7 +131,6 @@ def get_project_files(request, project_id: int):
                 case_level_one = {
                     "label": case_path[0],
                     "full_name": case_path[0],
-                    "icon": "el-icon-tickets",
                     "is_leaf": 1,
                     "children": []
                 }
@@ -139,7 +138,6 @@ def get_project_files(request, project_id: int):
                 case_level_one = {
                     "label": case_path[0],
                     "full_name": case_path[0],
-                    "icon": "el-icon-folder",
                     "is_leaf": 0,
                     "children": []
                 }
@@ -195,7 +193,6 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
             case_level_two = {
                 "label": case_path[0],
                 "full_name": file_name + "." + case_path[0],
-                "icon": "el-icon-folder",
                 "is_leaf": 0,
                 "children": []
             }
@@ -204,7 +201,6 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
             case_level_two = {
                 "label": case_path[0],
                 "full_name": file_name + "." + case_path[0],
-                "icon": "el-icon-tickets",
                 "is_leaf": 1,
                 "children": []
             }

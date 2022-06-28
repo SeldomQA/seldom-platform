@@ -53,9 +53,13 @@
               @node-click="handleNodeClick"
               >
               <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span>
-                  <i :class="data.icon"></i> {{ data.label }}
+                <span v-if="data.is_leaf === 1">
+                  <i class="el-icon-tickets"></i>
                 </span>
+                <span v-else>
+                  <i class="el-icon-folder"></i>
+                </span>
+                  {{ data.label }}
               </span>
             </el-tree>
           </el-card>
