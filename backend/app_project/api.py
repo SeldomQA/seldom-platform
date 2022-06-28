@@ -89,21 +89,38 @@ def update_project_cases(request, project_id: int):
     SeldomTestLoader.collectCaseInfo = True
     # 收集测试用例信息
     main_extend = TestMainExtend(path=test_dir)
-    case_info = main_extend.collect_cases()
-    print("case info\n", case_info)
-    # 删除旧用例
-    project_case = TestCase.objects.filter(project=project_obj)
-    project_case.delete()
-    # 创建用例
-    for case in case_info:
-        TestCase.objects.create(
-            project_id=project_id,
-            file_name=case["file"],
-            class_name=case["class"]["name"],
-            class_doc=case["class"]["doc"],
-            case_name=case["method"]["name"],
-            case_doc=case["method"]["doc"],
-        )
+    seldom_case = main_extend.collect_cases()
+    platform_case = TestCase.objects.filter(project=project_obj)
+    # project_case.delete()
+
+    # 从seldom项目中找到新增的用例
+    for seldom in seldom_case:
+        for platform in platform_case:
+            if (seldom["file"] == platform.file_name
+                and seldom["class"]["name"] == platform.class_name
+                    and seldom["method"]["name"] == platform.case_name):
+                break
+        else:
+            TestCase.objects.create(
+                project_id=project_id,
+                file_name=seldom["file"],
+                class_name=seldom["class"]["name"],
+                class_doc=seldom["class"]["doc"],
+                case_name=seldom["method"]["name"],
+                case_doc=seldom["method"]["doc"],
+            )
+
+    # 从platform找出已删除的用例
+    for platform in platform_case:
+        for seldom in seldom_case:
+            if (platform.file_name == seldom["file"]
+                and platform.class_name == seldom["class"]["name"]
+                    and platform.case_name == seldom["method"]["name"]):
+                break
+        else:
+            test_case = TestCase.objects.filter(project=project_obj, id=platform.id)
+            test_case.delete()
+
     return response()
 
 
