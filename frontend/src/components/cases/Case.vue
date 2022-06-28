@@ -71,6 +71,23 @@
             <el-table-column prop="class_doc" label="测试类描述"> </el-table-column>
             <el-table-column prop="case_name" label="测试方法"> </el-table-column>
             <el-table-column prop="case_doc" label="测试方法描述"> </el-table-column>
+            <el-table-column prop="status" label="状态">
+               <template slot-scope="scope">
+                <span v-if="scope.row.status === 0">
+                  <el-tag type="info"> 未执行 </el-tag>
+                </span>
+                <span v-else-if="scope.row.status === 1">
+                  <el-tag type="success"> 执行中 </el-tag>
+                </span>
+                <span v-else-if="scope.row.status === 2">
+                  <el-tag> 已执行 </el-tag>
+                </span>
+                <span v-else>
+                  <el-tag type="danger"> 未知 </el-tag>
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="result" label="结果"> </el-table-column>
             <el-table-column prop="report" label="报告">
               <template slot-scope="scope">
                 <el-button type="text" size="mini" @click="openReport(scope.row)">{{scope.row.report}}</el-button>
