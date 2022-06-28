@@ -1,46 +1,47 @@
 <script lang="ts">
-import ProjectApi from '~/request/project'
-import CaseApi from '~/request/case'
-import { reactive, onMounted, h, defineComponent, ref } from 'vue'
-import { NButton, useMessage, TreeOption, SelectOption } from 'naive-ui'
-import type { DataTableColumns } from 'naive-ui'
+import ProjectApi from "~/request/project";
+import CaseApi from "~/request/case";
+import { reactive, onMounted, h, defineComponent, ref } from "vue";
+import { NButton, NIcon, useMessage, TreeOption, SelectOption } from "naive-ui";
+import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
+import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
 
 type Song = {
-  no: number
-  title: string
-  length: string
-}
+  no: number;
+  title: string;
+  length: string;
+};
 
 const createColumns = ({
-  play
+  play,
 }: {
-  play: (row: Song, action: String) => void
+  play: (row: Song, action: String) => void;
 }): DataTableColumns<Song> => {
   return [
     {
-      title: 'ID',
-      key: 'id'
+      title: "ID",
+      key: "id",
     },
     {
-      title: '测试类',
-      key: 'class_name'
+      title: "测试类",
+      key: "class_name",
     },
     {
-      title: '测试类描述',
-      key: 'class_doc'
+      title: "测试类描述",
+      key: "class_doc",
     },
     {
-      title: '测试方法',
-      key: 'case_name'
+      title: "测试方法",
+      key: "case_name",
     },
     {
-      title: '测试方法描述',
-      key: 'case_doc'
+      title: "测试方法描述",
+      key: "case_doc",
     },
     {
-      title: '报告',
-      key: 'report',
+      title: "报告",
+      key: "report",
       render(row) {
         return h(
           NButton,
@@ -48,191 +49,216 @@ const createColumns = ({
             strong: true,
             // tertiary: true,
             text: true,
-            size: 'small',
-            onClick: () => play(row, "report")
+            size: "small",
+            onClick: () => play(row, "report"),
           },
           { default: () => row.report }
-        )
-      }
+        );
+      },
     },
     {
-      title: '操作',
-      key: 'actions',
+      title: "操作",
+      key: "actions",
       render(row) {
         return h(
           NButton,
           {
             strong: true,
             tertiary: true,
-            size: 'small',
-            onClick: () => play(row, "run")
+            size: "small",
+            onClick: () => play(row, "run"),
           },
-          { default: () => '执行' }
-        )
-      }
-    }
-  ]
-}
+          { default: () => "执行" }
+        );
+      },
+    },
+  ];
+};
 
-const caseData: Song[] = []
-
+const caseData: Song[] = [];
 
 export default defineComponent({
   setup() {
     const datas = reactive({
       loading: true,
-      projectId: '',
+      projectId: "",
       fileData: [],
       caseData: [],
       caseNumber: 0,
       defaultProps: {
-        children: 'children',
-        label: 'label'
+        children: "children",
+        label: "label",
       },
+    });
 
-    })
-
-    const message = useMessage()
+    const message = useMessage();
 
     const model = ref({
-      projectOptions: []
-    })
+      projectOptions: [],
+    });
+
+    // 格式化tree数据
+    const treeDataFormat = (datas) => {
+      return datas.map((_, index) => {
+        const label = _.label;
+        const full_name = _.full_name;
+        const children = _.children;
+        const isLeaf = _.is_leaf ? true : false;
+        const prefix = () =>
+          h(NIcon, null, {
+            default: () => h(isLeaf ? LogoPython : FolderOpenOutline),
+          });
+
+        return {
+          label,
+          full_name,
+          children,
+          isLeaf,
+          prefix,
+        };
+      });
+    };
 
     // 获取项目列表
     const initProjectList = async () => {
-      datas.loading = true
-      const resp = await ProjectApi.getProjects()
+      datas.loading = true;
+      const resp = await ProjectApi.getProjects();
       if (resp.success === true) {
         // datas.tableData = resp.data
         for (let i = 0; i < resp.data.length; i++) {
           model.value.projectOptions.push({
             value: resp.data[i].id,
-            label: resp.data[i].name
-          })
+            label: resp.data[i].name,
+          });
         }
       } else {
-        message.error(resp.error.message)
+        message.error(resp.error.message);
       }
-      datas.loading = false
-    }
+      datas.loading = false;
+    };
 
     // 初始化项目文件列表
     const initProjectFile = async () => {
-      const resp = await ProjectApi.getProjectTree(datas.projectId)
+      const resp = await ProjectApi.getProjectTree(datas.projectId);
       if (resp.success === true) {
-        datas.fileData = resp.data.files
-        datas.caseNumber = resp.data.case_number
+        datas.fileData = treeDataFormat(resp.data.files);
+        datas.caseNumber = resp.data.case_number;
         console.log(datas.fileData);
       } else {
-        message.error(resp.error.message)
+        message.error(resp.error.message);
       }
-    }
+    };
 
     // 点击项目文件
     const handleNodeClick = (data) => {
       // 如果是文件返回 类&方法
-      if (data.label.match('.py')) {
-        ProjectApi.getProjectCases(datas.projectId, data.full_name).then(resp => {
-          if (resp.success === true) {
-            message.success('获取用例成功')
-            console.log(resp.data)
-            datas.caseData = resp.data
-            // datas.initProject()
-          } else {
-            message.error(resp.error.message)
+      if (data.label.match(".py")) {
+        ProjectApi.getProjectCases(datas.projectId, data.full_name).then(
+          (resp) => {
+            if (resp.success === true) {
+              message.success("获取用例成功");
+              console.log(resp.data);
+              datas.caseData = resp.data;
+            } else {
+              message.error(resp.error.message);
+            }
           }
-        })
+        );
       } else {
         // 如果目录返回下一级 目录&文件
         if (data.children.length > 0) {
           // 下一级不为空，直接返回
-          return
+          return;
         }
-        ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name).then(resp => {
-          if (resp.success === true) {
-            message.success('获取用例成功')
-            console.log(resp.data)
-            data.children = resp.data
-            // datas.caseData = resp.data
-            // datas.initProject()
-          } else {
-            message.error(resp.error.message)
+        ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name).then(
+          (resp) => {
+            if (resp.success === true) {
+              message.success("获取用例成功");
+              // console.log(resp.data);
+              data.children = treeDataFormat(resp.data);
+              // datas.caseData = resp.data
+              // datas.initProject()
+            } else {
+              message.error(resp.error.message);
+            }
           }
-        })
+        );
       }
-    }
+    };
 
     // 同步项目用例
     const syncProject = async () => {
-      if (datas.projectId === '') {
-        message.error('请选择项目')
-        return
+      if (datas.projectId === "") {
+        message.error("请选择项目");
+        return;
       }
-      const resp = await ProjectApi.syncProjectCase(datas.projectId)
+      const resp = await ProjectApi.syncProjectCase(datas.projectId);
       if (resp.success === true) {
-        initProjectFile()
-        message.success('同步成功')
+        initProjectFile();
+        message.success("同步成功");
       } else {
-        message.error(resp.error.message)
+        message.error(resp.error.message);
       }
-    }
+    };
 
     const changeProject = (value: string, option: SelectOption) => {
-      datas.projectId = value
-      initProjectFile()
-    }
+      datas.projectId = value;
+      initProjectFile();
+    };
 
     // 运行用例
     const runCase = async (row) => {
-      const resp = await CaseApi.runningCase(row.id)
+      const resp = await CaseApi.runningCase(row.id);
       if (resp.success === true) {
         // datas.fileData = resp.data
-        message.success('开始执行')
+        message.success("开始执行");
       } else {
-        message.error('运行失败')
+        message.error("运行失败");
       }
       // initProjectFile()
-    }
+    };
 
     // 打开报告
     const openReport = (row) => {
-      window.open(baseUrl + '/reports/' + row.report)
-    }
+      window.open(baseUrl + "/reports/" + row.report);
+    };
 
     onMounted(() => {
-      initProjectList()
-    })
+      initProjectList();
+    });
 
     return {
-      datas, model,
+      datas,
+      model,
       caseData,
+      treeDataFormat,
       columns: createColumns({
         play(row: Song, action: String) {
           switch (action) {
             case "run":
-              runCase(row)
-              break
+              runCase(row);
+              break;
             case "report":
-              openReport(row)
-              break
+              openReport(row);
+              break;
           }
-
-        }
+        },
       }),
       pagination: false as const,
-      changeProject, syncProject, handleNodeClick,
+      changeProject,
+      syncProject,
+      handleNodeClick,
       nodeProps: ({ option }: { option: TreeOption }) => {
         return {
           onClick() {
-            handleNodeClick(option)
-          }
-        }
+            handleNodeClick(option);
+          },
+        };
       },
-      defaultExpandedKeys: ref(['40', '41']),
-    }
-  }
-})
-
+      defaultExpandedKeys: ref(["40", "41"]),
+    };
+  },
+});
 </script>
 
 <template>
@@ -241,7 +267,7 @@ export default defineComponent({
       <n-space justify="space-between">
         <span>用例管理</span>
         <n-breadcrumb separator=">">
-          <n-breadcrumb-item href="/" >首页</n-breadcrumb-item>
+          <n-breadcrumb-item href="/">首页</n-breadcrumb-item>
           <n-breadcrumb-item>用例管理</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
@@ -251,16 +277,25 @@ export default defineComponent({
         <n-space justify="space-between">
           <n-form inline :model="model" label-placement="left">
             <n-form-item label="项目">
-              <n-select style="width:200px" :options="model.projectOptions" placeholder="选择项目"
-                @update:value="changeProject">
+              <n-select
+                style="width: 200px"
+                :options="model.projectOptions"
+                placeholder="选择项目"
+                @update:value="changeProject"
+              >
               </n-select>
             </n-form-item>
             <n-form-item>
-              <n-button type="primary" @click="syncProject" size="small">同步</n-button>
+              <n-button type="primary" @click="syncProject" size="small"
+                >同步</n-button
+              >
             </n-form-item>
           </n-form>
           <n-form-item label="用例" label-placement="left">
-            <n-tag type="info" style="margin-right:12px">{{ datas.caseNumber }}</n-tag> 条
+            <n-tag type="info" style="margin-right: 12px">{{
+              datas.caseNumber
+            }}</n-tag>
+            条
           </n-form-item>
         </n-space>
       </div>
@@ -268,11 +303,23 @@ export default defineComponent({
       <div>
         <n-grid x-gap="16" :cols="6">
           <n-gi>
-            <n-tree class="filetree" block-line expand-on-click :data="datas.fileData"
-              :default-expanded-keys="defaultExpandedKeys" key-field='label' :node-props="nodeProps" />
+            <n-tree
+              class="filetree"
+              block-line
+              expand-on-click
+              :data="datas.fileData"
+              :default-expanded-keys="defaultExpandedKeys"
+              key-field="label"
+              :node-props="nodeProps"
+            />
           </n-gi>
           <n-gi span="5">
-            <n-data-table :columns="columns" :data="datas.caseData" :pagination="pagination" :bordered="false" />
+            <n-data-table
+              :columns="columns"
+              :data="datas.caseData"
+              :pagination="pagination"
+              :bordered="false"
+            />
           </n-gi>
         </n-grid>
       </div>
