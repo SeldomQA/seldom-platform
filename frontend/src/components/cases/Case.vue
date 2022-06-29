@@ -6,7 +6,7 @@
 */
 -->
 <template>
-  <div class="workbench">
+  <div class="case">
     <div style="padding-bottom: 20px; height: 30px;">
       <span class="span-left">
         <span class="page-title">用例管理</span>
@@ -65,7 +65,7 @@
           </el-card>
         </div>
         <div style="width: 78%; float: right">
-          <el-table :data="caseData" border style="width: 100%"  height="500">
+          <el-table :data="caseData" border  @row-click="caseRowClick" style="width: 100%"  height="500">
             <el-table-column prop="id" label="ID" width="100"> </el-table-column>
             <el-table-column prop="class_name" label="测试类"> </el-table-column>
             <el-table-column prop="class_doc" label="测试类描述"> </el-table-column>
@@ -95,12 +95,38 @@
             </el-table-column>
             <el-table-column label="操作" width="120">
               <template slot-scope="scope">
-              <el-button type="success" size="mini" @click="runCase(scope.row)">执行</el-button>
+              <el-button type="success" size="mini" @click="runCase(scope.row)" @click.stop="drawer = false">执行</el-button>
               </template>
             </el-table-column>
           </el-table>
         </div>
       </div>
+      <el-drawer
+        title="报告"
+        :visible.sync="drawer"
+        direction="rtl"
+        size="40%">
+        <span>
+          <el-tabs v-model="activeName" style="margin-left: 5px; margin-right: 5px;">
+            <el-tab-pane label="System Out" name="first">
+              <el-input
+                type="textarea"
+                :rows="25"
+                placeholder="system out is null"
+                v-model="systemOut">
+              </el-input>
+            </el-tab-pane>
+            <el-tab-pane label="Error" name="second">
+              <el-input
+                type="textarea"
+                :rows="25"
+                placeholder="error info null"
+                v-model="error">
+              </el-input>
+            </el-tab-pane>
+          </el-tabs>
+        </span>
+      </el-drawer>
     </el-card>
   </div>
 </template>
@@ -110,7 +136,7 @@ import ProjectApi from '../../request/project'
 import CaseApi from '../../request/case'
 
 export default {
-  name: 'Workbench',
+  name: 'case',
   components: {
     // 组件
   },
@@ -125,7 +151,11 @@ export default {
         children: 'children',
         label: 'label'
       },
-      projectOptions: []
+      projectOptions: [],
+      drawer: false,
+      activeName: 'first',
+      systemOut: '',
+      error: ''
     }
   },
 
@@ -147,7 +177,8 @@ export default {
             label: resp.data[i].name
           })
         }
-
+        this.projectId = this.projectOptions[0].value
+        this.initProjectFile()
       } else {
         this.$message.error(resp.error.message)
       }
@@ -233,7 +264,14 @@ export default {
     // 打开报告
     openReport(row) {
       window.open('/reports/' + row.report)
-    }
+    },
+
+    caseRowClick(row) {
+      this.currentCase = row.id
+      this.systemOut = row.system_out
+      this.error = row.error
+      this.drawer = true
+    },
 
   }
 }
