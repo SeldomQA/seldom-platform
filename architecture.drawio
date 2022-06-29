@@ -1,0 +1,100 @@
+<mxfile host="65bd71144e">
+    <diagram id="p7oQZnZ2B6rs75sT1LRB" name="Page-1">
+        <mxGraphModel dx="1236" dy="863" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="24" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="69" y="125" width="170" height="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="322" y="125" width="360" height="330" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="90" y="160" width="120" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="seldom-platform" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="98" y="170" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="frontend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="108" y="220" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="backend" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="108" y="280" width="90" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+                    <mxGeometry x="384" y="160" width="120" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="seldom自动化项目" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="389" y="170" width="110" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="seldom框架" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="399" y="260" width="90" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="web UI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+                    <mxGeometry x="584" y="185" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="" style="shape=flexArrow;endArrow=classic;html=1;fillColor=#f5f5f5;strokeColor=#666666;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="1" source="2">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="314" y="294.5" as="sourcePoint"/>
+                        <mxPoint x="394" y="294.5" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="11" value="http" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+                    <mxGeometry x="584" y="247" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="app" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+                    <mxGeometry x="584" y="300" width="80" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="514" y="235" as="sourcePoint"/>
+                        <mxPoint x="564" y="200" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="14" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="514" y="260" as="sourcePoint"/>
+                        <mxPoint x="574" y="260" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="15" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="514" y="287.5" as="sourcePoint"/>
+                        <mxPoint x="570" y="310" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="16" value="XTestRunner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="339" y="390" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="poium" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+                    <mxGeometry x="452" y="390" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="413.5" y="305" as="sourcePoint"/>
+                        <mxPoint x="413.5" y="385" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="19" value="" style="endArrow=classic;html=1;" edge="1" parent="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="478.5" y="305" as="sourcePoint"/>
+                        <mxPoint x="478.5" y="385" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="23" value="" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#a0522d;fontColor=#ffffff;strokeColor=#6D1F00;" vertex="1" parent="1">
+                    <mxGeometry x="425" y="68" width="30" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="&lt;ul&gt;&lt;li&gt;自动化测试工程师&lt;/li&gt;&lt;li&gt;测试开发工程师&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;" vertex="1" parent="1">
+                    <mxGeometry x="439" y="50" width="178" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="" style="shape=actor;whiteSpace=wrap;html=1;fillColor=#647687;fontColor=#ffffff;strokeColor=#314354;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="68" width="30" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="&lt;ul&gt;&lt;li&gt;测试管理&lt;/li&gt;&lt;li&gt;测试工程师&lt;/li&gt;&lt;li&gt;开发工程师&lt;/li&gt;&lt;/ul&gt;" style="text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;" vertex="1" parent="1">
+                    <mxGeometry x="100" y="41" width="168" height="80" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
