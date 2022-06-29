@@ -113,7 +113,7 @@
                 type="textarea"
                 :rows="25"
                 placeholder="system out is null"
-                v-model="systemOut">
+                v-model="caseInfo.system_out">
               </el-input>
             </el-tab-pane>
             <el-tab-pane label="Error" name="second">
@@ -121,7 +121,7 @@
                 type="textarea"
                 :rows="25"
                 placeholder="error info null"
-                v-model="error">
+                v-model="caseInfo.error">
               </el-input>
             </el-tab-pane>
           </el-tabs>
@@ -154,8 +154,7 @@ export default {
       projectOptions: [],
       drawer: false,
       activeName: 'first',
-      systemOut: '',
-      error: ''
+      caseInfo: ''
     }
   },
 
@@ -170,7 +169,6 @@ export default {
       this.loading = true
       const resp = await ProjectApi.getProjects()
       if (resp.success === true) {
-        // this.tableData = resp.data
         for (let i = 0; i < resp.data.length; i++) {
           this.projectOptions.push({
             value: resp.data[i].id,
@@ -203,9 +201,7 @@ export default {
         ProjectApi.getProjectCases(this.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
             this.$message.success('获取用例成功')
-            console.log(resp.data)
             this.caseData = resp.data
-            // this.initProject()
           } else {
             this.$message.error(resp.error.message)
           }
@@ -219,10 +215,7 @@ export default {
         ProjectApi.getProjectSubdirectory(this.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
             this.$message.success('获取用例成功')
-            console.log(resp.data)
             data.children = resp.data
-            // this.caseData = resp.data
-            // this.initProject()
           } else {
             this.$message.error(resp.error.message)
           }
@@ -253,12 +246,10 @@ export default {
     async runCase(row) {
       const resp = await CaseApi.runningCase(row.id)
       if (resp.success === true) {
-        // this.fileData = resp.data
         this.$message.success('开始执行')
       } else {
         this.$message.error('运行失败')
       }
-      // this.initProjectFile()
     },
 
     // 打开报告
@@ -267,11 +258,9 @@ export default {
     },
 
     caseRowClick(row) {
-      this.currentCase = row.id
-      this.systemOut = row.system_out
-      this.error = row.error
+      this.caseInfo = row
       this.drawer = true
-    },
+    }
 
   }
 }

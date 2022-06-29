@@ -172,9 +172,6 @@ def get_project_files(request, project_id: int):
         else:
             case_path = [case.file_name + ".py"]
 
-        print(case_path)
-        # f_name = case.file_name.replace(".", " / ")
-
         if case_path[0] not in files_name:
             files_name.append(case_path[0])
             if ".py" in case_path[0]:
@@ -225,9 +222,7 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
     all_cases = TestCase.objects.filter(project_id=project_id)
     files_name = []
     for case in all_cases:
-        print("all", case.file_name, case.file_name.startswith(file_name + "."))
         if case.file_name.startswith(file_name + ".") is True:
-            print(len(file_name + "."))
             if case.file_name[len(file_name + "."):] not in files_name:
                 files_name.append(case.file_name[len(file_name + "."):])
 

@@ -49,11 +49,11 @@ def seldom_running(test_dir, case_info, report_name, case_id):
     else:
         error_data = ""
 
-    if errors == 1:
+    if int(errors) == 1:
         result = "error"
-    elif failures == 1:
+    elif int(failures) == 1:
         result = "failure"
-    elif skipped == 1:
+    elif int(skipped) == 1:
         result = "skipped"
     else:
         result = "passed"
