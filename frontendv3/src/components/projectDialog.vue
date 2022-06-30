@@ -33,6 +33,7 @@
           :action="baseUrl + '/api/project/upload'"
           :max="1"
           @finish="handleFinish"
+          @remove="handleRemove"
         >
           <n-upload-dragger>
             <div style="margin-bottom: 12px">
@@ -87,7 +88,8 @@ const form = ref({
   address: "",
   is_delete: false,
   id: "",
-  cover: { dataName: "", name: "" },
+  cover_name: "",
+  path_name: "",
 });
 
 const rules = {
@@ -114,26 +116,49 @@ const handleFinish = ({
 }) => {
   const jsonresp = JSON.parse((event?.target as XMLHttpRequest).response);
   console.log(form.value);
-  // form.value.cover.dataName = "22";
-  // form.value.cover.name = file.name;
+  form.value.cover_name = file.name;
+  form.value.path_name = jsonresp.data.name;
   return file;
+};
+const handleRemove = async () => {
+  // 后续有具体删除需求备用
+  // const resp = await ProjectApi.removeProjectCover(props.pid);
+  // if (resp.success === true) {
+  //   form.value.path_name = "";
+  //   form.value.cover_name = "";
+  //   message.success("封面删除成功");
+  // } else {
+  //   message.error(resp.error.message);
+  // }
+  form.value.path_name = "";
+  form.value.cover_name = "";
+  message.success("封面删除成功");
 };
 
 // 获取一条项目信息
 const getProject = async () => {
   const resp = await ProjectApi.getProject(props.pid);
   if (resp.success === true) {
-    console.log(resp.data);
+    // console.log(resp.data);
     form.value = resp.data;
+    if (form.value.path_name != "") {
+      fileListRef.value.push({
+        id: form.value.path_name,
+        name: form.value.cover_name,
+        status: "finished",
+      });
+    }
   } else {
     message.error(resp.error.message);
   }
 };
+
 // 关闭dialog
 const cancelProject = () => {
   emit("cancel", {});
 };
-// 创建项目按钮
+
+// 新增&编辑保存按钮
 const onSubmit = () => {
   // console.log("pid", props.pid);
   formRef.value?.validate((errors) => {

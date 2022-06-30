@@ -4,6 +4,7 @@ import { useMessage } from "naive-ui";
 import { SettingsOutline } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
 import ProjectDialog from "@/projectDialog.vue";
+import baseUrl from "~/config/base-url";
 
 const message = useMessage();
 
@@ -96,12 +97,23 @@ onMounted(() => {
     <n-card class="main">
       <div class="filter-line">
         <n-space>
-        <n-button cy-data="create-project" type="primary" @click="showCreate()">创建</n-button></n-space>
+          <n-button
+            cy-data="create-project"
+            type="primary"
+            @click="showCreate()"
+            >创建</n-button
+          ></n-space
+        >
       </div>
       <div class="card-group">
         <n-space>
           <div v-for="(item, index) in datas.tableData" :key="index">
-            <n-card :title="item.name" style="width: 350px; height: 250px">
+            <n-card
+              :title="item.name"
+              style="width: 350px; height: 240px"
+              content-style="padding: 24;height:50%"
+              footer-style="padding: 0;height:100%"
+            >
               <template #header-extra>
                 <n-dropdown
                   trigger="hover"
@@ -113,7 +125,15 @@ onMounted(() => {
                   </n-icon>
                 </n-dropdown>
               </template>
-              <n-empty description="no cover"> </n-empty>
+              <div v-if="item.path_name == ''">
+                <n-empty description="no cover"> </n-empty>
+              </div>
+              <div v-else style="height: 100%; width;: 100%">
+                <img
+                  :src="baseUrl + '/static/images/' + item.path_name"
+                  style="height: 100%; width: auto"
+                />
+              </div>
               <template #footer>
                 {{ item.address }}
               </template>
@@ -154,11 +174,8 @@ onMounted(() => {
 </template>
 
 <style>
-.filter-line{
+.filter-line {
   padding-bottom: 24px;
-}
-.n-card {
-
 }
 .main {
   padding: 20px;
