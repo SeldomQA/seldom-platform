@@ -29,7 +29,7 @@
 
 ![](./img/seldom-platfrom.png)
 
-* 单个用例执行结果
+* 用例执行日志
 
 ![](./img/seldom-report.png)
 
