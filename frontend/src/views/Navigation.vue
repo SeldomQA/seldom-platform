@@ -11,8 +11,8 @@
       <el-container>
         <el-aside width="160px" style="background-color: #313a46">
           <el-menu text-color="#838f9c" active-text-color="#12263f" :default-active="onRoutes">
-            <div class="klook-logo">
-              <img src="../assets/logo.png" class="img-logo" />
+            <div class="seldom-logo">
+                <img src="../assets/seldom-platform.gif" class="img-logo" />
             </div>
             <router-link to="/">
               <el-menu-item index="1" class="menu-option">
@@ -111,7 +111,7 @@ export default {
   height: 100%;
 }
 
-.klook-logo {
+.seldom-logo {
   background-color: #313a46;
   line-height: 60px;
   padding-bottom: 0px;
@@ -121,7 +121,7 @@ export default {
 .img-logo {
   display: inline-block;
   vertical-align: middle;
-  height: 22px;
+  height: 32px;
 }
 
 .el-header {

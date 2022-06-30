@@ -1,5 +1,5 @@
 <template>
-  <h1 class="tagline">Seldom<span class="accent"> Platform</span></h1>
+  <img src="../assets/seldom-platform.gif" style="height: 40px;" />
   <n-menu :options="menuOptions" @update:value="handleUpdateValue" />
 </template>
 
