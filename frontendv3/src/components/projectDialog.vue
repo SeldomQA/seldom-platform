@@ -26,10 +26,14 @@
       </n-form-item>
       <n-form-item label="封面">
         <n-upload
+          ref="uploadRef"
+          v-model:file-list="fileListRef"
           multiple
           directory-dnd
-          action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
-          :max="5"
+          :action="baseUrl + '/api/project/upload'"
+          :max="1"
+          @finish="handleFinish"
+          @remove="handleRemove"
         >
           <n-upload-dragger>
             <div style="margin-bottom: 12px">
@@ -41,7 +45,8 @@
               点击或者拖动文件到该区域来上传
             </n-text>
             <n-p depth="3" style="margin: 8px 0 0 0">
-              请上传.png .jpg格式的图片，不要上传敏感数据或无意义的数据，破服务器请求手下留情
+              请上传.png
+              .jpg格式的图片，不要上传敏感数据或无意义的数据，破服务器请求手下留情
             </n-p>
           </n-upload-dragger>
         </n-upload>
@@ -51,10 +56,7 @@
           <n-button cy-data="cancel-project" @click="cancelProject()"
             >取消</n-button
           >
-          <n-button
-            cy-data="save-project"
-            type="primary"
-            @click="onSubmit"
+          <n-button cy-data="save-project" type="primary" @click="onSubmit"
             >保存</n-button
           >
         </n-space>
@@ -65,9 +67,10 @@
 
 <script setup lang="ts">
 import { reactive, ref, onMounted } from "vue";
-import { FormInst, useMessage } from "naive-ui";
+import { FormInst, useMessage, UploadFileInfo, UploadInst } from "naive-ui";
 import ProjectApi from "~/request/project";
-import { ArchiveOutline } from '@vicons/ionicons5'
+import { ArchiveOutline } from "@vicons/ionicons5";
+import baseUrl from "~/config/base-url";
 
 const props = defineProps({
   pid: Number,
@@ -77,13 +80,16 @@ const emit = defineEmits(["cancel"]);
 
 const message = useMessage();
 
-const formRef = ref<FormInst | null>(null)
+const formRef = ref<FormInst | null>(null);
+const uploadRef = ref<UploadInst | null>(null);
 
 const form = ref({
   name: "",
   address: "",
-  is_delete:false,
-  id:""
+  is_delete: false,
+  id: "",
+  cover_name: "",
+  path_name: "",
 });
 
 const rules = {
@@ -99,24 +105,62 @@ const rules = {
   },
 };
 
+// 上传图片
+const fileListRef = ref<UploadFileInfo[]>([]);
+const handleFinish = ({
+  file,
+  event,
+}: {
+  file: UploadFileInfo;
+  event?: ProgressEvent;
+}) => {
+  const jsonresp = JSON.parse((event?.target as XMLHttpRequest).response);
+  console.log(form.value);
+  form.value.cover_name = file.name;
+  form.value.path_name = jsonresp.data.name;
+  return file;
+};
+const handleRemove = async () => {
+  // 后续有具体删除需求备用
+  // const resp = await ProjectApi.removeProjectCover(props.pid);
+  // if (resp.success === true) {
+  //   form.value.path_name = "";
+  //   form.value.cover_name = "";
+  //   message.success("封面删除成功");
+  // } else {
+  //   message.error(resp.error.message);
+  // }
+  form.value.path_name = "";
+  form.value.cover_name = "";
+  message.success("封面删除成功");
+};
 
 // 获取一条项目信息
 const getProject = async () => {
   const resp = await ProjectApi.getProject(props.pid);
   if (resp.success === true) {
-    console.log(resp.data);
+    // console.log(resp.data);
     form.value = resp.data;
+    if (form.value.path_name != "") {
+      fileListRef.value.push({
+        id: form.value.path_name,
+        name: form.value.cover_name,
+        status: "finished",
+      });
+    }
   } else {
     message.error(resp.error.message);
   }
 };
+
 // 关闭dialog
 const cancelProject = () => {
   emit("cancel", {});
 };
-// 创建项目按钮
+
+// 新增&编辑保存按钮
 const onSubmit = () => {
-  console.log("pid", props.pid);
+  // console.log("pid", props.pid);
   formRef.value?.validate((errors) => {
     if (!errors) {
       if (props.pid === 0) {
@@ -139,20 +183,17 @@ const onSubmit = () => {
         });
       }
     } else {
-      console.log(213);
       return false;
     }
   });
 };
 
 onMounted(() => {
-    if (props.pid === 0) {
+  if (props.pid === 0) {
   } else {
-    getProject()
+    getProject();
   }
-  // 强
 });
-
 </script>
 
 <style scoped>

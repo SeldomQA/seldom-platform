@@ -21,6 +21,11 @@ class ProjectApi {
   deleteProject(pid) {
     return request.delete('/api/project/' + pid + '/')
   }
+  
+  // 后续有具体删除需求备用
+  // removeProjectCover(pid) {
+  //   return request.put('/api/project/cover/remove/' + pid + '/')
+  // }
 
   syncProjectCase(pid) {
     return request.get('/api/project/' + pid + '/sync')

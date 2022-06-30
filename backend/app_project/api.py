@@ -27,6 +27,8 @@ router = Router(tags=["project"])
 class ProjectItems(Schema):
     name: str
     address: str
+    cover_name: str
+    path_name: str
 
 
 @router.post('/create')
@@ -68,6 +70,8 @@ def update_project(request, project_id: int, project: ProjectItems):
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.name = project.name
     project_obj.address = project.address
+    project_obj.cover_name = project.cover_name
+    project_obj.path_name = project.path_name
     project_obj.save()
     return response(data=model_to_dict(project_obj))
 
@@ -110,6 +114,19 @@ def upload_project_image(request, file: UploadedFile = File(...)):
     return response(data={"name": file_name})
 
 
+# @router.put("/cover/remove/{project_id}/", auth=None)
+# def remove_project_image(request, project_id: int):
+#     """
+#     后续有具体删除需求备用
+#     项目图片删除
+#     """
+#     project_obj = get_object_or_404(Project, pk=project_id)
+#     project_obj.cover_name = ""
+#     project_obj.path_name = ""
+#     project_obj.save()
+#     return response()
+
+
 @router.get("/{project_id}/sync")
 def update_project_cases(request, project_id: int):
     """
@@ -130,7 +147,7 @@ def update_project_cases(request, project_id: int):
     for seldom in seldom_case:
         for platform in platform_case:
             if (seldom["file"] == platform.file_name
-                and seldom["class"]["name"] == platform.class_name
+                    and seldom["class"]["name"] == platform.class_name
                     and seldom["method"]["name"] == platform.case_name):
                 break
         else:
@@ -147,7 +164,7 @@ def update_project_cases(request, project_id: int):
     for platform in platform_case:
         for seldom in seldom_case:
             if (platform.file_name == seldom["file"]
-                and platform.class_name == seldom["class"]["name"]
+                    and platform.class_name == seldom["class"]["name"]
                     and platform.case_name == seldom["method"]["name"]):
                 break
         else:
