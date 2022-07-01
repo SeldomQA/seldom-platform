@@ -9,7 +9,18 @@
           <el-input cy-data="project-address"  v-model="form.address"></el-input>
           <el-alert title="关联项目：使用seldom开发的自动化项目路径" type="success" :closable="false"></el-alert>
         </el-form-item>
-        <el-form-item>
+        <el-form-item label="图片" prop="image">
+          <div id="image">
+            <el-upload
+              action="/api/project/upload"
+              list-type="picture-card"
+              :on-success="uploadSuccess"
+              :file-list="fileList"
+            >
+            </el-upload>
+          </div>
+        </el-form-item>
+        <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
           <div class="dialog-footer">
             <el-button cy-data="cancel-project" @click="cancelProject()">取消</el-button>
             <el-button cy-data="save-project" type="primary" @click="onSubmit('form')">保存</el-button>
@@ -21,7 +32,7 @@
 </template>
 
 <script>
-import ProjectApi from '../../../request/project'
+import ProjectApi from '../../request/project'
 
 export default {
   props: ['pid'],
@@ -31,7 +42,9 @@ export default {
       showTitle: '',
       form: {
         name: '',
-        address: ''
+        address: '',
+        cover_name: '',
+        path_name: ''
       },
       rules: {
         name: [
@@ -41,7 +54,8 @@ export default {
           { required: true, message: '请输入项目地址', trigger: 'blur' }
         ]
       },
-      inResize: true
+      inResize: true,
+      fileList: []
     }
   },
   created() {
@@ -66,6 +80,10 @@ export default {
       const resp = await ProjectApi.getProject(this.pid)
       if (resp.success === true) {
         this.form = resp.data
+        this.fileList.push({
+          name: resp.data.path_name,
+          url: 'static/images/' + resp.data.path_name
+        })
       } else {
         this.$message.error(resp.error.message);
       }
@@ -76,7 +94,6 @@ export default {
     },
     // 创建项目按钮
     onSubmit(formName) {
-      console.log('pid', this.pid)
       this.$refs[formName].validate(valid => {
         if (valid) {
           if (this.pid === 0) {
@@ -102,7 +119,14 @@ export default {
           return false;
         }
       });
+    },
+
+    // 上传成功
+    uploadSuccess(response, file) {
+      this.form.cover_name = file.name
+      this.form.path_name = response.data.name
     }
+
   }
 }
 </script>

@@ -36,8 +36,16 @@ def create_project(request, project: ProjectItems):
     """
     创建项目
     """
+    # 设置项目默认图片
+    if project.cover_name == "" and project.path_name == "":
+        project.cover_name = "seldom_logo.png"
+        project.path_name = "2d82cb919cf05116adf720f8f7437ac9.png"
+
     project_obj = Project.objects.create(
-        name=project.name, address=project.address)
+        name=project.name,
+        address=project.address,
+        cover_name=project.cover_name,
+        path_name=project.path_name)
     return response(data=model_to_dict(project_obj))
 
 
