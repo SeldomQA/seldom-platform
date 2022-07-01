@@ -27,8 +27,8 @@ router = Router(tags=["project"])
 class ProjectItems(Schema):
     name: str
     address: str
-    cover_name: str
-    path_name: str
+    cover_name: str = None
+    path_name: str = None
 
 
 @router.post('/create')
