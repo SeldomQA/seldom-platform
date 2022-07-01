@@ -12,7 +12,7 @@ class TestCase(models.Model):
     class_doc = models.TextField("类描述", null=True, blank=True, default="")
     case_name = models.CharField("方法名", max_length=100, null=False, default="")
     case_doc = models.TextField("方法描述", null=True, blank=True, default="")
-    report = models.CharField("报告", max_length=50, null=True, default="")
+    report = models.TextField("报告内容", null=True, default="")
     status = models.IntegerField("状态", default=0)  # 0未执行、1执行中、2已执行
     result = models.CharField("结果", max_length=50, null=True, default="")
     system_out = models.TextField("日志", null=True, default="")

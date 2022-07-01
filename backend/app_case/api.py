@@ -4,10 +4,10 @@ import threading
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 from ninja import Router
+from seldom.logging import log
+from seldom import TestMainExtend
 from app_project.models import Project
 from app_case.models import TestCase
-from seldom import TestMainExtend
-from seldom.logging import log
 from xml.dom.minidom import parse
 from utils.response import response
 from backend.settings import BASE_DIR
@@ -28,7 +28,8 @@ def seldom_running(test_dir, case_info, report_name, case_id):
     time.sleep(1)
 
     # 打开xml文档
-    dom = parse(os.path.join(REPORT_DIR, report_name))
+    report_path = os.path.join(REPORT_DIR, report_name)
+    dom = parse(report_path)
     # 得到文档元素对象
     root = dom.documentElement
     # 获取(一组)标签
@@ -58,14 +59,20 @@ def seldom_running(test_dir, case_info, report_name, case_id):
     else:
         result = "passed"
 
-    test_case = TestCase.objects.get(id=case_id)
-    test_case.status = 2
-    test_case.result = result
-    test_case.run_time = run_time
-    test_case.system_out = system_out_data
-    test_case.error = error_data
-    test_case.report = report_name
-    test_case.save()
+    with open(report_path, "r", encoding="utf-8") as f:
+        report_text = f.read()
+        # 保存表
+        test_case = TestCase.objects.get(id=case_id)
+        test_case.status = 2
+        test_case.result = result
+        test_case.run_time = run_time
+        test_case.system_out = system_out_data
+        test_case.error = error_data
+        test_case.report = report_text
+        test_case.save()
+
+    # 删除报告文件
+    # os.remove(report_path)
     log.info("save report")
 
 

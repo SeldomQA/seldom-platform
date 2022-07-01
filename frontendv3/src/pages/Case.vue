@@ -40,21 +40,23 @@ const createColumns = ({
       key: "case_doc",
     },
     {
-      title: "报告",
-      key: "report",
+      title: "状态",
+      key: "status",
       render(row) {
-        return h(
-          NButton,
-          {
-            strong: true,
-            // tertiary: true,
-            text: true,
-            size: "small",
-            onClick: () => play(row, "report"),
-          },
-          { default: () => row.report }
-        );
-      },
+        if (row.status === 0 ) {
+          return "未执行"
+        } else if (row.status === 1 ) {
+          return "执行中"
+        } else if (row.status === 2 ) {
+          return "已执行"
+        } else {
+          return "未知"
+        }
+      }
+    },
+    {
+      title: "结果",
+      key: "result",
     },
     {
       title: "操作",

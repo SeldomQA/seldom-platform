@@ -7,15 +7,15 @@ import os
 import hashlib
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
-from ninja import Router
 from ninja import File
+from ninja import Router
+from ninja import Schema
 from ninja.files import UploadedFile
-from utils.response import response, Error
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
-from ninja import Schema
 from app_project.models import Project
 from app_case.models import TestCase
+from utils.response import response, Error
 from backend.settings import BASE_DIR
 
 # upload image

@@ -88,11 +88,6 @@
               </template>
             </el-table-column>
             <el-table-column prop="result" label="结果"> </el-table-column>
-            <el-table-column prop="report" label="报告">
-              <template slot-scope="scope">
-                <el-button type="text" size="mini" @click="openReport(scope.row)">{{scope.row.report}}</el-button>
-              </template>
-            </el-table-column>
             <el-table-column label="操作" width="120">
               <template slot-scope="scope">
               <el-button type="success" size="mini" @click="runCase(scope.row)" @click.stop="drawer = false">执行</el-button>
