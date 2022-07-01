@@ -12,6 +12,7 @@ import {
   HomeOutline,
   FolderOpenOutline,
   DocumentTextOutline,
+  CalendarOutline
 } from "@vicons/ionicons5";
 
 function renderIcon(icon: Component) {
@@ -31,7 +32,7 @@ const menuOptions: MenuOption[] = [
             },
           },
         },
-        { default: () => "首页" }
+        { default: () => "项目管理" }
       ),
     key: "go-back-home",
     icon: renderIcon(HomeOutline),
@@ -52,6 +53,23 @@ const menuOptions: MenuOption[] = [
       ),
     key: "go-back-case",
     icon: renderIcon(FolderOpenOutline),
+  },
+  {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: "Task",
+            params: {
+              lang: "zh-CN",
+            },
+          },
+        },
+        { default: () => "任务管理" }
+      ),
+    key: "go-back-task",
+    icon: renderIcon(CalendarOutline),
   },
   {
     label: () =>

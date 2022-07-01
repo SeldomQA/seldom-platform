@@ -97,7 +97,6 @@ export default {
       const resp = await ProjectApi.getProjects()
       if (resp.success === true) {
         this.tableData = resp.data
-        console.log('tadfasd', this.tableData)
       } else {
         this.$message.error(resp.error.message)
       }

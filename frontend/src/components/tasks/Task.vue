@@ -9,12 +9,12 @@
   <div class="workbench">
     <div style="padding-bottom: 20px; height: 30px;">
       <span class="span-left">
-        <span class="page-title">报告管理</span>
+        <span class="page-title">任务管理</span>
       </span>
       <span class="span-breadcrumb">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>报告管理</el-breadcrumb-item>
+          <el-breadcrumb-item>任务管理</el-breadcrumb-item>
         </el-breadcrumb>
       </span>
     </div>

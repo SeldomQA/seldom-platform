@@ -26,9 +26,15 @@
                 <template #title>用例管理</template>
               </el-menu-item>
             </router-link>
-            <router-link to="/reports">
+            <router-link to="/tasks">
               <el-menu-item index="3" class="menu-option">
-                <i class="el-icon-document"></i>
+                <i class="el-icon-date"></i>
+                <template #title>任务管理</template>
+              </el-menu-item>
+            </router-link>
+            <router-link to="/reports">
+              <el-menu-item index="4" class="menu-option">
+                <i class="el-icon-document-copy"></i>
                 <template #title>报告管理</template>
               </el-menu-item>
             </router-link>
