@@ -11,7 +11,7 @@
 | backend  | 后端: django + django-ninjia |  [link](./backend/README.md)   |
 | frontend  | 前端：vue2 + element-ui |  [link](./frontend/README.md)  |
 | frontendv3  | 前端：vue3 + naive-ui |  [link](./frontendv3/README.md) |
-| seldom-web-testing  | 接入平台的seldom web项目 |  [link](./frontendv3/README.md) |
+| seldom-web-testing  | 接入平台的seldom web项目 |  [link](./seldom-web-testing/README.md) |
 
 __注：__
 
