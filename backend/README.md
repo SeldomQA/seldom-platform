@@ -17,6 +17,7 @@
 * 执行数据库同步
 
 ```
+> python manage.py makemigrations
 > python manage.py migrate
 ```
 
