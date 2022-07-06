@@ -8,14 +8,22 @@
 
 ## 安装
 
+* 安装依赖
+
 ```shell
 > pip install -r requirements.txt
+```
+
+* 执行数据库同步
+
+```
+> python manage.py runserver
 ```
 
 ## 启动
 
 ```shell
-> python .\manage.py runserver
+> python manage.py runserver
 ```
 
 ## 查看接口
