@@ -17,7 +17,7 @@
 * 执行数据库同步
 
 ```
-> python manage.py runserver
+> python manage.py migrate
 ```
 
 ## 启动
