@@ -18,26 +18,26 @@
         </el-breadcrumb>
       </span>
     </div>
-    <el-card class="main-card" shadow="never">
+    <el-card shadow="never">
       <div class="filter-line">
         <el-button cy-data="create-project" type="primary" @click="showCreate()">创建</el-button>
       </div>
-      <div style="min-height: 600px">
+      <el-row>
         <div v-for="(item, index) in tableData" :key="index">
           <el-col :span="7" class="project-card">
-            <el-card class="box-card">
+            <el-card>
               <div>
-                <img
-                  :src="'static/images/' + item.path_name"
-                  class="image"
-                  style="height: 120px; width: 120px"
-                />
-              </div>
-              <div style="margin-top: 10px;">
-                <el-tag>{{item.address}}</el-tag>
-              </div>
+                  <img
+                    :src="'static/images/' + item.path_name"
+                    class="image"
+                    style="height: 120px; width: 120px"
+                  />
+                </div>
+                <div style="margin-top: 10px;">
+                  <el-tag>{{item.address}}</el-tag>
+                </div>
               <div slot="header" class="clearfix">
-                <span>{{item.id}} - {{item.name}} </span>
+                <span>【{{item.id}}】{{item.name}} </span>
                 <span style="float: right; padding: 3px 0">
                   <el-dropdown style="left: 5px;">
                     <i class="el-icon-setting" style="margin-right: 15px"></i>
@@ -58,9 +58,8 @@
             </el-card>
           </el-col>
         </div>
-      </div>
+      </el-row>
     </el-card>
-
     <project-dialog v-if="showDailog" :pid=projectId @cancel="cancelProject"></project-dialog>
   </div>
 </template>
