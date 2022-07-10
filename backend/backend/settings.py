@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app_project',
     'app_case',
+    'app_task',
     'corsheaders',  # 跨域
 ]
 
