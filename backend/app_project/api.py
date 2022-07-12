@@ -13,6 +13,7 @@ from ninja import Schema
 from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
+from seldom.utils import file
 from app_project.models import Project
 from app_case.models import TestCase
 from utils.response import response, Error
@@ -142,6 +143,7 @@ def update_project_cases(request, project_id: int):
     """
     project_obj = get_object_or_404(Project, pk=project_id)
     # 项目本地目录
+    file.add_to_path(project_obj.address)
     test_dir = os.path.join(project_obj.address, "test_dir")
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
@@ -149,7 +151,6 @@ def update_project_cases(request, project_id: int):
     main_extend = TestMainExtend(path=test_dir)
     seldom_case = main_extend.collect_cases()
     platform_case = TestCase.objects.filter(project=project_obj)
-    # project_case.delete()
 
     # 从seldom项目中找到新增的用例
     for seldom in seldom_case:
