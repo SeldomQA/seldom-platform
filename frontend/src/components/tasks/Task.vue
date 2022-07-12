@@ -177,11 +177,9 @@ export default {
             // this.caseData = resp.data
             for (let i = 0; i < resp.data.length; i++) {
               // 如果用例不在列表时添加
-              var isExists = false
-              for(let j = 0; j < this.caseData.length; j++) {
-                console.log("iii", resp.data[i])
-                console.log("jjj", this.caseData[j])
-                if(resp.data[i].id === this.caseData[j].key) {
+              let isExists = false
+              for (let j = 0; j < this.caseData.length; j++) {
+                if (resp.data[i].id === this.caseData[j].key) {
                   isExists = true
                   break
                 }
