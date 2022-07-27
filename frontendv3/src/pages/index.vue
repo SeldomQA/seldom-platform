@@ -20,7 +20,7 @@ const initProjects = async () => {
   datas.loading = true;
   const resp = await ProjectApi.getProjects();
   if (resp.success === true) {
-    datas.tableData = resp.data;
+    datas.tableData = resp.result;
   } else {
     message.error(resp.error.message);
   }
