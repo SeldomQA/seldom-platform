@@ -94,7 +94,7 @@ onMounted(() => {
         </n-breadcrumb>
       </n-space>
     </div>
-    <n-card class="main">
+    <n-card class="main-card">
       <div class="filter-line">
         <n-space>
           <n-button
@@ -142,11 +142,7 @@ onMounted(() => {
         </n-space>
       </div>
     </n-card>
-    <n-modal
-      v-model:show="datas.showDailog"
-      :pid="datas.projectId"
-      style="min-width: 600px"
-    >
+    <n-modal v-model:show="datas.showDailog" style="min-width: 600px">
       <n-card
         style="width: 600px"
         v-if="datas.projectId == 0"
@@ -179,5 +175,8 @@ onMounted(() => {
 }
 .main {
   padding: 20px;
+}
+.card-group {
+  text-align: center;
 }
 </style>
