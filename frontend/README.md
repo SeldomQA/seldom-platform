@@ -16,21 +16,21 @@
 
 ## vue环境配置
 
-* dev (本地开发环境) - `.env.dev` 配置mock地址
+* local (本地开发环境) - `.env.local` 
 
 ```shell
 > npm run serve
 > npm run build
 ```
 
-* local (与后端开发联调环境) - `.env.local` 配置后端开发环境地址。
+* dev (开发测试环境) - `.env.dev` 配置后端开发环境地址。
 
 ```shell
-> npm run local-serve
-> npm run local-build
+> npm run dev-serve
+> npm run dev-build
 ```
 
-* local (与后端开发联调环境) - `.env.prod` 配置后端产线地址。
+* prod (正式生产环境) - `.env.prod` 配置后端产线地址。
 
 ```shell
 > npm run prod-serve
@@ -40,8 +40,17 @@
 * `.env.xxx`配置文件说明
 
 ```conf
+# .env.local
+NODE_ENV=local  # 环境名称
+VUE_APP_URL=/  # 接口地址
+
+# .env.dev
 NODE_ENV=dev  # 环境名称
-VUE_APP_URL=http://10.2.180.77:3000/mock/11  # 接口地址
+VUE_APP_URL=http://seldom.dev.company.com  # 接口地址
+
+# .env.prod
+NODE_ENV=pord  # 环境名称
+VUE_APP_URL=http://seldom.company.com  # 接口地址
 ```
 
 * 本地联调
