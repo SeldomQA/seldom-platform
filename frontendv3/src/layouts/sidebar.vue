@@ -12,7 +12,8 @@ import {
   HomeOutline,
   FolderOpenOutline,
   DocumentTextOutline,
-  CalendarOutline
+  CalendarOutline,
+  SettingsOutline
 } from "@vicons/ionicons5";
 
 function renderIcon(icon: Component) {
@@ -87,6 +88,23 @@ const menuOptions: MenuOption[] = [
       ),
     key: "go-back-report",
     icon: renderIcon(DocumentTextOutline),
+  },
+    {
+    label: () =>
+      h(
+        RouterLink,
+        {
+          to: {
+            name: "Env",
+            params: {
+              lang: "zh-CN",
+            },
+          },
+        },
+        { default: () => "环境配置" }
+      ),
+    key: "go-back-env",
+    icon: renderIcon(SettingsOutline),
   },
 ];
 

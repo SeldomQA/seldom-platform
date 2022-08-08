@@ -17,6 +17,9 @@
       <n-form-item label="关联项目" path="address">
         <n-input v-model:value="form.address" placeholder="请输入关联项目" />
       </n-form-item>
+      <n-form-item label="用例目录" path="case_dir">
+        <n-input v-model:value="form.case_dir" placeholder="请输入用例目录" />
+      </n-form-item>
       <n-form-item>
         <n-alert
           style="width: 100%"
@@ -34,6 +37,7 @@
           :max="1"
           @finish="handleFinish"
           @remove="handleRemove"
+          :show-retry-button= false
         >
           <n-upload-dragger>
             <div style="margin-bottom: 12px">
@@ -86,6 +90,7 @@ const uploadRef = ref<UploadInst | null>(null);
 const form = ref({
   name: "",
   address: "",
+  case_dir: "",
   is_delete: false,
   id: "",
   cover_name: "",
@@ -103,6 +108,11 @@ const rules = {
     trigger: ["blur", "input"],
     message: "请输入关联项目",
   },
+  case_dir: {
+    required: true,
+    trigger: ["blur", "input"],
+    message: "请输入用例目录",
+  },
 };
 
 // 上传图片
@@ -115,9 +125,17 @@ const handleFinish = ({
   event?: ProgressEvent;
 }) => {
   const jsonresp = JSON.parse((event?.target as XMLHttpRequest).response);
-  console.log(form.value);
-  form.value.cover_name = file.name;
-  form.value.path_name = jsonresp.data.name;
+  console.log(fileListRef.value);
+  // console.log(jsonresp);
+  if (jsonresp.success) {
+    form.value.cover_name = file.name;
+    form.value.path_name = jsonresp.result.name;
+    message.success("上传成功");
+  } else {
+    fileListRef.value[0].id = "";
+    fileListRef.value[0].status = "error";
+    message.error(jsonresp.error.message);
+  }
   return file;
 };
 const handleRemove = async () => {
@@ -139,8 +157,8 @@ const handleRemove = async () => {
 const getProject = async () => {
   const resp = await ProjectApi.getProject(props.pid);
   if (resp.success === true) {
-    // console.log(resp.data);
-    form.value = resp.data;
+    // console.log(resp.result);
+    form.value = resp.result;
     if (form.value.path_name != "") {
       fileListRef.value.push({
         id: form.value.path_name,
