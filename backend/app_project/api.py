@@ -6,33 +6,26 @@ function: 项目管理
 import os
 import hashlib
 from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
 from ninja import File
 from ninja import Router
-from ninja import Schema
 from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
+from seldom.utils import file
 from app_project.models import Project
+from app_project.api_schma import ProjectIn
 from app_case.models import TestCase
-from utils.response import response, Error
+from app_utils.response import response, Error, model_to_dict
 from backend.settings import BASE_DIR
-
+from random import randint
 # upload image
 IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
 
 router = Router(tags=["project"])
 
 
-class ProjectItems(Schema):
-    name: str
-    address: str
-    cover_name: str = None
-    path_name: str = None
-
-
 @router.post('/create')
-def create_project(request, project: ProjectItems):
+def create_project(request, project: ProjectIn):
     """
     创建项目
     """
@@ -44,9 +37,10 @@ def create_project(request, project: ProjectItems):
     project_obj = Project.objects.create(
         name=project.name,
         address=project.address,
+        case_dir=project.case_dir,
         cover_name=project.cover_name,
         path_name=project.path_name)
-    return response(data=model_to_dict(project_obj))
+    return response(result=model_to_dict(project_obj))
 
 
 @router.get('/list')
@@ -58,7 +52,7 @@ def get_projects(request):
     project_list = []
     for project in projects:
         project_list.append(model_to_dict(project))
-    return response(data=project_list)
+    return response(result=project_list)
 
 
 @router.get('/{project_id}/')
@@ -67,21 +61,22 @@ def get_project(request, project_id: int):
     通过项目ID查询项目
     """
     project_obj = get_object_or_404(Project, pk=project_id, is_delete=False)
-    return response(data=model_to_dict(project_obj))
+    return response(result=model_to_dict(project_obj))
 
 
 @router.put('/{project_id}/')
-def update_project(request, project_id: int, project: ProjectItems):
+def update_project(request, project_id: int, project: ProjectIn):
     """
     通过项目ID更新项目
     """
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.name = project.name
     project_obj.address = project.address
+    project_obj.case_dir = project.case_dir
     project_obj.cover_name = project.cover_name
     project_obj.path_name = project.path_name
     project_obj.save()
-    return response(data=model_to_dict(project_obj))
+    return response(result=model_to_dict(project_obj))
 
 
 @router.delete('/{project_id}/')
@@ -92,6 +87,7 @@ def delete_project(request, project_id: int):
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.is_delete = True
     project_obj.save()
+
     return response()
 
 
@@ -119,7 +115,7 @@ def upload_project_image(request, file: UploadedFile = File(...)):
         for chunk in file.chunks():
             f.write(chunk)
 
-    return response(data={"name": file_name})
+    return response(result={"name": file_name})
 
 
 # @router.put("/cover/remove/{project_id}/", auth=None)
@@ -141,15 +137,18 @@ def update_project_cases(request, project_id: int):
     同步项目用例
     """
     project_obj = get_object_or_404(Project, pk=project_id)
-    # 项目本地目录
-    test_dir = os.path.join(project_obj.address, "test_dir")
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
+
+    # 项目本地目录
+    file.add_to_path(project_obj.address)
+    test_dir = file.join(project_obj.address, project_obj.case_dir)
+
     # 收集测试用例信息
     main_extend = TestMainExtend(path=test_dir)
-    seldom_case = main_extend.collect_cases()
+    seldom_case = main_extend.collect_cases(json=False, level="method")
+
     platform_case = TestCase.objects.filter(project=project_obj)
-    # project_case.delete()
 
     # 从seldom项目中找到新增的用例
     for seldom in seldom_case:
@@ -216,27 +215,37 @@ def get_project_files(request, project_id: int):
 
             files.append(case_level_one)
 
-    return response(data={"case_number": case_number, "files": files})
+    return response(result={"case_number": case_number, "files": files})
 
 
 @router.get('/{project_id}/cases')
-def get_project_file_cases(request, project_id: int, file_name: str):
+def get_project_file_cases(request, project_id: int, file_name: str, audit: bool = None):
     """
     获取文件下面的测试用例
     """
     # 如果是文件，直接取文件的类、方法
     if ".py" in file_name:
-        file_cases = TestCase.objects.filter(
-            project_id=project_id,
-            file_name=file_name[0:-3]
-        )
+        if audit is not None:
+            file_cases = TestCase.objects.filter(
+                project_id=project_id,
+                file_name=file_name[0:-3],
+                audit=audit,
+            )
+        else:
+            file_cases = TestCase.objects.filter(
+                project_id=project_id,
+                file_name=file_name[0:-3]
+            )
         case_list = []
         for case in file_cases:
             case_list.append(model_to_dict(case))
         # 通过接口返回
-        return response(data=case_list)
-    else:
-        return response(data=[])
+        if len(case_list) == 0:
+            return response(error=Error.CASE_AUDIT_NULL)
+
+        return response(result=case_list)
+
+    return response()
 
 
 @router.get('/{project_id}/subdirectory')
@@ -276,4 +285,4 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
             }
         case_name.append(case_level_two)
 
-    return response(data=case_name)
+    return response(result=case_name)

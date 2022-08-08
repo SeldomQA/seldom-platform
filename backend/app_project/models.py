@@ -7,6 +7,7 @@ class Project(models.Model):
     """
     name = models.CharField("名称", max_length=50, null=False)
     address = models.CharField("项目地址", max_length=200, null=False)
+    case_dir = models.CharField("用例目录", max_length=200, default="test_dir")
     is_delete = models.BooleanField("删除", null=True, default=False)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
