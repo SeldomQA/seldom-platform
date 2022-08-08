@@ -37,7 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app_project',
     'app_case',
+    'app_task',
     'corsheaders',  # 跨域
+    'django_apscheduler',  # 定时任务
 ]
 
 MIDDLEWARE = [
@@ -132,3 +134,11 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# 定时任务配置
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
+
+
+# 目录配置
+REPORT_DIR = os.path.join(BASE_DIR, "reports")
