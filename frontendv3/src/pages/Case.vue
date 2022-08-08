@@ -126,11 +126,11 @@ export default defineComponent({
       datas.loading = true;
       const resp = await ProjectApi.getProjects();
       if (resp.success === true) {
-        // datas.tableData = resp.data
-        for (let i = 0; i < resp.data.length; i++) {
+        // datas.tableData = resp.result
+        for (let i = 0; i < resp.result.length; i++) {
           model.value.projectOptions.push({
-            value: resp.data[i].id,
-            label: resp.data[i].name,
+            value: resp.result[i].id,
+            label: resp.result[i].name,
           });
         }
       } else {
@@ -143,8 +143,8 @@ export default defineComponent({
     const initProjectFile = async () => {
       const resp = await ProjectApi.getProjectTree(datas.projectId);
       if (resp.success === true) {
-        datas.fileData = treeDataFormat(resp.data.files);
-        datas.caseNumber = resp.data.case_number;
+        datas.fileData = treeDataFormat(resp.result.files);
+        datas.caseNumber = resp.result.case_number;
         console.log(datas.fileData);
       } else {
         message.error(resp.error.message);
@@ -159,8 +159,8 @@ export default defineComponent({
           (resp) => {
             if (resp.success === true) {
               message.success("获取用例成功");
-              console.log(resp.data);
-              datas.caseData = resp.data;
+              console.log(resp.result);
+              datas.caseData = resp.result;
             } else {
               message.error(resp.error.message);
             }
@@ -176,9 +176,9 @@ export default defineComponent({
           (resp) => {
             if (resp.success === true) {
               message.success("获取用例成功");
-              // console.log(resp.data);
-              data.children = treeDataFormat(resp.data);
-              // datas.caseData = resp.data
+              // console.log(resp.result);
+              data.children = treeDataFormat(resp.result);
+              // datas.caseData = resp.result
               // datas.initProject()
             } else {
               message.error(resp.error.message);
@@ -212,7 +212,7 @@ export default defineComponent({
     const runCase = async (row) => {
       const resp = await CaseApi.runningCase(row.id);
       if (resp.success === true) {
-        // datas.fileData = resp.data
+        // datas.fileData = resp.result
         message.success("开始执行");
       } else {
         message.error("运行失败");
@@ -330,6 +330,10 @@ export default defineComponent({
 </template>
 
 <style>
+.filter-line {
+  padding-bottom: 20px;
+}
+
 .filetree {
   border: solid 1px var(--n-border-color);
 }
