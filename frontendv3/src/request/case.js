@@ -1,11 +1,9 @@
-import request from './HttpCommon.js'
+import request from "./HttpCommon.js";
 
 class CaseApi {
-
-  runningCase(case_id) {
-    return request.post('/api/case/' + case_id + '/running')
+  runningCase(case_id, data) {
+    return request.post("/api/case/" + case_id + "/running", data);
   }
-
 }
 
-export default new CaseApi()
+export default new CaseApi();
