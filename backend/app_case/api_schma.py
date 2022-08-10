@@ -1,6 +1,7 @@
 from typing import Any
 from ninja import Schema
 from enum import Enum
+from typing import Optional
 
 
 class EnvType(str, Enum):
@@ -11,5 +12,6 @@ class EnvType(str, Enum):
 
 class RunCaseIn(Schema):
     """运行测试用例入参"""
-    env: EnvType
-
+    base_url: Optional[str] = None
+    browser: Optional[str] = None
+    env: Optional[str] = None

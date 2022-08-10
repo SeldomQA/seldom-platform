@@ -19,19 +19,12 @@ def seldom_running(test_dir, case_info, report_name, case_id, env):
     :param env:
     :return:
     """
-    # 环境判断
-    if env == "preannouncement":
-        Seldom.env = "preannouncement"
-        base_url = "http://123.io/"
-    elif env == "product":
-        Seldom.env = "product"
-        base_url = "http://123.io"
-    else:
-        Seldom.env = "product"
-        base_url = "https://123.com"
+    base_url = env.base_url
+    browser = env.browser
+    Seldom.env = env.env
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url)
+    main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url, browser=browser)
     main_extend.run_cases(case_info)
 
     # 2. 借助项目中的文件执行
@@ -103,7 +96,7 @@ def thread_run_case(test_dir, case_info, report_name, case_id, env):
     线程运行用例
     """
     threads = []
-    t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, case_id, env, ))
+    t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, case_id, env,))
     threads.append(t)
     for t in threads:
         t.start()

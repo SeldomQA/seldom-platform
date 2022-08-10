@@ -14,13 +14,11 @@ router = Router(tags=["case"])
 
 
 @router.post('/{case_id}/running')
-def running_case(request, case_id: int, run_case: RunCaseIn):
+def running_case(request, case_id: int, env: RunCaseIn):
     """
     运行测试用例
     """
     # 运行环境
-    env = run_case.env
-
     case = get_object_or_404(TestCase, pk=case_id)
     case.status = 1
     case.save()
