@@ -40,7 +40,9 @@ def running_case(request, case_id: int, run_case: RunCaseIn):
     # 项目目录添加环境变量
     project = Project.objects.get(id=case.project_id)
     file.add_to_path(project.address)
-    test_dir = os.path.join(project.address, "TestCase")
+    test_dir = os.path.join(project.address, project.case_dir)
+    if os.path.exists(test_dir) is False:
+        return response(error=Error.CASE_IDR_ERROR)
 
     # 定义报告
     report_name = f'{str(time.time()).split(".")[0]}.xml'
