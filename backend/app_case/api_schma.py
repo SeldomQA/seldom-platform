@@ -11,5 +11,5 @@ class EnvType(str, Enum):
 
 class RunCaseIn(Schema):
     """运行测试用例入参"""
-    env: EnvType
+    env: int   # 环境ID, 从Env表查询
 

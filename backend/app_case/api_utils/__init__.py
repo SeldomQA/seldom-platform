@@ -5,11 +5,12 @@ from xml.dom.minidom import parse
 from seldom.logging import log
 from seldom import Seldom
 from seldom import TestMainExtend
+from app_project.models import Env
 from app_case.models import TestCase, CaseResult
 from backend.settings import REPORT_DIR
 
 
-def seldom_running(test_dir, case_info, report_name, case_id, env):
+def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: int, env: int):
     """
     seldom运行用例
     :param test_dir: 测试目录
@@ -19,19 +20,22 @@ def seldom_running(test_dir, case_info, report_name, case_id, env):
     :param env:
     :return:
     """
-    # 环境判断
-    if env == "preannouncement":
-        Seldom.env = "preannouncement"
-        base_url = "http://123.io/"
-    elif env == "product":
-        Seldom.env = "product"
-        base_url = "http://123.io"
+    # 配置运行环境
+    env = Env.objects.get(id=env)
+
+    Seldom.env = env.env
+    if env.browser != "":
+        browser = env.browser
     else:
-        Seldom.env = "product"
-        base_url = "https://123.com"
+        browser = None
+
+    if env.base_url != "":
+        base_url = env.base_url
+    else:
+        base_url = None
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url)
+    main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, base_url=base_url)
     main_extend.run_cases(case_info)
 
     # 2. 借助项目中的文件执行
