@@ -144,14 +144,14 @@ onMounted(() => {
             </n-button>
           </template>
           <template #description> {{ item.desc }} </template>
-          <n-descriptions label-placement="left">
-            <n-descriptions-item label="base_url">
+          <n-descriptions id="thing-desc" label-placement="left" :column="1">
+            <n-descriptions-item v-if="item.base_url" label="base_url">
               {{ item.base_url }}
             </n-descriptions-item>
-            <n-descriptions-item label="browser">
+            <n-descriptions-item v-if="item.browser" label="browser">
               {{ item.browser }}
             </n-descriptions-item>
-            <n-descriptions-item label="env">
+            <n-descriptions-item v-if="item.env" label="env">
               {{ item.env }}
             </n-descriptions-item>
           </n-descriptions>
@@ -194,9 +194,15 @@ onMounted(() => {
 }
 
 .envthing {
-  width: 400px;
+  max-width: 400px;
+  min-width: 300px;
   padding: 18px;
   border: solid;
   border-color: rgb(239, 239, 245);
 }
+
+#thing-desc .n-descriptions-table-content{
+  padding: 4px
+}
+
 </style>
