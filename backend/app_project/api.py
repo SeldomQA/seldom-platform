@@ -12,8 +12,8 @@ from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from seldom.utils import file
-from app_project.models import Project
-from app_project.api_schma import ProjectIn
+from app_project.models import Project, Env
+from app_project.api_schma import ProjectIn, EnvIn
 from app_case.models import TestCase
 from app_utils.response import response, Error, model_to_dict
 from backend.settings import BASE_DIR
@@ -286,3 +286,73 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
         case_name.append(case_level_two)
 
     return response(result=case_name)
+
+
+@router.post('/env')
+def create_env(request, env: EnvIn):
+    """
+    创建环境
+    """
+    project_obj = Env.objects.create(
+        name=env.name,
+        env=env.env,
+        browser=env.browser,
+        base_url=env.base_url)
+    return response(result=model_to_dict(project_obj))
+
+
+@router.get('/env/{env_id}/')
+def get_env(request, env_id: int):
+    """
+    获取环境
+    """
+    try:
+        env = Env.objects.get(id=env_id)
+    except Env.DoesNotExist:
+        return response(error=Error.ENV_IS_NULL)
+
+    return response(result=model_to_dict(env))
+
+
+@router.get('/env/list')
+def get_env_list(request):
+    """
+    获取环境列表
+    """
+    envs = Env.objects.all()
+    env_list = []
+    for env in envs:
+        env_list.append(model_to_dict(env))
+    return response(result=env_list)
+
+
+@router.delete('/env/{env_id}/')
+def delete_env(request, env_id: int):
+    """
+    删除环境
+    """
+    try:
+        env = Env.objects.get(id=env_id)
+        env.delete()
+    except Env.DoesNotExist:
+        return response(error=Error.ENV_IS_NULL)
+
+    return response()
+
+
+@router.put('/env/{env_id}/')
+def update_env(request, env_id: int, env: EnvIn):
+    """
+    更新环境
+    """
+    try:
+        env_obj = Env.objects.get(id=env_id)
+        env_obj.name = env.name
+        env_obj.env = env.env
+        env_obj.browser = env.browser
+        env_obj.base_url = env.base_url
+        env_obj.save()
+    except Env.DoesNotExist:
+        return response(error=Error.ENV_IS_NULL)
+
+    return response()
