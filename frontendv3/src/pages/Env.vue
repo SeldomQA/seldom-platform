@@ -5,7 +5,7 @@ import { reactive, onMounted, h, defineComponent, ref } from "vue";
 import { NIcon, useMessage, TreeOption, SelectOption } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
-import { CashOutline as CashIcon } from "@vicons/ionicons5";
+import { MenuOutline, CloudOutline, TrashOutline, PencilOutline } from "@vicons/ionicons5";
 import envForm from "@/envForm.vue";
 
 const message = useMessage();
@@ -37,23 +37,77 @@ const datas = reactive({
   loading: false,
   showDailog: false,
   modalType: 0,
+  envDatas: [],
+  envId: 0
 });
 
 // 显示创建窗口
 const showCreate = () => {
-  console.log(123);
+  datas.modalType = 1
+  datas.envId = 0
   datas.showDailog = true;
+};
+
+// 显示编辑窗口
+const showUpdate = (id: number) => {
+  datas.modalType = 0
+  datas.envId = id
+  datas.showDailog = true;
+};
+
+const getEnvList = async () => {
+  const resp = await ProjectApi.getEnvs()
+  if (resp.success === true) {
+    datas.envDatas = resp.result;
+  } else {
+    message.error(resp.error.message);
+  }
+}
+
+const deleteEnv = async (id: number) => {
+  const resp = await ProjectApi.deleteEnv(id);
+  if (resp.success === true) {
+    message.success("删除成功！");
+    getEnvList();
+  } else {
+    message.error("删除失败");
+  }
 };
 
 const onNegativeClick = () => {
   message.success("Cancel");
   datas.showDailog = false;
 };
+
 const onPositiveClick = () => {
-  message.success("Submit");
+  // message.success(JSON.stringify(form.value.model));
+  if (datas.modalType == 1) {
+    ProjectApi.createEnv(form.value.model).then((resp) => {
+      if (resp.success === true) {
+        message.success("创建成功！");
+        getEnvList();
+      } else {
+        message.error("创建失败！");
+      }
+    })
+  } else {
+    ProjectApi.updateEnv(datas.envId, form.value.model).then((resp) => {
+      if (resp.success === true) {
+        message.success("更新成功！");
+        getEnvList();
+      } else {
+        message.error("更新失败！");
+      }
+    })
+  }
   datas.showDailog = false;
-  message.success(JSON.stringify(form.value.model));
 };
+
+
+onMounted(() => {
+  getEnvList();
+});
+
 </script>
 
 <template>
@@ -73,57 +127,52 @@ const onPositiveClick = () => {
       </div>
 
       <n-space>
-        <n-thing v-for="(item, index) in envDatas" class="envthing" style="">
+        <n-thing v-for="(item, index) in datas.envDatas" class="envthing">
           <template #avatar>
             <n-avatar>
               <n-icon>
-                <cash-icon />
+                <CloudOutline />
               </n-icon>
             </n-avatar>
           </template>
-          <template #header> {{ item.header }} </template>
+          <template #header> {{ item.name }} </template>
           <template #header-extra>
             <n-button circle size="small">
               <template #icon>
-                <cash-icon />
+                <MenuOutline />
               </template>
             </n-button>
           </template>
           <template #description> {{ item.desc }} </template>
           <n-descriptions label-placement="left">
-            <n-descriptions-item
-              v-for="(val, key, index) in item.descItems"
-              :label="key"
-            >
-              {{ val }}
+            <n-descriptions-item label="base_url">
+              {{ item.base_url }}
+            </n-descriptions-item>
+            <n-descriptions-item label="browser">
+              {{ item.browser }}
+            </n-descriptions-item>
+            <n-descriptions-item label="env">
+              {{ item.env }}
             </n-descriptions-item>
           </n-descriptions>
-          <template #footer> Action </template>
+          <!-- <template #footer>  </template> -->
           <template #action>
             <n-space>
-              <n-button size="small">
+              <n-button size="small" @click="showUpdate(item.id)">
                 <template #icon>
                   <n-icon>
-                    <cash-icon />
+                    <PencilOutline />
                   </n-icon>
                 </template>
-                1 块钱
+                编辑
               </n-button>
-              <n-button size="small">
+              <n-button size="small" @click="deleteEnv(item.id)">
                 <template #icon>
                   <n-icon>
-                    <cash-icon />
+                    <TrashOutline />
                   </n-icon>
                 </template>
-                10 块钱
-              </n-button>
-              <n-button size="small">
-                <template #icon>
-                  <n-icon>
-                    <cash-icon />
-                  </n-icon>
-                </template>
-                100 块钱
+                删除
               </n-button>
             </n-space>
           </template>
@@ -131,17 +180,10 @@ const onPositiveClick = () => {
       </n-space>
     </n-card>
 
-    <n-modal
-      v-model:show="datas.showDailog"
-      style="min-width: 600px"
-      preset="dialog"
-      positive-text="确认"
-      negative-text="算了"
-      @positive-click="onPositiveClick"
-      @negative-click="onNegativeClick"
-      :title="datas.modalType ? '新建环境' : '创建项目'"
-    >
-      <envForm ref="form" />
+    <n-modal v-model:show="datas.showDailog" style="min-width: 600px" preset="dialog" positive-text="确认"
+      negative-text="算了" @positive-click="onPositiveClick" @negative-click="onNegativeClick"
+      :title="datas.modalType ? '新建环境' : '编辑环境'">
+      <envForm ref="form" :envid="datas.envId" />
     </n-modal>
   </div>
 </template>
@@ -150,6 +192,7 @@ const onPositiveClick = () => {
 .filter-line {
   padding-bottom: 20px;
 }
+
 .envthing {
   width: 400px;
   padding: 18px;
