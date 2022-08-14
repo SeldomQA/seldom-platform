@@ -18,6 +18,9 @@ class Error:
     PROJECT_ID_NULL = {"10020": "项目id不存在"}
     PROJECT_OBJECT_NULL = {"10021": "通过id查询项目不存在"}
     PROJECT_DELETE_ERROR = {"10023": "项目删除失败"}
+    PROJECT_ADDRESS_ERROR = {"10024": "项目地址错误"}
+    PROJECT_CLONE_ERROR = {"10025": "项目克隆失败"}
+    PROJECT_DIR_NULL = {"10026": "项目测试目录不存在"}
 
     FILE_TYPE_ERROR = {"10031": "文件类型错误"}
     FILE_SIZE_ERROR = {"10032": "超出文件大小"}

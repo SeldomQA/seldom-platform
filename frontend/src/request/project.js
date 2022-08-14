@@ -18,6 +18,10 @@ class ProjectApi {
     return request.put('/api/project/' + pid + '/', data)
   }
 
+  cloneProject(pid) {
+    return request.get('/api/project/' + pid + '/clone')
+  }
+
   deleteProject(pid) {
     return request.delete('/api/project/' + pid + '/')
   }

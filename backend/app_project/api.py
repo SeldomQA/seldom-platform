@@ -5,6 +5,7 @@ function: 项目管理
 """
 import os
 import hashlib
+import subprocess
 from django.shortcuts import get_object_or_404
 from ninja import File
 from ninja import Router
@@ -79,6 +80,38 @@ def update_project(request, project_id: int, project: ProjectIn):
     return response(result=model_to_dict(project_obj))
 
 
+@router.get('/{project_id}/clone')
+def clone_project(request, project_id: int):
+    """
+    git克隆项目到本地
+    """
+    project_obj = get_object_or_404(Project, pk=project_id)
+    if "/" not in project_obj.address:
+        return response(error=Error.PROJECT_ADDRESS_ERROR)
+
+    # 项目名
+    project_name = project_obj.address.split("/")[-1]
+    # 本地github地址
+    local_github_dir = file.join(BASE_DIR, "github")
+    # 本地项目地址
+    project_address = file.join(local_github_dir, project_name)
+
+    if os.path.isdir(project_address) is False:
+        args = ["clone", project_obj.address]
+        res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
+        if res == 0:
+            return response()
+        else:
+            return response(error=Error.PROJECT_CLONE_ERROR)
+    else:
+        args = ["pull"]
+        res = subprocess.check_call(['git'] + list(args), cwd=project_address)
+        if res == 0:
+            return response()
+        else:
+            return response(error=Error.PROJECT_CLONE_ERROR)
+
+
 @router.delete('/{project_id}/')
 def delete_project(request, project_id: int):
     """
@@ -137,18 +170,30 @@ def update_project_cases(request, project_id: int):
     同步项目用例
     """
     project_obj = get_object_or_404(Project, pk=project_id)
+
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
 
     # 项目本地目录
-    file.add_to_path(project_obj.address)
-    test_dir = file.join(project_obj.address, project_obj.case_dir)
+    project_name = project_obj.address.split("/")[-1]
+    github_dir = file.join(BASE_DIR, "github")
+    project_address = file.join(github_dir, project_name)
+
+    # 把项目目录加到环境变量path
+    file.add_to_path(project_address)
+
+    test_dir = file.join(project_address, project_obj.case_dir)
+
+    if os.path.isdir(test_dir) is False:
+        return response(error=Error.PROJECT_DIR_NULL)
 
     # 收集测试用例信息
     main_extend = TestMainExtend(path=test_dir)
-    seldom_case = main_extend.collect_cases(json=False, level="method")
+    seldom_case = main_extend.collect_cases(json=False)
+    print(seldom_case)
 
     platform_case = TestCase.objects.filter(project=project_obj)
+    print("platform_case", platform_case)
 
     # 从seldom项目中找到新增的用例
     for seldom in seldom_case:
@@ -158,6 +203,8 @@ def update_project_cases(request, project_id: int):
                     and seldom["method"]["name"] == platform.case_name):
                 break
         else:
+            print("seldom-file--->", seldom)
+            print("seldom-file--->", seldom["file"])
             TestCase.objects.create(
                 project_id=project_id,
                 file_name=seldom["file"],
