@@ -10,26 +10,7 @@ import envForm from "@/envForm.vue";
 
 const message = useMessage();
 
-const envDatas = [
-  {
-    header: "测试环境",
-    desc: "这是用于测试环境",
-    descItems: {
-      "base-url": "http://10.10.33.51:3000/env",
-      username: "test",
-      passwd: "123456",
-    },
-  },
-  {
-    header: "正式环境",
-    desc: "这是用于正式环境",
-    descItems: {
-      "base-url": "http://10.10.33.51:3000/env",
-      username: "admin",
-      passwd: "123456",
-    },
-  },
-];
+const envDatas = [];
 
 const form = ref();
 

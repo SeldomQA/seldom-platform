@@ -98,14 +98,7 @@ export default defineComponent({
 
     const model = ref({
       projectOptions: [],
-      envList: [{
-        value: "prod",
-        label: "正式"
-      }, {
-        value: "test",
-        label: "测试"
-      }
-      ]
+      envOptions: []
     });
 
     // 格式化tree数据
@@ -139,6 +132,23 @@ export default defineComponent({
         // datas.tableData = resp.result
         for (let i = 0; i < resp.result.length; i++) {
           model.value.projectOptions.push({
+            value: resp.result[i].id,
+            label: resp.result[i].name,
+          });
+        }
+      } else {
+        message.error(resp.error.message);
+      }
+      datas.loading = false;
+    };
+  
+    const initEnvsList = async () => {
+      datas.loading = true;
+      console.log(111);
+      const resp = await ProjectApi.getEnvs();
+      if (resp.success === true) {
+        for (let i = 0; i < resp.result.length; i++) {
+          model.value.envOptions.push({
             value: resp.result[i].id,
             label: resp.result[i].name,
           });
@@ -241,6 +251,7 @@ export default defineComponent({
 
     onMounted(() => {
       initProjectList();
+      initEnvsList();
     });
 
     return {
@@ -303,7 +314,7 @@ export default defineComponent({
           </n-form>
           <n-form inline label-placement="left">
             <n-form-item label="环境">
-              <n-select style="width: 200px" :options="model.envList" placeholder="选择环境" @update:value="changeEnv">
+              <n-select style="width: 200px" :options="model.envOptions" placeholder="选择环境" @update:value="changeEnv">
               </n-select>
             </n-form-item>
             <n-form-item label="用例">
