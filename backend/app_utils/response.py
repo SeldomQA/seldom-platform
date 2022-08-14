@@ -27,7 +27,7 @@ class Error:
 
     CASE_AUDIT_FAIL = {"20021": "没有权限审核用例"}
     CASE_AUDIT_NULL = {"20022": "没有审核通过的用例"}
-    CASE_IDR_ERROR = {"20023": "用例目录不存在"}
+    CASE_DIR_ERROR = {"20023": "用例目录不存在"}
 
     ENV_IS_NULL = {"10041": "查询环境未空"}
 

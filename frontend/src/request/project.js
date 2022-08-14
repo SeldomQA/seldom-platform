@@ -10,6 +10,10 @@ class ProjectApi {
     return request.get('/api/project/list', data)
   }
 
+  getEnvs() {
+    return request.get('/api/project/env/list')
+  }
+
   getProject(pid) {
     return request.get('/api/project/' + pid + '/')
   }

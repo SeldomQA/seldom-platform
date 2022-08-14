@@ -9,6 +9,7 @@ from app_case.models import TestCase, CaseResult
 from app_utils.response import response, Error
 from app_case.api_schma import RunCaseIn
 from app_case.api_utils import thread_run_case
+from backend.settings import BASE_DIR
 
 router = Router(tags=["case"])
 
@@ -19,6 +20,7 @@ def running_case(request, case_id: int, env: RunCaseIn):
     运行测试用例
     """
     # 运行环境
+    env = env.env
     case = get_object_or_404(TestCase, pk=case_id)
     case.status = 1
     case.save()
@@ -38,15 +40,24 @@ def running_case(request, case_id: int, env: RunCaseIn):
     # 项目目录添加环境变量
     project = Project.objects.get(id=case.project_id)
     file.add_to_path(project.address)
-    test_dir = os.path.join(project.address, project.case_dir)
-    if os.path.exists(test_dir) is False:
-        return response(error=Error.CASE_IDR_ERROR)
+
+    # 项目相关目录
+    project_name = project.address.split("/")[-1]
+    project_address = file.join(BASE_DIR, "github", project_name)
+    project_case_dir = file.join(project_address, project.case_dir)
+
+    # 判断目录是否存在
+    if os.path.exists(project_case_dir) is False:
+        return response(error=Error.CASE_DIR_ERROR)
+
+    # 添加环境变量
+    file.add_to_path(project_address)
 
     # 定义报告
     report_name = f'{str(time.time()).split(".")[0]}.xml'
     # 丢给线程执行用例
     threads = []
-    t = threading.Thread(target=thread_run_case, args=(test_dir, case_info, report_name, case.id, env))
+    t = threading.Thread(target=thread_run_case, args=(project_case_dir, case_info, report_name, case.id, env))
     threads.append(t)
     for t in threads:
         t.start()

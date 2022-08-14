@@ -3,6 +3,7 @@ import time
 import threading
 from xml.dom.minidom import parse
 from seldom.logging import log
+from seldom.utils import file
 from seldom import Seldom
 from seldom import TestMainExtend
 from app_project.models import Env
@@ -97,8 +98,9 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
         test_case.status = 2
         test_case.save()
 
-    # 删除报告文件
-    # os.remove(report_path)
+        # 删除报告文件
+        # os.remove(report_path)
+
     log.info("running end!!")
 
 
