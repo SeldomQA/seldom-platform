@@ -21,6 +21,10 @@ class ProjectApi {
     return request.delete("/api/project/" + pid + "/");
   }
 
+  cloneProject(pid) {
+    return request.get("/api/project/" + pid + "/clone");
+  }
+
   // 后续有具体删除需求备用
   // removeProjectCover(pid) {
   //   return request.put('/api/project/cover/remove/' + pid + '/')
