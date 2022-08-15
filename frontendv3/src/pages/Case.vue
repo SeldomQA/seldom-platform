@@ -44,15 +44,15 @@ const createColumns = ({
       key: "status",
       render(row) {
         if (row.status === 0) {
-          return "未执行"
+          return "未执行";
         } else if (row.status === 1) {
-          return "执行中"
+          return "执行中";
         } else if (row.status === 2) {
-          return "已执行"
+          return "已执行";
         } else {
-          return "未知"
+          return "未知";
         }
-      }
+      },
     },
     {
       title: "结果",
@@ -91,14 +91,14 @@ export default defineComponent({
         children: "children",
         label: "label",
       },
-      env: ""
+      env: null,
     });
 
     const message = useMessage();
 
     const model = ref({
       projectOptions: [],
-      envOptions: []
+      envOptions: [],
     });
 
     // 格式化tree数据
@@ -126,7 +126,6 @@ export default defineComponent({
     // 获取项目列表
     const initProjectList = async () => {
       datas.loading = true;
-      console.log(111);
       const resp = await ProjectApi.getProjects();
       if (resp.success === true) {
         // datas.tableData = resp.result
@@ -141,10 +140,9 @@ export default defineComponent({
       }
       datas.loading = false;
     };
-  
+
     const initEnvsList = async () => {
       datas.loading = true;
-      console.log(111);
       const resp = await ProjectApi.getEnvs();
       if (resp.success === true) {
         for (let i = 0; i < resp.result.length; i++) {
@@ -165,7 +163,7 @@ export default defineComponent({
       if (resp.success === true) {
         datas.fileData = treeDataFormat(resp.result.files);
         datas.caseNumber = resp.result.case_number;
-        console.log(datas.fileData);
+        // console.log(datas.fileData);
       } else {
         message.error(resp.error.message);
       }
@@ -179,7 +177,6 @@ export default defineComponent({
           (resp) => {
             if (resp.success === true) {
               message.success("获取用例成功");
-              console.log(resp.result);
               datas.caseData = resp.result;
             } else {
               message.error(resp.error.message);
@@ -234,13 +231,18 @@ export default defineComponent({
 
     // 运行用例
     const runCase = async (row) => {
-      const resp = await CaseApi.runningCase(row.id, { env:datas.env });
-      if (resp.success === true) {
-        // datas.fileData = resp.result
-        message.success("开始执行");
+      if (datas.env === null) {
+        message.warning("请选择执行环境");
       } else {
-        message.error("运行失败");
+        const resp = await CaseApi.runningCase(row.id, { env: datas.env });
+        if (resp.success === true) {
+          // datas.fileData = resp.result
+          message.success("开始执行");
+        } else {
+          message.error("运行失败");
+        }
       }
+
       // initProjectFile()
     };
 
@@ -272,7 +274,8 @@ export default defineComponent({
         },
       }),
       pagination: false as const,
-      changeProject, changeEnv,
+      changeProject,
+      changeEnv,
       syncProject,
       handleNodeClick,
       nodeProps: ({ option }: { option: TreeOption }) => {
@@ -304,22 +307,33 @@ export default defineComponent({
         <n-space justify="space-between">
           <n-form inline :model="model" label-placement="left">
             <n-form-item label="项目">
-              <n-select style="width: 200px" :options="model.projectOptions" placeholder="选择项目"
-                @update:value="changeProject">
+              <n-select
+                style="width: 200px"
+                :options="model.projectOptions"
+                placeholder="选择项目"
+                @update:value="changeProject"
+              >
               </n-select>
             </n-form-item>
             <n-form-item>
-              <n-button type="primary" @click="syncProject" size="small">同步</n-button>
+              <n-button type="primary" @click="syncProject" size="small"
+                >同步</n-button
+              >
             </n-form-item>
           </n-form>
           <n-form inline label-placement="left">
             <n-form-item label="环境">
-              <n-select style="width: 200px" :options="model.envOptions" placeholder="选择环境" @update:value="changeEnv">
+              <n-select
+                style="width: 200px"
+                :options="model.envOptions"
+                placeholder="选择环境"
+                @update:value="changeEnv"
+              >
               </n-select>
             </n-form-item>
             <n-form-item label="用例">
               <n-tag type="info" style="margin-right: 12px">{{
-                  datas.caseNumber
+                datas.caseNumber
               }}</n-tag>
               条
             </n-form-item>
@@ -330,11 +344,23 @@ export default defineComponent({
       <div>
         <n-grid x-gap="16" :cols="6">
           <n-gi>
-            <n-tree class="filetree" block-line expand-on-click :data="datas.fileData"
-              :default-expanded-keys="defaultExpandedKeys" key-field="label" :node-props="nodeProps" />
+            <n-tree
+              class="filetree"
+              block-line
+              expand-on-click
+              :data="datas.fileData"
+              :default-expanded-keys="defaultExpandedKeys"
+              key-field="label"
+              :node-props="nodeProps"
+            />
           </n-gi>
           <n-gi span="5">
-            <n-data-table :columns="columns" :data="datas.caseData" :pagination="pagination" :bordered="false" />
+            <n-data-table
+              :columns="columns"
+              :data="datas.caseData"
+              :pagination="pagination"
+              :bordered="false"
+            />
           </n-gi>
         </n-grid>
       </div>

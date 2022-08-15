@@ -1,4 +1,5 @@
 from ninja import Schema
+from typing import Optional
 
 
 class ProjectIn(Schema):
@@ -13,6 +14,6 @@ class ProjectIn(Schema):
 class EnvIn(Schema):
     """环境入参"""
     name: str
-    env: str = ""
-    browser: str = ""
-    base_url: str = ""
+    env: Optional[str] = None
+    browser: Optional[str] = None
+    base_url: Optional[str] = None
