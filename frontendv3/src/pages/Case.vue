@@ -2,10 +2,18 @@
 import ProjectApi from "~/request/project";
 import CaseApi from "~/request/case";
 import { reactive, onMounted, h, defineComponent, ref } from "vue";
-import { NButton, NIcon, useMessage, TreeOption, SelectOption } from "naive-ui";
+import {
+  NButton,
+  NIcon,
+  useMessage,
+  TreeOption,
+  SelectOption,
+  NSpace,
+} from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
 import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
+import CaseResult from "~/components/caseResult.vue";
 
 type Song = {
   no: number;
@@ -55,22 +63,36 @@ const createColumns = ({
       },
     },
     {
-      title: "结果",
-      key: "result",
-    },
-    {
       title: "操作",
       key: "actions",
       render(row) {
         return h(
-          NButton,
+          NSpace,
+          {},
           {
-            strong: true,
-            tertiary: true,
-            size: "small",
-            onClick: () => play(row, "run"),
-          },
-          { default: () => "执行" }
+            default: () => [
+              h(
+                NButton,
+                {
+                  strong: true,
+                  tertiary: true,
+                  size: "small",
+                  onClick: () => play(row, "report"),
+                },
+                { default: () => "查看" }
+              ),
+              h(
+                NButton,
+                {
+                  strong: true,
+                  tertiary: true,
+                  size: "small",
+                  onClick: () => play(row, "run"),
+                },
+                { default: () => "执行" }
+              ),
+            ],
+          }
         );
       },
     },
@@ -92,15 +114,14 @@ export default defineComponent({
         label: "label",
       },
       env: null,
+      selectedTreeNode: null,
+      selectedCase: null,
     });
-
     const message = useMessage();
-
     const model = ref({
       projectOptions: [],
       envOptions: [],
     });
-
     // 格式化tree数据
     const treeDataFormat = (datas) => {
       return datas.map((_, index) => {
@@ -112,7 +133,6 @@ export default defineComponent({
           h(NIcon, null, {
             default: () => h(isLeaf ? LogoPython : FolderOpenOutline),
           });
-
         return {
           label,
           full_name,
@@ -122,7 +142,6 @@ export default defineComponent({
         };
       });
     };
-
     // 获取项目列表
     const initProjectList = async () => {
       datas.loading = true;
@@ -140,7 +159,6 @@ export default defineComponent({
       }
       datas.loading = false;
     };
-
     const initEnvsList = async () => {
       datas.loading = true;
       const resp = await ProjectApi.getEnvs();
@@ -156,7 +174,6 @@ export default defineComponent({
       }
       datas.loading = false;
     };
-
     // 初始化项目文件列表
     const initProjectFile = async () => {
       const resp = await ProjectApi.getProjectTree(datas.projectId);
@@ -168,9 +185,9 @@ export default defineComponent({
         message.error(resp.error.message);
       }
     };
-
     // 点击项目文件
     const handleNodeClick = (data) => {
+      datas.selectedTreeNode = data;
       // 如果是文件返回 类&方法
       if (data.label.match(".py")) {
         ProjectApi.getProjectCases(datas.projectId, data.full_name).then(
@@ -204,7 +221,6 @@ export default defineComponent({
         );
       }
     };
-
     // 同步项目用例
     const syncProject = async () => {
       if (datas.projectId === "") {
@@ -219,16 +235,13 @@ export default defineComponent({
         message.error(resp.error.message);
       }
     };
-
     const changeProject = (value: string, option: SelectOption) => {
       datas.projectId = value;
       initProjectFile();
     };
-
     const changeEnv = (value: string, option: SelectOption) => {
       datas.env = value;
     };
-
     // 运行用例
     const runCase = async (row) => {
       if (datas.env === null) {
@@ -242,20 +255,36 @@ export default defineComponent({
           message.error("运行失败");
         }
       }
-
       // initProjectFile()
     };
-
+    // refresh
+    const refresh = () => {
+      if (datas.selectedTreeNode === null) {
+        message.warning("请选择左侧树节点用例文件");
+      } else {
+        ProjectApi.getProjectCases(
+          datas.projectId,
+          datas.selectedTreeNode.full_name
+        ).then((resp) => {
+          if (resp.success === true) {
+            message.success("刷新成功");
+            datas.caseData = resp.result;
+          } else {
+            message.error(resp.error.message);
+          }
+        });
+      }
+    };
     // 打开报告
     const openReport = (row) => {
-      window.open(baseUrl + "/reports/" + row.report);
+      datas.selectedCase = row;
+      showModal.value = true;
     };
-
+    const showModal = ref(false);
     onMounted(() => {
       initProjectList();
       initEnvsList();
     });
-
     return {
       datas,
       model,
@@ -278,6 +307,8 @@ export default defineComponent({
       changeEnv,
       syncProject,
       handleNodeClick,
+      initProjectList,
+      refresh,
       nodeProps: ({ option }: { option: TreeOption }) => {
         return {
           onClick() {
@@ -286,8 +317,10 @@ export default defineComponent({
         };
       },
       defaultExpandedKeys: ref(["40", "41"]),
+      showModal,
     };
   },
+  components: { CaseResult },
 });
 </script>
 
@@ -340,7 +373,10 @@ export default defineComponent({
           </n-form>
         </n-space>
       </div>
-      <h1>用例列表</h1>
+      <n-space justify="space-between" align="center">
+        <h1>用例列表</h1>
+        <n-button type="primary" @click="refresh">刷新</n-button>
+      </n-space>
       <div>
         <n-grid x-gap="16" :cols="6">
           <n-gi>
@@ -365,6 +401,20 @@ export default defineComponent({
         </n-grid>
       </div>
     </n-card>
+
+    <n-modal id="result" v-model:show="showModal">
+      <n-card
+        title="执行结果"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <template #header-extra> 噢?！ </template>
+        <CaseResult :caseid="datas.selectedCase.id" />
+        <template #footer> 尾部 </template>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
@@ -379,5 +429,10 @@ export default defineComponent({
 
 .n-tree-node-content {
   text-align: left;
+}
+
+#result {
+  height: 720px;
+  width: 1280px;
 }
 </style>

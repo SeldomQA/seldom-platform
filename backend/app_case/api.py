@@ -65,10 +65,10 @@ def running_case(request, case_id: int, env: RunCaseIn):
     return response()
 
 
-@router.post('/{case_id}/result')
+@router.get('/{case_id}/result')
 def get_case_result(request, case_id: int):
     """
-    获得测试用例
+        获取测试用例执行结果
     """
     results = CaseResult.objects.filter(case_id=case_id).order_by("-create_time")
     if len(results) == 0:
