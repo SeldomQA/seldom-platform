@@ -42,7 +42,7 @@ def running_case(request, case_id: int, env: RunCaseIn):
     file.add_to_path(project.address)
 
     # 项目相关目录
-    project_name = project.address.split("/")[-1]
+    project_name = project.address.split("/")[-1].replace(".git", "")
     project_address = file.join(BASE_DIR, "github", project_name)
     project_case_dir = file.join(project_address, project.case_dir)
 

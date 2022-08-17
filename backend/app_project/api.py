@@ -91,7 +91,7 @@ def clone_project(request, project_id: int):
         return response(error=Error.PROJECT_ADDRESS_ERROR)
 
     # 项目名
-    project_name = project_obj.address.split("/")[-1]
+    project_name = project_obj.address.split("/")[-1].replace(".git", "")
     # 本地github地址
     local_github_dir = file.join(BASE_DIR, "github")
     # 本地项目地址
