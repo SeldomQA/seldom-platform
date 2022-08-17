@@ -19,6 +19,7 @@ from app_case.models import TestCase
 from app_utils.response import response, Error, model_to_dict
 from backend.settings import BASE_DIR
 from random import randint
+
 # upload image
 IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
 
@@ -175,7 +176,7 @@ def update_project_cases(request, project_id: int):
     SeldomTestLoader.collectCaseInfo = True
 
     # 项目本地目录
-    project_name = project_obj.address.split("/")[-1]
+    project_name = project_obj.address.split("/")[-1].replace(".git", "")
     github_dir = file.join(BASE_DIR, "github")
     project_address = file.join(github_dir, project_name)
 
