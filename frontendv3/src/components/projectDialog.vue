@@ -14,7 +14,7 @@
       <n-form-item label="名称" path="name">
         <n-input v-model:value="form.name" placeholder="请输入名称" />
       </n-form-item>
-      <n-form-item label="关联项目" path="address">
+      <n-form-item label="git项目" path="address">
         <n-input v-model:value="form.address" placeholder="请输入关联项目" />
       </n-form-item>
       <n-form-item label="用例目录" path="case_dir">
@@ -23,7 +23,7 @@
       <n-form-item>
         <n-alert
           style="width: 100%"
-          title="关联项目：使用seldom开发的自动化项目路径"
+          title="克隆项目：项目的git地址"
           type="success"
         ></n-alert>
       </n-form-item>

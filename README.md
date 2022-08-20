@@ -11,12 +11,9 @@
 | backend  | 后端: django + django-ninjia |  [link](./backend/README.md)   |
 | frontend  | 前端：vue2 + element-ui |  [link](./frontend/README.md)  |
 | frontendv3  | 前端：vue3 + naive-ui |  [link](./frontendv3/README.md) |
-| seldom-web-testing  | 接入平台的seldom web项目 |  [link](./seldom-web-testing/README.md) |
 
-__注：__
-
-1. `frontend` 和 `frontendv3` 是两套并行开发前端项目，选择哪个取决于你的个人喜好。
-2. `seldom-web-testing` 只是为了方便平台开发调试，可以接入任何seldom自动化项目。
+> __注：__
+> `frontend` 和 `frontendv3` 是两套并行开发前端项目，选择哪个取决于你的个人喜好。
 
 ## seldomQA 架构
 
@@ -25,25 +22,29 @@ __注：__
 ## ToDo
 - [x] 项目管理 ✔️
 - [x] 用例管理 ✔️
-- [ ] 测试任务 ⌛
-- [ ] 测试报告
-- [ ] 测试统计
+- [x] 环境管理 ✔️
+- [ ] 登录注册 ⌛
+- [ ] 任务管理 ⌛
+- [ ] 任务报告
 
 ## Function
 
-* 项目管理
+### 项目管理
 
-![](./img/seldom-project-ui.png)
+1. 创建&编辑项目
 
-* seldom项目代码。
+![](./img/v3-project-1.png)
 
-![](./img/seldom-project.png)
+2. 克隆&拉取项目代码
 
-* 平台解析seldom项目（目录、文件、类、方法）
+![](./img/v3-project-2.png)
 
-![](./img/seldom-platfrom.png)
 
-* 用例执行日志
+### 环境管理
 
-![](./img/seldom-report.png)
+![](./img/v3-env.png)
+
+### 用例管理
+
+![](./img/v3-case.png)
 

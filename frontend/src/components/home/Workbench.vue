@@ -43,6 +43,9 @@
                     <i class="el-icon-setting" style="margin-right: 15px"></i>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item>
+                        <el-button cy-data="delete-project" @click="cloneProject(item.id)" type="text">克隆&拉取</el-button>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
                         <el-button cy-data="edit-project" @click="showEdit(item.id)" type="text" size="mini">编辑</el-button>
                       </el-dropdown-item>
                       <el-dropdown-item>
@@ -95,7 +98,7 @@ export default {
       this.loading = true
       const resp = await ProjectApi.getProjects()
       if (resp.success === true) {
-        this.tableData = resp.data
+        this.tableData = resp.result
       } else {
         this.$message.error(resp.error.message)
       }
@@ -115,6 +118,16 @@ export default {
       this.showDailog = false
       this.projectId = 0
       this.initProjects()
+    },
+    // 克隆项目到本地
+    async cloneProject(pid) {
+      const resp = await ProjectApi.cloneProject(pid)
+      if (resp.success === true) {
+        this.$message.success('克隆&拉取完成！')
+        this.initProjects()
+      } else {
+        this.$message.error('克隆失败');
+      }
     },
     // 删除一条项目信息
     async deleteProject(pid) {

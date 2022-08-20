@@ -7,7 +7,10 @@
         </el-form-item>
         <el-form-item label="关联项目" prop="address">
           <el-input cy-data="project-address"  v-model="form.address"></el-input>
-          <el-alert title="关联项目：使用seldom开发的自动化项目路径" type="success" :closable="false"></el-alert>
+          <el-alert title="克隆项目：项目的git地址" type="success" :closable="false"></el-alert>
+        </el-form-item>
+        <el-form-item label="测试目录" prop="address">
+          <el-input cy-data="project-test-dir"  v-model="form.case_dir"></el-input>
         </el-form-item>
         <el-form-item label="图片" prop="image">
           <div id="image">
@@ -43,6 +46,7 @@ export default {
       form: {
         name: '',
         address: '',
+        case_dir: '',
         cover_name: '',
         path_name: ''
       },
@@ -79,10 +83,10 @@ export default {
     async getProject() {
       const resp = await ProjectApi.getProject(this.pid)
       if (resp.success === true) {
-        this.form = resp.data
+        this.form = resp.result
         this.fileList.push({
-          name: resp.data.path_name,
-          url: 'static/images/' + resp.data.path_name
+          name: resp.result.path_name,
+          url: 'static/images/' + resp.result.path_name
         })
       } else {
         this.$message.error(resp.error.message);
