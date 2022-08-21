@@ -28,7 +28,7 @@
             <el-card>
               <div>
                   <img
-                    :src="'static/images/' + item.path_name"
+                    :src="'static/images/' + item.path_name  + '/'"
                     class="image"
                     style="height: 120px; width: 120px"
                   />
