@@ -2,23 +2,12 @@
 /**
 * @author huzhiheng
 * @date 2022-02-11
-* @desc 首页/我的工作台
+* @desc 项目管理/配置中心
 */
 -->
 <template>
-  <div class="workbench">
-    <div style="padding-bottom: 20px; height: 30px;">
-      <span class="span-left">
-        <span class="page-title">项目管理</span>
-      </span>
-      <span class="span-breadcrumb">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>工作台</el-breadcrumb-item>
-        </el-breadcrumb>
-      </span>
-    </div>
-    <el-card shadow="never">
+  <div class="main-card">
+    <div shadow="never">
       <div class="filter-line">
         <el-button cy-data="create-project" type="primary" @click="showCreate()">创建</el-button>
       </div>
@@ -68,7 +57,7 @@
           </el-col>
         </div>
       </el-row>
-    </el-card>
+    </div>
     <project-dialog v-if="showDailog" :pid=projectId @cancel="cancelProject"></project-dialog>
   </div>
 </template>
@@ -162,6 +151,7 @@ export default {
 .filter-line {
   height: 50px;
   text-align: left;
+  margin-left: 15px;
 }
 .foot-page {
   margin-top: 20px;
