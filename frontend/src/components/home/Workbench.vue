@@ -33,8 +33,14 @@
                     style="height: 120px; width: 120px"
                   />
                 </div>
-                <div style="margin-top: 10px;">
+                <!-- <div style="margin-top: 10px;">
                   <el-tag>{{item.address}}</el-tag>
+                </div> -->
+                <div style="margin-top: 10px;">
+                  <el-tag>测试目录：{{item.case_dir}}</el-tag>
+                </div>
+                <div style="margin-top: 10px;">
+                  <el-tag>文件数量：{{item.test_num}}</el-tag>
                 </div>
               <div slot="header" class="clearfix">
                 <span>【{{item.id}}】{{item.name}} </span>
