@@ -37,6 +37,16 @@
           <el-form-item label="用例" style="float: right;">
            <el-tag>{{caseNumber}}</el-tag> 条
           </el-form-item>
+          <el-form-item label="环境" style="float: right;">
+            <el-select v-model="runEnv.env" placeholder="选择项目" size="small">
+              <el-option
+                v-for="item in envOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
         </el-form>
       </div>
       <h1>用例列表</h1>
@@ -149,13 +159,18 @@ export default {
       projectOptions: [],
       drawer: false,
       activeName: 'first',
-      caseInfo: ''
+      caseInfo: '',
+      runEnv: {
+        env: ''
+      },
+      envOptions: []
     }
   },
 
   mounted() {
     // 初始化方法
     this.initProjectList()
+    this.initEnv()
   },
 
   methods: {
@@ -164,10 +179,10 @@ export default {
       this.loading = true
       const resp = await ProjectApi.getProjects()
       if (resp.success === true) {
-        for (let i = 0; i < resp.data.length; i++) {
+        for (let i = 0; i < resp.result.length; i++) {
           this.projectOptions.push({
-            value: resp.data[i].id,
-            label: resp.data[i].name
+            value: resp.result[i].id,
+            label: resp.result[i].name
           })
         }
         this.projectId = this.projectOptions[0].value
@@ -182,8 +197,23 @@ export default {
     async initProjectFile() {
       const resp = await ProjectApi.getProjectTree(this.projectId)
       if (resp.success === true) {
-        this.fileData = resp.data.files
-        this.caseNumber = resp.data.case_number
+        this.fileData = resp.result.files
+        this.caseNumber = resp.result.case_number
+      } else {
+        this.$message.error(resp.error.message)
+      }
+    },
+
+    // 初始化环境列表
+    async initEnv() {
+      const resp = await ProjectApi.getEnvs()
+      if (resp.success === true) {
+        for (let i = 0; i < resp.result.length; i++) {
+          this.envOptions.push({
+            value: resp.result[i].id,
+            label: resp.result[i].name
+          })
+        }
       } else {
         this.$message.error(resp.error.message)
       }
@@ -196,7 +226,7 @@ export default {
         ProjectApi.getProjectCases(this.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
             this.$message.success('获取用例成功')
-            this.caseData = resp.data
+            this.caseData = resp.result
           } else {
             this.$message.error(resp.error.message)
           }
@@ -210,7 +240,7 @@ export default {
         ProjectApi.getProjectSubdirectory(this.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
             this.$message.success('获取用例成功')
-            data.children = resp.data
+            data.children = resp.result
           } else {
             this.$message.error(resp.error.message)
           }
@@ -239,7 +269,7 @@ export default {
 
     // 运行用例
     async runCase(row) {
-      const resp = await CaseApi.runningCase(row.id)
+      const resp = await CaseApi.runningCase(row.id, this.runEnv)
       if (resp.success === true) {
         this.$message.success('开始执行')
       } else {

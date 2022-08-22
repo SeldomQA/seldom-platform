@@ -2,10 +2,18 @@
 import ProjectApi from "~/request/project";
 import CaseApi from "~/request/case";
 import { reactive, onMounted, h, defineComponent, ref } from "vue";
-import { NButton, NIcon, useMessage, TreeOption, SelectOption } from "naive-ui";
+import {
+  NButton,
+  NIcon,
+  useMessage,
+  TreeOption,
+  SelectOption,
+  NSpace,
+} from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
 import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
+import CaseResult from "~/components/caseResult.vue";
 
 type Song = {
   no: number;
@@ -43,34 +51,48 @@ const createColumns = ({
       title: "状态",
       key: "status",
       render(row) {
-        if (row.status === 0 ) {
-          return "未执行"
-        } else if (row.status === 1 ) {
-          return "执行中"
-        } else if (row.status === 2 ) {
-          return "已执行"
+        if (row.status === 0) {
+          return "未执行";
+        } else if (row.status === 1) {
+          return "执行中";
+        } else if (row.status === 2) {
+          return "已执行";
         } else {
-          return "未知"
+          return "未知";
         }
-      }
-    },
-    {
-      title: "结果",
-      key: "result",
+      },
     },
     {
       title: "操作",
       key: "actions",
       render(row) {
         return h(
-          NButton,
+          NSpace,
+          {},
           {
-            strong: true,
-            tertiary: true,
-            size: "small",
-            onClick: () => play(row, "run"),
-          },
-          { default: () => "执行" }
+            default: () => [
+              h(
+                NButton,
+                {
+                  strong: true,
+                  tertiary: true,
+                  size: "small",
+                  onClick: () => play(row, "report"),
+                },
+                { default: () => "查看" }
+              ),
+              h(
+                NButton,
+                {
+                  strong: true,
+                  tertiary: true,
+                  size: "small",
+                  onClick: () => play(row, "run"),
+                },
+                { default: () => "执行" }
+              ),
+            ],
+          }
         );
       },
     },
@@ -91,14 +113,15 @@ export default defineComponent({
         children: "children",
         label: "label",
       },
+      env: null,
+      selectedTreeNode: null,
+      selectedCase: null,
     });
-
     const message = useMessage();
-
     const model = ref({
       projectOptions: [],
+      envOptions: [],
     });
-
     // 格式化tree数据
     const treeDataFormat = (datas) => {
       return datas.map((_, index) => {
@@ -110,7 +133,6 @@ export default defineComponent({
           h(NIcon, null, {
             default: () => h(isLeaf ? LogoPython : FolderOpenOutline),
           });
-
         return {
           label,
           full_name,
@@ -120,17 +142,16 @@ export default defineComponent({
         };
       });
     };
-
     // 获取项目列表
     const initProjectList = async () => {
       datas.loading = true;
       const resp = await ProjectApi.getProjects();
       if (resp.success === true) {
-        // datas.tableData = resp.data
-        for (let i = 0; i < resp.data.length; i++) {
+        // datas.tableData = resp.result
+        for (let i = 0; i < resp.result.length; i++) {
           model.value.projectOptions.push({
-            value: resp.data[i].id,
-            label: resp.data[i].name,
+            value: resp.result[i].id,
+            label: resp.result[i].name,
           });
         }
       } else {
@@ -138,29 +159,42 @@ export default defineComponent({
       }
       datas.loading = false;
     };
-
+    const initEnvsList = async () => {
+      datas.loading = true;
+      const resp = await ProjectApi.getEnvs();
+      if (resp.success === true) {
+        for (let i = 0; i < resp.result.length; i++) {
+          model.value.envOptions.push({
+            value: resp.result[i].id,
+            label: resp.result[i].name,
+          });
+        }
+      } else {
+        message.error(resp.error.message);
+      }
+      datas.loading = false;
+    };
     // 初始化项目文件列表
     const initProjectFile = async () => {
       const resp = await ProjectApi.getProjectTree(datas.projectId);
       if (resp.success === true) {
-        datas.fileData = treeDataFormat(resp.data.files);
-        datas.caseNumber = resp.data.case_number;
-        console.log(datas.fileData);
+        datas.fileData = treeDataFormat(resp.result.files);
+        datas.caseNumber = resp.result.case_number;
+        // console.log(datas.fileData);
       } else {
         message.error(resp.error.message);
       }
     };
-
     // 点击项目文件
     const handleNodeClick = (data) => {
+      datas.selectedTreeNode = data;
       // 如果是文件返回 类&方法
       if (data.label.match(".py")) {
         ProjectApi.getProjectCases(datas.projectId, data.full_name).then(
           (resp) => {
             if (resp.success === true) {
               message.success("获取用例成功");
-              console.log(resp.data);
-              datas.caseData = resp.data;
+              datas.caseData = resp.result;
             } else {
               message.error(resp.error.message);
             }
@@ -176,9 +210,9 @@ export default defineComponent({
           (resp) => {
             if (resp.success === true) {
               message.success("获取用例成功");
-              // console.log(resp.data);
-              data.children = treeDataFormat(resp.data);
-              // datas.caseData = resp.data
+              // console.log(resp.result);
+              data.children = treeDataFormat(resp.result);
+              // datas.caseData = resp.result
               // datas.initProject()
             } else {
               message.error(resp.error.message);
@@ -187,7 +221,6 @@ export default defineComponent({
         );
       }
     };
-
     // 同步项目用例
     const syncProject = async () => {
       if (datas.projectId === "") {
@@ -202,33 +235,56 @@ export default defineComponent({
         message.error(resp.error.message);
       }
     };
-
     const changeProject = (value: string, option: SelectOption) => {
       datas.projectId = value;
       initProjectFile();
     };
-
+    const changeEnv = (value: string, option: SelectOption) => {
+      datas.env = value;
+    };
     // 运行用例
     const runCase = async (row) => {
-      const resp = await CaseApi.runningCase(row.id);
-      if (resp.success === true) {
-        // datas.fileData = resp.data
-        message.success("开始执行");
+      if (datas.env === null) {
+        message.warning("请选择执行环境");
       } else {
-        message.error("运行失败");
+        const resp = await CaseApi.runningCase(row.id, { env: datas.env });
+        if (resp.success === true) {
+          // datas.fileData = resp.result
+          message.success("开始执行");
+        } else {
+          message.error("运行失败");
+        }
       }
       // initProjectFile()
     };
-
+    // refresh
+    const refresh = () => {
+      if (datas.selectedTreeNode === null) {
+        message.warning("请选择左侧树节点用例文件");
+      } else {
+        ProjectApi.getProjectCases(
+          datas.projectId,
+          datas.selectedTreeNode.full_name
+        ).then((resp) => {
+          if (resp.success === true) {
+            message.success("刷新成功");
+            datas.caseData = resp.result;
+          } else {
+            message.error(resp.error.message);
+          }
+        });
+      }
+    };
     // 打开报告
     const openReport = (row) => {
-      window.open(baseUrl + "/reports/" + row.report);
+      datas.selectedCase = row;
+      showModal.value = true;
     };
-
+    const showModal = ref(false);
     onMounted(() => {
       initProjectList();
+      initEnvsList();
     });
-
     return {
       datas,
       model,
@@ -248,8 +304,11 @@ export default defineComponent({
       }),
       pagination: false as const,
       changeProject,
+      changeEnv,
       syncProject,
       handleNodeClick,
+      initProjectList,
+      refresh,
       nodeProps: ({ option }: { option: TreeOption }) => {
         return {
           onClick() {
@@ -258,8 +317,10 @@ export default defineComponent({
         };
       },
       defaultExpandedKeys: ref(["40", "41"]),
+      showModal,
     };
   },
+  components: { CaseResult },
 });
 </script>
 
@@ -293,15 +354,29 @@ export default defineComponent({
               >
             </n-form-item>
           </n-form>
-          <n-form-item label="用例" label-placement="left">
-            <n-tag type="info" style="margin-right: 12px">{{
-              datas.caseNumber
-            }}</n-tag>
-            条
-          </n-form-item>
+          <n-form inline label-placement="left">
+            <n-form-item label="环境">
+              <n-select
+                style="width: 200px"
+                :options="model.envOptions"
+                placeholder="选择环境"
+                @update:value="changeEnv"
+              >
+              </n-select>
+            </n-form-item>
+            <n-form-item label="用例">
+              <n-tag type="info" style="margin-right: 12px">{{
+                datas.caseNumber
+              }}</n-tag>
+              条
+            </n-form-item>
+          </n-form>
         </n-space>
       </div>
-      <h1>用例列表</h1>
+      <n-space justify="space-between" align="center">
+        <h1>用例列表</h1>
+        <n-button type="primary" @click="refresh">刷新</n-button>
+      </n-space>
       <div>
         <n-grid x-gap="16" :cols="6">
           <n-gi>
@@ -326,14 +401,38 @@ export default defineComponent({
         </n-grid>
       </div>
     </n-card>
+
+    <n-modal id="result" v-model:show="showModal">
+      <n-card
+        title="执行结果"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <template #header-extra> 噢?！ </template>
+        <CaseResult :caseid="datas.selectedCase.id" />
+        <template #footer> 尾部 </template>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <style>
+.filter-line {
+  padding-bottom: 20px;
+}
+
 .filetree {
   border: solid 1px var(--n-border-color);
 }
+
 .n-tree-node-content {
   text-align: left;
+}
+
+#result {
+  height: 720px;
+  width: 1280px;
 }
 </style>
