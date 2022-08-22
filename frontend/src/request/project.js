@@ -10,12 +10,20 @@ class ProjectApi {
     return request.get('/api/project/list', data)
   }
 
+  getEnvs() {
+    return request.get('/api/project/env/list')
+  }
+
   getProject(pid) {
     return request.get('/api/project/' + pid + '/')
   }
 
   updateProject(pid, data) {
     return request.put('/api/project/' + pid + '/', data)
+  }
+
+  cloneProject(pid) {
+    return request.get('/api/project/' + pid + '/clone')
   }
 
   deleteProject(pid) {

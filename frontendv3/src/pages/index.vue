@@ -54,7 +54,22 @@ const deleteProject = async (pid: number) => {
   }
 };
 
+// 克隆拉取项目信息
+const cloneProject = async (pid: number) => {
+  const resp = await ProjectApi.cloneProject(pid);
+  if (resp.success === true) {
+    message.success("克隆&拉取成功！");
+    initProjects();
+  } else {
+    message.error("克隆&拉取失败");
+  }
+};
+
 const options = [
+  {
+    label: "克隆&拉取",
+    key: "clone",
+  },
   {
     label: "编辑",
     key: "edit",
@@ -67,6 +82,9 @@ const options = [
 
 const handleSelect = (key: string | number, pid: number) => {
   switch (key) {
+    case "clone":
+      cloneProject(pid);
+      break;
     case "edit":
       showEdit(pid);
       break;

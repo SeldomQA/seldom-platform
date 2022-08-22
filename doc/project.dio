@@ -1,0 +1,54 @@
+<mxfile host="65bd71144e">
+    <diagram id="GofeY0m8e1OVXqnM-FnF" name="Page-1">
+        <mxGraphModel dx="932" dy="819" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.containers.marginRect2;rectMarginLeft=67;strokeColor=#666666;gradientColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="70" y="90" width="730" height="340" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Tab 1" style="strokeColor=inherit;fillColor=inherit;gradientColor=inherit;strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.containers.rrect;rSize=0;fontSize=17;fontColor=#666666;" vertex="1" parent="2">
+                    <mxGeometry width="70" height="25" relative="1" as="geometry">
+                        <mxPoint x="-10" y="10" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="4" value="项目管理" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.containers.rrect;rSize=0;fontSize=17;fontColor=#ffffff;strokeColor=#008cff;fillColor=#008cff;" vertex="1" parent="2">
+                    <mxGeometry width="70" height="25" relative="1" as="geometry">
+                        <mxPoint x="-10" y="40" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="5" value="Tab 3" style="strokeColor=inherit;fillColor=inherit;gradientColor=inherit;strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.containers.rrect;rSize=0;fontSize=17;fontColor=#666666;" vertex="1" parent="2">
+                    <mxGeometry width="70" height="25" relative="1" as="geometry">
+                        <mxPoint x="-10" y="70" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="6" value="" style="strokeWidth=1;shadow=0;dashed=0;align=center;html=1;shape=mxgraph.mockup.containers.leftButton;rSize=5;strokeColor=#008cff;fillColor=#008cff;resizeHeight=1;movable=0;deletable=0;" vertex="1" parent="2">
+                    <mxGeometry width="7" height="340" relative="1" as="geometry">
+                        <mxPoint x="60" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7" value="创建" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.rrect;rSize=5;strokeColor=none;strokeWidth=1;fillColor=#0085FC;fontColor=#FFFFFF;whiteSpace=wrap;align=center;verticalAlign=middle;spacingLeft=0;fontStyle=0;fontSize=16;spacing=5;" vertex="1" parent="2">
+                    <mxGeometry x="120" y="32.9" width="80" height="37.1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="&lt;br&gt;github: http://github.com/xxx/xxx&lt;br&gt;测试目录：test_dir&lt;br&gt;文件数量：321&lt;br&gt;" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.rrect;rSize=5;strokeColor=#0085FC;html=1;whiteSpace=wrap;fillColor=#ffffff;fontColor=#0085FC;verticalAlign=bottom;align=left;spacing=20;spacingBottom=0;fontSize=14;" vertex="1" parent="2">
+                    <mxGeometry x="120" y="100" width="250" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="seldom-api-testing" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.topButton;rSize=5;perimeter=none;whiteSpace=wrap;fillColor=#F7F7F7;strokeColor=#0085FC;fontColor=#212529;resizeWidth=1;fontSize=18;align=left;spacing=20;" vertex="1" parent="8">
+                    <mxGeometry width="250" height="50" relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="拉取" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.rrect;rSize=5;strokeColor=#0085FC;strokeWidth=1;fillColor=none;fontColor=#0085FC;whiteSpace=wrap;align=center;verticalAlign=middle;spacingLeft=0;fontStyle=0;fontSize=16;spacing=5;" vertex="1" parent="8">
+                    <mxGeometry x="148" y="140" width="76" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;br&gt;github: http://github.com/xxx/xxx&lt;br&gt;测试目录：test_dir&lt;br&gt;文件数量：0" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.rrect;rSize=5;strokeColor=#0085FC;html=1;whiteSpace=wrap;fillColor=#ffffff;fontColor=#0085FC;verticalAlign=bottom;align=left;spacing=20;spacingBottom=0;fontSize=14;" vertex="1" parent="2">
+                    <mxGeometry x="410" y="100" width="250" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="seldom-web-testing" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.topButton;rSize=5;perimeter=none;whiteSpace=wrap;fillColor=#F7F7F7;strokeColor=#0085FC;fontColor=#212529;resizeWidth=1;fontSize=18;align=left;spacing=20;" vertex="1" parent="11">
+                    <mxGeometry width="250" height="50" relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="克隆" style="html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.rrect;rSize=5;strokeColor=none;strokeWidth=1;fillColor=#0085FC;fontColor=#FFFFFF;whiteSpace=wrap;align=center;verticalAlign=middle;spacingLeft=0;fontStyle=0;fontSize=16;spacing=5;" vertex="1" parent="11">
+                    <mxGeometry x="150" y="140" width="70" height="30" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
