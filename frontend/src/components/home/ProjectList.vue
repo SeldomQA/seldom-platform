@@ -38,13 +38,13 @@
                     <i class="el-icon-setting" style="margin-right: 15px"></i>
                     <el-dropdown-menu slot="dropdown">
                       <el-dropdown-item>
-                        <el-button cy-data="delete-project" @click="cloneProject(item.id)" type="text">克隆&拉取</el-button>
+                        <el-button cy-data="delete-project" @click="cloneProject(item.id)" type="text" class="dropdown-menu">克隆&拉取</el-button>
                       </el-dropdown-item>
                       <el-dropdown-item>
-                        <el-button cy-data="edit-project" @click="showEdit(item.id)" type="text" size="mini">编辑</el-button>
+                        <el-button cy-data="edit-project" @click="showEdit(item.id)" type="text" class="dropdown-menu">编辑</el-button>
                       </el-dropdown-item>
                       <el-dropdown-item>
-                        <el-button cy-data="delete-project" @click="deleteProject(item.id)" type="text">删除</el-button>
+                        <el-button cy-data="delete-project" @click="deleteProject(item.id)" type="text" class="dropdown-menu">删除</el-button>
                       </el-dropdown-item>
                     </el-dropdown-menu>
                   </el-dropdown>
@@ -163,5 +163,9 @@ export default {
   margin-right: 15px;
   margin-top: 15px;
   margin-bottom: 15px
+}
+.dropdown-menu {
+  width: 100%;
+  text-align: left;
 }
 </style>
