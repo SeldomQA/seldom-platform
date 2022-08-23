@@ -11,7 +11,7 @@ from django_apscheduler.jobstores import DjangoJobStore, register_events, regist
 from app_project.models import Project, Env
 from app_case.models import TestCase
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
-from app_task.api_schma import TaskIn, TimedIn, ReportOut, ReportIn, TaskListIn
+from app_task.api_schma import TaskIn, TimedIn, ReportOut, ReportIn
 from app_task.api_utils import thread_run_task
 from app_utils.response import response, model_to_dict, Error
 from app_utils.pagination import CustomPagination
@@ -197,10 +197,9 @@ def add_timed(request, task_id: int, timed: TimedIn):
             }
         })
 
-    # 项目目录添加环境变量
+    # 测试用例目录
     project = Project.objects.get(id=task.project_id)
     project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
-    file.add_to_path(project_dir)
     test_dir = file.join(project_dir, project.case_dir)
     if os.path.exists(test_dir) is False:
         return response(error=Error.CASE_DIR_ERROR)
