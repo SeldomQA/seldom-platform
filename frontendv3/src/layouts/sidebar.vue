@@ -13,7 +13,9 @@ import {
   FolderOpenOutline,
   DocumentTextOutline,
   CalendarOutline,
-  SettingsOutline
+  SettingsOutline,
+  CloudOutline,
+  PeopleOutline, MailOutline
 } from "@vicons/ionicons5";
 
 function renderIcon(icon: Component) {
@@ -22,22 +24,48 @@ function renderIcon(icon: Component) {
 
 const menuOptions: MenuOption[] = [
   {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: "index",
-            params: {
-              lang: "zh-CN",
+    label: '配置管理',
+    key: 'system-setting',
+    icon: renderIcon(SettingsOutline),
+    children: [{
+      label: () =>
+        h(
+          RouterLink,
+          {
+            to: {
+              name: "index",
+              params: {
+                lang: "zh-CN",
+              },
             },
           },
-        },
-        { default: () => "项目管理" }
-      ),
-    key: "go-back-home",
-    icon: renderIcon(HomeOutline),
+          { default: () => "项目管理" }
+        ),
+      key: "go-back-home",
+      icon: renderIcon(HomeOutline),
+    }, {
+      label: () =>
+        h(
+          RouterLink,
+          {
+            to: {
+              name: "Env",
+              params: {
+                lang: "zh-CN",
+              },
+            },
+          },
+          { default: () => "环境管理" }
+        ),
+      key: "go-back-env",
+      icon: renderIcon(CloudOutline),
+    }, {
+      label: '团队管理', key: 'team', icon: renderIcon(PeopleOutline)
+    }, {
+      label: '邮件组', key: 'mail', icon: renderIcon(MailOutline)
+    }]
   },
+
   {
     label: () =>
       h(
@@ -89,23 +117,7 @@ const menuOptions: MenuOption[] = [
     key: "go-back-report",
     icon: renderIcon(DocumentTextOutline),
   },
-    {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: "Env",
-            params: {
-              lang: "zh-CN",
-            },
-          },
-        },
-        { default: () => "环境配置" }
-      ),
-    key: "go-back-env",
-    icon: renderIcon(SettingsOutline),
-  },
+
 ];
 
 export default defineComponent({
@@ -113,8 +125,8 @@ export default defineComponent({
     return {
       menuOptions,
       handleUpdateValue(key: string, item: MenuOption) {
-        console.log("[onUpdate:value]: " + JSON.stringify(key));
-        console.log("[onUpdate:value]: " + JSON.stringify(item));
+        // console.log("[onUpdate:value]: " + JSON.stringify(key));
+        // console.log("[onUpdate:value]: " + JSON.stringify(item));
       },
     };
   },
