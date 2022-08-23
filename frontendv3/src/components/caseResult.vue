@@ -2,7 +2,6 @@
 import { FormInst, useMessage } from "naive-ui";
 import {
   defineComponent,
-  defineProps,
   reactive,
   ref,
   onMounted,
