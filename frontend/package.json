@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve serve",
-    "build": "vue-cli-service build serve",
-    "local-serve": "vue-cli-service serve --mode local",
-    "local-build": "vue-cli-service build --mode local",
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service serve",
+    "dev-serve": "vue-cli-service serve --mode dev",
+    "dev-build": "vue-cli-service build --mode dev",
     "prod-serve": "vue-cli-service serve --mode prod",
     "prod-build": "vue-cli-service build --mode prod",
     "test:e2e": "vue-cli-service test:e2e",
@@ -16,6 +16,7 @@
     "axios": "^0.23.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
+    "serve": "^14.0.1",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
     "vuex": "^3.4.0"

@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Workbench from '../components/home/Workbench.vue'
+import SettingTabs from '../components/home/SettingTabs.vue'
 import Case from '../components/cases/Case.vue'
 import Task from '../components/tasks/Task.vue'
 import Report from '../components/reports/Report.vue'
@@ -10,8 +10,8 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Workbench',
-    component: Workbench
+    name: 'Setting',
+    component: SettingTabs
   },
   {
     path: '/cases',

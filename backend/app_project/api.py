@@ -35,11 +35,15 @@ def create_project(request, project: ProjectIn):
     if project.cover_name == "" and project.path_name == "":
         project.cover_name = "seldom_logo.png"
         project.path_name = "2d82cb919cf05116adf720f8f7437ac9.png"
-
+    #设置默认目录
+    if project.case_dir == "":
+        project_case_dir = "test_dir"
+    else:
+        project_case_dir = project.case_dir
     project_obj = Project.objects.create(
         name=project.name,
         address=project.address,
-        case_dir=project.case_dir,
+        case_dir=project_case_dir,
         cover_name=project.cover_name,
         path_name=project.path_name)
     return response(result=model_to_dict(project_obj))
@@ -101,6 +105,13 @@ def clone_project(request, project_id: int):
         args = ["clone", project_obj.address]
         res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
         if res == 0:
+            #获取文件数量
+            test_num = 0
+            for dirpath, dirnames, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            project_obj.save()
             return response()
         else:
             return response(error=Error.PROJECT_CLONE_ERROR)
@@ -108,6 +119,13 @@ def clone_project(request, project_id: int):
         args = ["pull"]
         res = subprocess.check_call(['git'] + list(args), cwd=project_address)
         if res == 0:
+            #获取文件数量
+            test_num = 0
+            for dirpath, dirnames, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            project_obj.save()
             return response()
         else:
             return response(error=Error.PROJECT_CLONE_ERROR)
