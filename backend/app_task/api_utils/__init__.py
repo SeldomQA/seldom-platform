@@ -27,11 +27,22 @@ def seldom_running(test_dir, case_info, report_name, task_id):
 
     # 环境判断
     env = Env.objects.get(id=env)
-    Seldom.env = env.env
-    base_url = env.base_url
+    if env.browser == "":
+        browser = None
+    else:
+        browser = env.browser
+
+    if env.env == "":
+        Seldom.env = None
+    else:
+        Seldom.env = env.env
+    if env.base_url == "":
+        base_url = None
+    else:
+        base_url = env.base_url
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url)
+    main_extend = TestMainExtend(path=test_dir, browser=browser, report=report_name, base_url=base_url)
     main_extend.run_cases(case_info)
     time.sleep(2)
 

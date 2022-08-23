@@ -11,16 +11,16 @@ from django_apscheduler.jobstores import DjangoJobStore, register_events, regist
 from app_project.models import Project, Env
 from app_case.models import TestCase
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
-from app_task.api_schma import TaskIn, TimedIn, ReportOut, ReportIn
+from app_task.api_schma import TaskIn, TimedIn, ReportOut, ReportIn, TaskListIn
 from app_task.api_utils import thread_run_task
-from app_utils.response import response, model_to_dict
+from app_utils.response import response, model_to_dict, Error
 from app_utils.pagination import CustomPagination
 from backend.settings import BASE_DIR
 
 
 # 定时任务
 scheduler = BackgroundScheduler()
-scheduler.add_jobstore(DjangoJobStore(), 'default')
+# scheduler.add_jobstore(DjangoJobStore(), 'default')
 
 router = Router(tags=["task"])
 
@@ -30,11 +30,9 @@ def create_task(request, task: TaskIn):
     """
     创建任务
     """
-
     task_obj = TestTask.objects.create(
         name=task.name,
         env=task.env,
-        email=task.email,
         project_id=task.project,
     )
 
@@ -74,11 +72,11 @@ def get_task(request, task_id: int):
 
 
 @router.get('/list')
-def get_task_list(request):
+def get_task_list(request, project_id: int):
     """
     获得任务列表
     """
-    tasks = TestTask.objects.all()
+    tasks = TestTask.objects.filter(project_id=project_id)
     task_list = []
     for task in tasks:
         task_dict = model_to_dict(task)
@@ -106,7 +104,6 @@ def update_task(request, task_id: int, task: TaskIn):
     env = Env.objects.get(id=task.env)
     task_obj.name = task.name
     task_obj.env = env.id
-    task_obj.email = task.email
     task_obj.save()
 
     TaskCaseRelevance.objects.filter(task=task_obj).delete()
@@ -136,8 +133,7 @@ def running_task(request, task_id: int):
     """
     # 保存定时任务格式
     task = TestTask.objects.get(id=task_id)
-    task.status = 2
-    task.save()
+
     relevance = TaskCaseRelevance.objects.filter(task_id=task_id)
     case_list = []
     for r in relevance:
@@ -156,8 +152,13 @@ def running_task(request, task_id: int):
 
     # 项目目录添加环境变量
     project = Project.objects.get(id=task.project_id)
-    file.add_to_path(file.join(BASE_DIR, project.address))
-    test_dir = file.join(os.path.dirname(BASE_DIR), project.address, project.case_dir)
+
+    project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
+    file.add_to_path(project_dir)
+    test_dir = file.join(project_dir, project.case_dir)
+
+    if os.path.exists(test_dir) is False:
+        return response(error=Error.CASE_DIR_ERROR)
 
     # 定义报告
     report_name = f'{task.name}_{str(time.time()).split(".")[0]}.xml'
@@ -198,8 +199,11 @@ def add_timed(request, task_id: int, timed: TimedIn):
 
     # 项目目录添加环境变量
     project = Project.objects.get(id=task.project_id)
-    file.add_to_path(file.join(BASE_DIR, project.address))
-    test_dir = file.join(BASE_DIR, project.address, project.case_dir)
+    project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
+    file.add_to_path(project_dir)
+    test_dir = file.join(project_dir, project.case_dir)
+    if os.path.exists(test_dir) is False:
+        return response(error=Error.CASE_DIR_ERROR)
 
     # 定义报告
     report_name = f'{task.name}_{str(time.time()).split(".")[0]}.xml'
@@ -210,7 +214,7 @@ def add_timed(request, task_id: int, timed: TimedIn):
         scheduler.remove_job(job_id=task.job_id)
 
     # 添加定时任务
-    job_id = scheduler.add_job(thread_run_task, 'cron', args=[test_dir, case_list, report_name, task_id, True],
+    job_id = scheduler.add_job(thread_run_task, 'cron', args=[test_dir, case_list, report_name, task_id],
                                minute=timed.minute,
                                hour=timed.hour,
                                day_of_week=timed.day_of_week,
@@ -221,7 +225,7 @@ def add_timed(request, task_id: int, timed: TimedIn):
                                max_instances=1,
                                replace_existing=True,
                                )
-    register_events(scheduler)
+
     try:
         scheduler.start()
     except SchedulerAlreadyRunningError:
@@ -259,7 +263,7 @@ def get_report_list(request):
     """
     获得任务报告列表（分页）
     """
-    return TaskReport.objects.all().order_by("-create_time")
+    return TaskReport.objects.all().order_by("-create_time")[:1000]
 
 
 @router.post("/report/{report_id}/results")

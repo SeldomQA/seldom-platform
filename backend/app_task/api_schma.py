@@ -7,7 +7,6 @@ class TaskIn(Schema):
     project: str
     name: str
     env: str
-    email: str
     cases: list
 
 
