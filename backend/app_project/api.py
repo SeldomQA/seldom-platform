@@ -285,29 +285,19 @@ def get_project_files(request, project_id: int):
 
 
 @router.get('/{project_id}/cases')
-def get_project_file_cases(request, project_id: int, file_name: str, audit: bool = None):
+def get_project_file_cases(request, project_id: int, file_name: str):
     """
     获取文件下面的测试用例
     """
     # 如果是文件，直接取文件的类、方法
     if ".py" in file_name:
-        if audit is not None:
-            file_cases = TestCase.objects.filter(
-                project_id=project_id,
-                file_name=file_name[0:-3],
-                audit=audit,
-            )
-        else:
-            file_cases = TestCase.objects.filter(
-                project_id=project_id,
-                file_name=file_name[0:-3]
-            )
+        file_cases = TestCase.objects.filter(
+            project_id=project_id,
+            file_name=file_name[0:-3]
+        )
         case_list = []
         for case in file_cases:
             case_list.append(model_to_dict(case))
-        # 通过接口返回
-        if len(case_list) == 0:
-            return response(error=Error.CASE_AUDIT_NULL)
 
         return response(result=case_list)
 
