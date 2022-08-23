@@ -64,7 +64,7 @@ onMounted(() => {
         </n-descriptions-item>
       </n-descriptions>
       <h3 style="text-align: left">运行日志</h3>
-      <textarea style="width: 96%;border-color: gray;" rows="20">
+      <textarea style="width: 96%; border-color: gray" rows="20">
         {{ result.system_out }}
       </textarea>
     </template>
