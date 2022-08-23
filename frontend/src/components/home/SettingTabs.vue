@@ -23,7 +23,7 @@
         <project-list v-if="showTab == 1"></project-list>
       </el-tab-pane>
       <el-tab-pane label="环境管理" name="env">
-        <env-list v-if="showTab == 2"></env-list>
+        <EnvList v-if="showTab == 2"></EnvList>
       </el-tab-pane>
       <el-tab-pane label="团队管理" name="team">团队管理</el-tab-pane>
       <el-tab-pane label="邮件组" name="emailGroup">邮件组</el-tab-pane>

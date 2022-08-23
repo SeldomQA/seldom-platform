@@ -7,28 +7,93 @@
 -->
 <template>
   <div class="main-card">
-    环境管理页
+      <div class="filter-line">
+        <el-button cy-data="create-project" type="primary" @click="showCreate()">创建</el-button>
+      </div>
+      <div class="envlist">
+      <el-table :data="envData" border style="width: 100%">
+        <el-table-column fixed prop="id" label="ID" width="80">
+        </el-table-column>
+        <el-table-column prop="name" label="名称"> </el-table-column>
+        <el-table-column prop="base_url" label="base_url"> </el-table-column>
+        <el-table-column prop="browser" label="browser"> </el-table-column>
+        <el-table-column prop="env" label="env"> </el-table-column>
+        <el-table-column prop="update_time" label="更新时间"> </el-table-column>
+        <el-table-column fixed="right" label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button type="text" size="small" @click="showEdit(scope.row)"
+              >编辑</el-button
+            >
+            <el-button type="text" size="small" @click="deleteEnv(scope.row)"
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+      </div>
+      <EnvDialog v-if="showDailog" @cancel="cancelEnv" :eid=envid></EnvDialog>
   </div>
 </template>
 
 <script>
+import EnvApi from '../../request/env'
+import EnvDialog from './EnvDialog'
 
 export default {
   components: {
-    // 组件
+    EnvDialog
   },
   data() {
     return {
-      loading: false
+      loading: false,
+      envData: [],
+      showDailog: false,
+      envid: 0
     }
   },
 
   mounted() {
-    // 初始化方法
+    this.initEnvList()
   },
-
   methods: {
-    // 定义方法
+    // 初始化获取环境列表
+    async initEnvList() {
+      console.log('获取环境列表');
+      const resp = await EnvApi.GetEnvList();
+      if (resp.success === true) {
+        this.envData = resp.result;
+        // this.$message.success("查询成功");
+      } else {
+        this.$message.error('查询失败!');
+      }
+    },
+    // 显示创建窗口
+    showCreate() {
+      this.showDailog = true
+    },
+    // 显示编辑窗口
+    showEdit(obj) {
+      this.envid = obj.id
+      this.showDailog = true
+    },
+    // 子组件的回调
+    cancelEnv() {
+      this.showDailog = false
+      this.envid = 0
+      this.initEnvList()
+    },
+    // 删除环境信息
+    async deleteEnv(obj) {
+      this.envid = obj.id
+      const resp = await EnvApi.DeleteEnv(this.envid);
+      if (resp.success === true) {
+        this.$message.success('删除成功');
+        this.initEnvList()
+        this.envid = 0
+      } else {
+        this.$message.error('删除失败!');
+      }
+    }
   }
 }
 </script>
