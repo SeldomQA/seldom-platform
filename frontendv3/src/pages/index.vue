@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, onMounted } from "vue";
 import { useMessage } from "naive-ui";
-import { SettingsOutline, LogoPython, GitMergeOutline } from "@vicons/ionicons5";
+import { SettingsOutline, DocumentTextOutline, GitMergeOutline } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
 import ProjectDialog from "@/projectDialog.vue";
 import baseUrl from "~/config/base-url";
@@ -138,14 +138,16 @@ onMounted(() => {
                 <img :src="baseUrl + '/static/images/' + item.path_name" style="height: 100%; width: 100%" />
               </div>
               <template #footer>
-                <n-icon>
-                  <GitMergeOutline />
-                </n-icon> {{ item.address }}
+                <p>
+                  <n-icon>
+                    <GitMergeOutline />
+                  </n-icon> {{ item.address }}
+                </p>
               </template>
               <template #action>
                 <div>
                   <n-icon>
-                    <LogoPython />
+                    <DocumentTextOutline />
                   </n-icon> {{ item.test_num }}
                 </div>
               </template>
