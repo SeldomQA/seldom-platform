@@ -14,6 +14,7 @@ class Project(models.Model):
     cover_name = models.CharField("封面名称", max_length=64, default="")
     path_name = models.CharField("封面路径名称", max_length=64, default="")
     test_num = models.IntegerField("文件数", default=0)
+    is_clone = models.IntegerField("克隆", default=0)
 
     def __str__(self):
         return self.name

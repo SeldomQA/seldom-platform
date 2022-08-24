@@ -55,6 +55,18 @@ def get_projects(request):
     获取项目列表
     """
     projects = Project.objects.filter(is_delete=False)
+    for project in projects:
+        # 项目名
+        project_name = project.address.split("/")[-1].replace(".git", "")
+        # 本地github地址
+        local_github_dir = file.join(BASE_DIR, "github")
+        # 本地项目地址
+        project_address = file.join(local_github_dir, project_name)
+        # 判断本地是否有克隆文件
+        if os.path.isdir(project_address) is True:
+            # 调整为已克隆
+            project.is_clone = 1
+            project.save()
     project_list = []
     for project in projects:
         project_list.append(model_to_dict(project))
@@ -103,7 +115,12 @@ def clone_project(request, project_id: int):
 
     if os.path.isdir(project_address) is False:
         args = ["clone", project_obj.address]
-        res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
+        try:
+            res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
+        except NotADirectoryError:
+            # 没有目录，创建目录
+            os.mkdir(local_github_dir)
+            res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
         if res == 0:
             #获取文件数量
             test_num = 0
@@ -111,6 +128,8 @@ def clone_project(request, project_id: int):
                 file_counts = len(filenames)
                 test_num = test_num + file_counts
             project_obj.test_num = test_num
+            #调整为已克隆
+            project_obj.is_clone = 1
             project_obj.save()
             return response()
         else:
