@@ -67,6 +67,9 @@ def get_projects(request):
             # 调整为已克隆
             project.is_clone = 1
             project.save()
+        else:
+            project.is_clone = 0
+            project.save()
     project_list = []
     for project in projects:
         project_list.append(model_to_dict(project))
