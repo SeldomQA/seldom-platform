@@ -24,39 +24,31 @@ const createColumns = ({
       key: "id",
     },
     {
-      title: "测试类",
+      title: "任务名称",
       key: "class_name",
     },
     {
-      title: "测试类描述",
+      title: "环境",
       key: "class_doc",
     },
     {
-      title: "测试方法",
+      title: "定时任务(Cron)",
       key: "case_name",
-    },
-    {
-      title: "测试方法描述",
-      key: "case_doc",
     },
     {
       title: "状态",
       key: "status",
       render(row) {
-        if (row.status === 0 ) {
-          return "未执行"
-        } else if (row.status === 1 ) {
-          return "执行中"
-        } else if (row.status === 2 ) {
-          return "已执行"
+        if (row.status === 0) {
+          return "未执行";
+        } else if (row.status === 1) {
+          return "执行中";
+        } else if (row.status === 2) {
+          return "已执行";
         } else {
-          return "未知"
+          return "未知";
         }
-      }
-    },
-    {
-      title: "结果",
-      key: "result",
+      },
     },
     {
       title: "操作",
@@ -225,6 +217,20 @@ export default defineComponent({
       window.open(baseUrl + "/reports/" + row.report);
     };
 
+    // 新增编辑任务modal
+    const bodyStyle = {
+      width: "600px",
+    };
+
+    const segmented = {
+      content: "soft",
+      footer: "soft",
+    };
+
+    const showModal = ref(false);
+
+    const options = [{}];
+
     onMounted(() => {
       initProjectList();
     });
@@ -258,6 +264,35 @@ export default defineComponent({
         };
       },
       defaultExpandedKeys: ref(["40", "41"]),
+      // modal
+      segmented,
+      showModal,
+      formValue: ref({
+        user: {
+          name: "",
+          age: "",
+        },
+        phone: "",
+      }),
+      rules: {
+        user: {
+          name: {
+            required: true,
+            message: "请输入任务名称",
+            trigger: "blur",
+          },
+          age: {
+            required: true,
+            message: "请选择运行环境",
+            trigger: ["input", "blur"],
+          },
+        },
+        phone: {
+          required: true,
+          message: "请输入邮箱地址",
+          trigger: ["input"],
+        },
+      },
     };
   },
 });
@@ -275,7 +310,7 @@ export default defineComponent({
       </n-space>
     </div>
     <n-card class="main-card">
-            <div>
+      <div>
         <n-space justify="space-between">
           <n-form inline :model="model" label-placement="left">
             <n-form-item label="项目">
@@ -287,27 +322,100 @@ export default defineComponent({
               >
               </n-select>
             </n-form-item>
-            <n-form-item>
-              <n-button type="primary" @click="syncProject" size="small"
-                >同步</n-button
-              >
+            <n-form-item label="用例" label-placement="left">
+              <n-tag type="info" style="margin-right: 12px">{{
+                datas.caseNumber
+              }}</n-tag>
+              条
             </n-form-item>
           </n-form>
-          <n-form-item label="用例" label-placement="left">
-            <n-tag type="info" style="margin-right: 12px">{{
-              datas.caseNumber
-            }}</n-tag>
-            条
-          </n-form-item>
+          <n-button type="primary" @click="showModal = true" size="small"
+            >创建</n-button
+          >
         </n-space>
       </div>
       <h1>用例列表</h1>
+      <n-data-table
+        :columns="columns"
+        :data="datas.caseData"
+        :pagination="pagination"
+        :bordered="false"
+      />
     </n-card>
+
+    <n-modal
+      v-model:show="showModal"
+      class="custom-card"
+      preset="card"
+      style="width: 80%"
+      title="卡片预设"
+      size="huge"
+      :bordered="false"
+      :segmented="segmented"
+    >
+      <n-form
+        ref="formRef"
+        label-placement="left"
+        inline
+        :label-width="80"
+        :model="formValue"
+        :rules="rules"
+        :size="size"
+        show-require-mark
+      >
+        <n-form-item label="任务名称" path="name">
+          <n-input
+            v-model:value="formValue.user.name"
+            placeholder="请输入任务名称"
+          />
+        </n-form-item>
+        <n-form-item label="运行环境" path="env">
+          <n-input
+            v-model:value="formValue.user.age"
+            placeholder="请选择运行环境"
+          />
+        </n-form-item>
+        <n-form-item label="告警邮箱" path="email">
+          <n-input
+            v-model:value="formValue.phone"
+            placeholder="请输入邮箱地址"
+          />
+        </n-form-item>
+        <n-form-item>
+          <n-button type="primary" @click="handleValidateClick">
+            保存
+          </n-button>
+        </n-form-item>
+      </n-form>
+      <n-divider title-placement="left"> 选择用例 </n-divider>
+      <div>
+        <n-grid x-gap="16" :cols="6">
+          <n-gi>
+            <n-tree
+              class="filetree"
+              block-line
+              expand-on-click
+              :data="datas.fileData"
+              :default-expanded-keys="defaultExpandedKeys"
+              key-field="label"
+              :node-props="nodeProps"
+            />
+          </n-gi>
+          <n-gi span="5">
+            <n-transfer
+              ref="transfer"
+              virtual-scroll
+              :options="options"
+              source-filterable
+              target-filterable
+            />
+          </n-gi>
+        </n-grid>
+      </div>
+    </n-modal>
   </div>
 </template>
 
-<script>
-</script>
+<script></script>
 
-<style>
-</style>
+<style></style>
