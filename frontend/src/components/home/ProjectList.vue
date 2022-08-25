@@ -37,8 +37,11 @@
                   <el-dropdown style="left: 5px;">
                     <i class="el-icon-setting" style="margin-right: 15px"></i>
                     <el-dropdown-menu slot="dropdown">
-                      <el-dropdown-item>
-                        <el-button cy-data="delete-project" @click="cloneProject(item.id)" type="text" class="dropdown-menu">克隆&拉取</el-button>
+                      <el-dropdown-item v-if="item.is_clone==0">
+                        <el-button cy-data="delete-project" @click="cloneProject(item.id)" type="text" class="dropdown-menu">克隆</el-button>
+                      </el-dropdown-item>
+                      <el-dropdown-item v-if="item.is_clone==1">
+                        <el-button cy-data="delete-project" @click="cloneProject(item.id)" type="text" class="dropdown-menu">拉取</el-button>
                       </el-dropdown-item>
                       <el-dropdown-item>
                         <el-button cy-data="edit-project" @click="showEdit(item.id)" type="text" class="dropdown-menu">编辑</el-button>
