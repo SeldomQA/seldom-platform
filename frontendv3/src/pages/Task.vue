@@ -2,10 +2,18 @@
 import ProjectApi from "~/request/project";
 import CaseApi from "~/request/case";
 import { reactive, onMounted, h, defineComponent, ref } from "vue";
-import { NButton, NIcon, useMessage, TreeOption, SelectOption } from "naive-ui";
+import {
+  NButton,
+  NIcon,
+  useMessage,
+  TreeOption,
+  SelectOption,
+  FormInst,
+} from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
 import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
+import TaskApi from "~/request/task";
 
 type Song = {
   no: number;
@@ -25,15 +33,15 @@ const createColumns = ({
     },
     {
       title: "任务名称",
-      key: "class_name",
+      key: "name",
     },
     {
       title: "环境",
-      key: "class_doc",
+      key: "env",
     },
     {
       title: "定时任务(Cron)",
-      key: "case_name",
+      key: "timed_dict",
     },
     {
       title: "状态",
@@ -71,6 +79,14 @@ const createColumns = ({
 
 const caseData: Song[] = [];
 
+type ModalDatas = {
+  type?: number | null;
+  taskId?: number | null;
+  title: string;
+  sourceDatas: { label: string; value: string }[];
+  targetDatas: { value: string }[];
+};
+
 export default defineComponent({
   setup() {
     const datas = reactive({
@@ -78,17 +94,21 @@ export default defineComponent({
       projectId: "",
       fileData: [],
       caseData: [],
+      taskData: [],
       caseNumber: 0,
-      defaultProps: {
-        children: "children",
-        label: "label",
-      },
+    });
+
+    const modalDatas: ModalDatas = reactive({
+      title: "",
+      sourceDatas: [],
+      targetDatas: [],
     });
 
     const message = useMessage();
 
     const model = ref({
       projectOptions: [],
+      envOptions: [],
     });
 
     // 格式化tree数据
@@ -137,7 +157,7 @@ export default defineComponent({
       if (resp.success === true) {
         datas.fileData = treeDataFormat(resp.result.files);
         datas.caseNumber = resp.result.case_number;
-        console.log(datas.fileData);
+        // console.log(datas.fileData);
       } else {
         message.error(resp.error.message);
       }
@@ -151,8 +171,12 @@ export default defineComponent({
           (resp) => {
             if (resp.success === true) {
               message.success("获取用例成功");
-              console.log(resp.result);
+              // console.log(resp.result);
               datas.caseData = resp.result;
+              modalDatas.sourceDatas = resp.result.map((_, index) => ({
+                label: _.case_name,
+                value: _.id,
+              }));
             } else {
               message.error(resp.error.message);
             }
@@ -168,10 +192,7 @@ export default defineComponent({
           (resp) => {
             if (resp.success === true) {
               message.success("获取用例成功");
-              // console.log(resp.result);
               data.children = treeDataFormat(resp.result);
-              // datas.caseData = resp.result
-              // datas.initProject()
             } else {
               message.error(resp.error.message);
             }
@@ -180,36 +201,25 @@ export default defineComponent({
       }
     };
 
-    // 同步项目用例
-    const syncProject = async () => {
-      if (datas.projectId === "") {
-        message.error("请选择项目");
-        return;
-      }
-      const resp = await ProjectApi.syncProjectCase(datas.projectId);
-      if (resp.success === true) {
-        initProjectFile();
-        message.success("同步成功");
-      } else {
-        message.error(resp.error.message);
-      }
-    };
-
     const changeProject = (value: string, option: SelectOption) => {
       datas.projectId = value;
       initProjectFile();
+      initTaskList();
     };
 
-    // 运行用例
-    const runCase = async (row) => {
-      const resp = await CaseApi.runningCase(row.id);
+    const changeEnv = (value: string, option: SelectOption) => {
+      datas.env = value;
+    };
+
+    const initTaskList = async () => {
+      datas.loading = true;
+      const resp = await TaskApi.getTasks();
       if (resp.success === true) {
-        // datas.fileData = resp.result
-        message.success("开始执行");
+        datas.taskData = resp.result;
       } else {
-        message.error("运行失败");
+        message.error(resp.error.message);
       }
-      // initProjectFile()
+      datas.loading = false;
     };
 
     // 打开报告
@@ -217,9 +227,40 @@ export default defineComponent({
       window.open(baseUrl + "/reports/" + row.report);
     };
 
+    const initEnvsList = async () => {
+      datas.loading = true;
+      const resp = await ProjectApi.getEnvs();
+      if (resp.success === true) {
+        for (let i = 0; i < resp.result.length; i++) {
+          model.value.envOptions.push({
+            value: resp.result[i].id,
+            label: resp.result[i].name,
+          });
+        }
+      } else {
+        message.error(resp.error.message);
+      }
+      datas.loading = false;
+    };
+
     // 新增编辑任务modal
-    const bodyStyle = {
-      width: "600px",
+    const showModal = ref(false);
+    const openModal = (type: number) => {
+      if (datas.projectId == "") {
+        message.warning("请选择项目");
+      } else {
+        switch (type) {
+          case 1:
+            modalDatas.title = "新增任务";
+            modalDatas.type = 1;
+
+            break;
+          case 2:
+            modalDatas.title = "编辑任务";
+            break;
+        }
+        showModal.value = true;
+      }
     };
 
     const segmented = {
@@ -227,12 +268,58 @@ export default defineComponent({
       footer: "soft",
     };
 
-    const showModal = ref(false);
+    const formRef = ref<FormInst | null>(null);
+
+    const formValue = ref<{ name: string; env: string; email: string }>({
+      name: "",
+      env: "",
+      email: "",
+    });
 
     const options = [{}];
 
+    const handleSave = (e: MouseEvent) => {
+      e.preventDefault();
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+          console.log(modalDatas.targetDatas);
+          let payload = {
+            taskId: modalDatas.taskId,
+            project: datas.projectId,
+            name: formValue.value.name,
+            env: formValue.value.env,
+            email: formValue.value.email,
+            cases: modalDatas.targetDatas,
+          };
+          if (modalDatas.type === 1) {
+            TaskApi.createTask(payload).then((resp) => {
+              if (resp.success === true) {
+                message.success("创建成功！");
+                showModal.value = false;
+              } else {
+                message.error("创建失败！");
+              }
+            });
+          } else {
+            TaskApi.updateTask(modalDatas.taskId, payload).then((resp) => {
+              if (resp.success === true) {
+                message.success("更新成功！");
+                showModal.value = false;
+              } else {
+                message.error("更新失败！");
+              }
+            });
+          }
+        } else {
+          message.error("必填项校验不通过");
+          console.log(errors);
+        }
+      });
+    };
+
     onMounted(() => {
       initProjectList();
+      initEnvsList();
     });
 
     return {
@@ -244,7 +331,7 @@ export default defineComponent({
         play(row: Song, action: String) {
           switch (action) {
             case "run":
-              runCase(row);
+              openReport(row);
               break;
             case "report":
               openReport(row);
@@ -254,7 +341,7 @@ export default defineComponent({
       }),
       pagination: false as const,
       changeProject,
-      syncProject,
+      changeEnv,
       handleNodeClick,
       nodeProps: ({ option }: { option: TreeOption }) => {
         return {
@@ -265,34 +352,31 @@ export default defineComponent({
       },
       defaultExpandedKeys: ref(["40", "41"]),
       // modal
+      modalDatas,
       segmented,
       showModal,
-      formValue: ref({
-        user: {
-          name: "",
-          age: "",
-        },
-        phone: "",
-      }),
+      openModal,
+
+      formRef,
+      formValue,
       rules: {
-        user: {
-          name: {
-            required: true,
-            message: "请输入任务名称",
-            trigger: "blur",
-          },
-          age: {
-            required: true,
-            message: "请选择运行环境",
-            trigger: ["input", "blur"],
-          },
+        name: {
+          required: true,
+          message: "请输入任务名称",
+          trigger: "blur",
         },
-        phone: {
+        env: {
+          required: true,
+          message: "请选择运行环境",
+          trigger: ["input", "blur"],
+        },
+        email: {
           required: true,
           message: "请输入邮箱地址",
           trigger: ["input"],
         },
       },
+      handleSave,
     };
   },
 });
@@ -329,15 +413,15 @@ export default defineComponent({
               条
             </n-form-item>
           </n-form>
-          <n-button type="primary" @click="showModal = true" size="small"
+          <n-button type="primary" @click="openModal(1)" size="small"
             >创建</n-button
           >
         </n-space>
       </div>
-      <h1>用例列表</h1>
+      <h1>任务列表</h1>
       <n-data-table
         :columns="columns"
-        :data="datas.caseData"
+        :data="datas.taskData"
         :pagination="pagination"
         :bordered="false"
       />
@@ -348,7 +432,7 @@ export default defineComponent({
       class="custom-card"
       preset="card"
       style="width: 80%"
-      title="卡片预设"
+      :title="modalDatas.title"
       size="huge"
       :bordered="false"
       :segmented="segmented"
@@ -360,31 +444,32 @@ export default defineComponent({
         :label-width="80"
         :model="formValue"
         :rules="rules"
-        :size="size"
+        size="medium"
         show-require-mark
       >
         <n-form-item label="任务名称" path="name">
           <n-input
-            v-model:value="formValue.user.name"
+            v-model:value="formValue.name"
             placeholder="请输入任务名称"
           />
         </n-form-item>
         <n-form-item label="运行环境" path="env">
-          <n-input
-            v-model:value="formValue.user.age"
+          <n-select
+            style="width: 200px"
+            :options="model.envOptions"
             placeholder="请选择运行环境"
-          />
+            @update:value="changeEnv"
+          >
+          </n-select>
         </n-form-item>
         <n-form-item label="告警邮箱" path="email">
           <n-input
-            v-model:value="formValue.phone"
+            v-model:value="formValue.email"
             placeholder="请输入邮箱地址"
           />
         </n-form-item>
         <n-form-item>
-          <n-button type="primary" @click="handleValidateClick">
-            保存
-          </n-button>
+          <n-button type="primary" @click="handleSave"> 保存 </n-button>
         </n-form-item>
       </n-form>
       <n-divider title-placement="left"> 选择用例 </n-divider>
@@ -405,7 +490,8 @@ export default defineComponent({
             <n-transfer
               ref="transfer"
               virtual-scroll
-              :options="options"
+              :options="modalDatas.sourceDatas"
+              v-model:value="modalDatas.targetDatas"
               source-filterable
               target-filterable
             />
