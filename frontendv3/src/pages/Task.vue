@@ -9,6 +9,7 @@ import {
   TreeOption,
   SelectOption,
   FormInst,
+  NSpace,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
@@ -41,7 +42,7 @@ const createColumns = ({
     },
     {
       title: "定时任务(Cron)",
-      key: "timed_dict",
+      key: "status",
     },
     {
       title: "状态",
@@ -63,14 +64,52 @@ const createColumns = ({
       key: "actions",
       render(row) {
         return h(
-          NButton,
+          NSpace,
+          {},
           {
-            strong: true,
-            tertiary: true,
-            size: "small",
-            onClick: () => play(row, "run"),
-          },
-          { default: () => "执行" }
+            default: () => [
+              h(
+                NButton,
+                {
+                  type: "primary",
+                  strong: true,
+                  secondary: true,
+                  onClick: () => play(row, "run"),
+                },
+                { default: () => "运行" }
+              ),
+              h(
+                NButton,
+                {
+                  type: "info",
+                  strong: true,
+                  secondary: true,
+                  onClick: () => play(row, "set"),
+                },
+                { default: () => "定时" }
+              ),
+              h(
+                NButton,
+                {
+                  type: "warning",
+                  strong: true,
+                  secondary: true,
+                  onClick: () => play(row, "edit"),
+                },
+                { default: () => "编辑" }
+              ),
+              h(
+                NButton,
+                {
+                  type: "error",
+                  strong: true,
+                  secondary: true,
+                  onClick: () => play(row, "delete"),
+                },
+                { default: () => "删除" }
+              ),
+            ],
+          }
         );
       },
     },
@@ -208,7 +247,7 @@ export default defineComponent({
     };
 
     const changeEnv = (value: string, option: SelectOption) => {
-      datas.env = value;
+      formValue.value.env = value;
     };
 
     const initTaskList = async () => {
@@ -220,11 +259,6 @@ export default defineComponent({
         message.error(resp.error.message);
       }
       datas.loading = false;
-    };
-
-    // 打开报告
-    const openReport = (row) => {
-      window.open(baseUrl + "/reports/" + row.report);
     };
 
     const initEnvsList = async () => {
@@ -257,6 +291,7 @@ export default defineComponent({
             break;
           case 2:
             modalDatas.title = "编辑任务";
+            modalDatas.type = 2;
             break;
         }
         showModal.value = true;
@@ -271,9 +306,9 @@ export default defineComponent({
     const formRef = ref<FormInst | null>(null);
 
     const formValue = ref<{ name: string; env: string; email: string }>({
-      name: "",
-      env: "",
-      email: "",
+      name: null,
+      env: null,
+      email: null,
     });
 
     const options = [{}];
@@ -333,7 +368,13 @@ export default defineComponent({
             case "run":
               openReport(row);
               break;
-            case "report":
+            case "set":
+              openReport(row);
+              break;
+            case "edit":
+              openReport(row);
+              break;
+            case "delete":
               openReport(row);
               break;
           }
@@ -363,12 +404,13 @@ export default defineComponent({
         name: {
           required: true,
           message: "请输入任务名称",
-          trigger: "blur",
+          trigger: ["input"],
         },
         env: {
+          type: "number",
           required: true,
+          trigger: ["blur", "change"],
           message: "请选择运行环境",
-          trigger: ["input", "blur"],
         },
         email: {
           required: true,
@@ -439,11 +481,11 @@ export default defineComponent({
     >
       <n-form
         ref="formRef"
+        :model="formValue"
+        :rules="rules"
         label-placement="left"
         inline
         :label-width="80"
-        :model="formValue"
-        :rules="rules"
         size="medium"
         show-require-mark
       >
@@ -455,10 +497,10 @@ export default defineComponent({
         </n-form-item>
         <n-form-item label="运行环境" path="env">
           <n-select
+            v-model:value="formValue.env"
             style="width: 200px"
             :options="model.envOptions"
             placeholder="请选择运行环境"
-            @update:value="changeEnv"
           >
           </n-select>
         </n-form-item>
