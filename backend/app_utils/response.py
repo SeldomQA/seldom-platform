@@ -25,11 +25,13 @@ class Error:
     FILE_TYPE_ERROR = {"10031": "文件类型错误"}
     FILE_SIZE_ERROR = {"10032": "超出文件大小"}
 
-    CASE_AUDIT_FAIL = {"20021": "没有权限审核用例"}
-    CASE_AUDIT_NULL = {"20022": "没有审核通过的用例"}
-    CASE_DIR_ERROR = {"20023": "用例目录不存在"}
+    CASE_AUDIT_FAIL = {"20041": "没有权限审核用例"}
+    CASE_AUDIT_NULL = {"20042": "没有审核通过的用例"}
+    CASE_DIR_ERROR = {"20043": "用例目录不存在"}
 
     ENV_IS_NULL = {"10041": "查询环境未空"}
+
+    TASK_ID_NULL = {"10056": "任务ID不能为空"}
 
 
 def model_to_dict(instance: object) -> dict:
