@@ -6,9 +6,10 @@ from seldom.utils import file
 from seldom.logging import log
 from seldom import TestMainExtend
 from seldom import Seldom
-from app_project.models import Env
+from seldom import ChromeConfig,FirefoxConfig, EdgeConfig
+from app_project.models import Project, Env
 from app_task.models import TestTask, TaskReport, ReportDetails
-from backend.settings import REPORT_DIR
+from backend.settings import BASE_DIR, REPORT_DIR
 
 
 def seldom_running(test_dir, case_info, report_name, task_id):
@@ -27,11 +28,31 @@ def seldom_running(test_dir, case_info, report_name, task_id):
 
     # 环境判断
     env = Env.objects.get(id=env)
-    Seldom.env = env.env
-    base_url = env.base_url
+    if env.browser == "":
+        browser = None
+    else:
+        browser = env.browser
+        # 设置浏览器headless模式
+        ChromeConfig.headless = True
+        FirefoxConfig.headless = True
+        EdgeConfig.headless = True
+
+    if env.env == "":
+        Seldom.env = None
+    else:
+        Seldom.env = env.env
+    if env.base_url == "":
+        base_url = None
+    else:
+        base_url = env.base_url
+
+    # 项目添加环境变量
+    project = Project.objects.get(id=task.project_id)
+    project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
+    file.add_to_path(project_dir)
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url)
+    main_extend = TestMainExtend(path=test_dir, browser=browser, report=report_name, base_url=base_url)
     main_extend.run_cases(case_info)
     time.sleep(2)
 

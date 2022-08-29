@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import SettingTabs from '../components/home/SettingTabs.vue'
 import Case from '../components/cases/Case.vue'
-import Task from '../components/tasks/Task.vue'
+import TaskList from '../components/tasks/TaskList.vue'
 import Report from '../components/reports/Report.vue'
 
 Vue.use(VueRouter)
@@ -21,7 +21,7 @@ const routes = [
   {
     path: '/tasks',
     name: 'Task',
-    component: Task
+    component: TaskList
   },
   {
     path: '/reports',

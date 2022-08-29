@@ -73,7 +73,7 @@ export default {
     onRoutes() {
       if (this.$route.path === '/cases') {
         return '2'
-      } else if (this.$route.path === '/reports') {
+      } else if (this.$route.path === '/tasks') {
         return '3'
       }
       return '1'
