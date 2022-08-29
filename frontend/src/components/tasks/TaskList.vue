@@ -18,7 +18,7 @@
         </el-breadcrumb>
       </span>
     </div>
-    <el-card class="main-card">
+    <el-card class="main-card" v-if="taskFlag">
       <div style="text-align: left;">
         <el-form :inline="true">
           <el-form-item label="项目">
@@ -54,6 +54,9 @@
           <el-table-column
             prop="name"
             label="任务">
+            <template slot-scope="scope">
+              <el-button type="text" @click="clickTaskName(scope.row)">{{scope.row.name}}</el-button>
+            </template>
           </el-table-column>
           <el-table-column
             prop="env"
@@ -106,6 +109,11 @@
       <TaskDialog v-if="taskDailog" :pid=projectId :tid=taskId @cancel="cancelDialog"></TaskDialog>
       <TimedDialog v-if="timedDailog" :tid=taskId :ttmied=taskTimed @cancel="cancelDialog"></TimedDialog>
     </el-card>
+    <el-card class="main-card" v-else>
+      <el-page-header @back="goBack" content="任务报告" style="margin-bottom: 50px;">
+      </el-page-header>
+      <taskReport :tid=taskId></taskReport>
+    </el-card>
   </div>
 </template>
 
@@ -114,17 +122,19 @@ import ProjectApi from '../../request/project'
 import TaskApi from '../../request/task'
 import TaskDialog from './TaskDialog.vue'
 import TimedDialog from './TimedDialog.vue'
-
+import taskReport from './TaskReport.vue'
 
 export default {
   name: 'task',
   components: {
     // 组件
     TaskDialog,
-    TimedDialog
+    TimedDialog,
+    taskReport
   },
   data() {
     return {
+      taskFlag: true,
       taskDailog: false,
       timedDailog: false,
       projectId: '',
@@ -234,11 +244,22 @@ export default {
         this.$message.error('运行失败！')
       }
     },
-
+    // 改变选择的项目
     changeProject(value) {
       this.projectId = value
       this.initProjectFile()
       this.initTaskList()
+    },
+    // 显示任务报告列表
+    clickTaskName(row) {
+      console.log(row)
+      this.taskId = row.id
+      console.log('aaa', this.taskId)
+      this.taskFlag = false
+    },
+    // 返回任务列表
+    goBack() {
+      this.taskFlag = true
     }
   }
 }

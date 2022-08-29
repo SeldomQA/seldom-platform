@@ -34,6 +34,14 @@ class TaskApi {
     return request.delete('/api/task/' + tid + '/timed')
   }
 
+  getReportAll(data) {
+    return request.get('/api/task/reports', data)
+  }
+
+  getReportResult(rid, data) {
+    return request.post('/api//task/report/' + rid + '/results', data)
+  }
+
 }
 
 export default new TaskApi()

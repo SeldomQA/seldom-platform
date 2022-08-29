@@ -258,11 +258,13 @@ def delete_timed(request, task_id: int):
 
 @router.get("/reports", response=List[ReportOut])
 @paginate(CustomPagination)
-def get_report_list(request):
+def get_report_list(request, task_id: int):
     """
     获得任务报告列表（分页）
     """
-    return TaskReport.objects.all().order_by("-create_time")[:1000]
+    if task_id == 0:
+        return response(error=Error.TASK_ID_NULL)
+    return TaskReport.objects.filter(task_id=task_id).order_by("-create_time")[:1000]
 
 
 @router.post("/report/{report_id}/results")
