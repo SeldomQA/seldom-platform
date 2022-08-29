@@ -278,8 +278,8 @@ export default defineComponent({
     };
 
     // 新增编辑任务modal
-    const showModal = ref(false);
-    const openModal = (type: number) => {
+    const showModalTask = ref(false);
+    const openModalTask = (type: number) => {
       if (datas.projectId == "") {
         message.warning("请选择项目");
       } else {
@@ -294,7 +294,7 @@ export default defineComponent({
             modalDatas.type = 2;
             break;
         }
-        showModal.value = true;
+        showModalTask.value = true;
       }
     };
 
@@ -305,7 +305,11 @@ export default defineComponent({
 
     const formRef = ref<FormInst | null>(null);
 
-    const formValue = ref<{ name: string; env: string; email: string }>({
+    const formValue = ref<{
+      name: string | null;
+      env: string | null;
+      email: string | null;
+    }>({
       name: null,
       env: null,
       email: null,
@@ -330,7 +334,7 @@ export default defineComponent({
             TaskApi.createTask(payload).then((resp) => {
               if (resp.success === true) {
                 message.success("创建成功！");
-                showModal.value = false;
+                showModalTask.value = false;
               } else {
                 message.error("创建失败！");
               }
@@ -339,7 +343,7 @@ export default defineComponent({
             TaskApi.updateTask(modalDatas.taskId, payload).then((resp) => {
               if (resp.success === true) {
                 message.success("更新成功！");
-                showModal.value = false;
+                showModalTask.value = false;
               } else {
                 message.error("更新失败！");
               }
@@ -351,6 +355,25 @@ export default defineComponent({
         }
       });
     };
+
+    // 定时设置
+    const showModalTimer = ref(false);
+
+    const formRefTimer = ref<FormInst | null>(null);
+
+    const formValueTimer = ref<{
+      minute: string | null;
+      hour: string | null;
+      day_of_week: string | null;
+      day: string | null;
+      month: string | null;
+    }>({
+      minute: "*",
+      hour: "*",
+      day_of_week: "*",
+      day: "*",
+      month: "*",
+    });
 
     onMounted(() => {
       initProjectList();
@@ -366,16 +389,13 @@ export default defineComponent({
         play(row: Song, action: String) {
           switch (action) {
             case "run":
-              openReport(row);
               break;
             case "set":
-              openReport(row);
+              showModalTimer.value = true;
               break;
             case "edit":
-              openReport(row);
               break;
             case "delete":
-              openReport(row);
               break;
           }
         },
@@ -395,12 +415,11 @@ export default defineComponent({
       // modal
       modalDatas,
       segmented,
-      showModal,
-      openModal,
-
+      showModalTask,
+      openModalTask,
       formRef,
       formValue,
-      rules: {
+      rulesTask: {
         name: {
           required: true,
           message: "请输入任务名称",
@@ -419,6 +438,25 @@ export default defineComponent({
         },
       },
       handleSave,
+      showModalTimer,
+      rulesTimer: {
+        name: {
+          required: true,
+          message: "请输入任务名称",
+          trigger: ["input"],
+        },
+        env: {
+          type: "number",
+          required: true,
+          trigger: ["blur", "change"],
+          message: "请选择运行环境",
+        },
+        email: {
+          required: true,
+          message: "请输入邮箱地址",
+          trigger: ["input"],
+        },
+      },
     };
   },
 });
@@ -455,7 +493,7 @@ export default defineComponent({
               条
             </n-form-item>
           </n-form>
-          <n-button type="primary" @click="openModal(1)" size="small"
+          <n-button type="primary" @click="openModalTask(1)" size="small"
             >创建</n-button
           >
         </n-space>
@@ -470,7 +508,7 @@ export default defineComponent({
     </n-card>
 
     <n-modal
-      v-model:show="showModal"
+      v-model:show="showModalTask"
       class="custom-card"
       preset="card"
       style="width: 80%"
@@ -482,7 +520,7 @@ export default defineComponent({
       <n-form
         ref="formRef"
         :model="formValue"
-        :rules="rules"
+        :rules="rulesTask"
         label-placement="left"
         inline
         :label-width="80"
@@ -540,6 +578,55 @@ export default defineComponent({
           </n-gi>
         </n-grid>
       </div>
+    </n-modal>
+
+    <n-modal
+      v-model:show="showModalTimer"
+      class="custom-card"
+      preset="card"
+      style="width: 80%"
+      title="定时任务"
+      size="huge"
+      :bordered="false"
+      :segmented="segmented"
+    >
+      <n-form
+        ref="formRef"
+        :model="formValue"
+        :rules="rulesTimer"
+        label-placement="left"
+        inline
+        :label-width="80"
+        size="medium"
+        show-require-mark
+      >
+        <n-form-item label="秒" path="name">
+          <n-input
+            v-model:value="formValue.name"
+            placeholder="请输入任务名称"
+          />
+        </n-form-item>
+        <n-form-item label="分" path="env">
+          <n-select
+            v-model:value="formValue.env"
+            style="width: 200px"
+            :options="model.envOptions"
+            placeholder="请选择运行环境"
+          >
+          </n-select>
+        </n-form-item>
+        <n-form-item label="时" path="email">
+          <n-input
+            v-model:value="formValue.email"
+            placeholder="请输入邮箱地址"
+          />
+        </n-form-item>
+        <n-form-item>
+          <n-button type="primary" @click="handleSave"> 保存 </n-button>
+        </n-form-item>
+      </n-form>
+      <n-divider title-placement="left"> 选择用例 </n-divider>
+      <div></div>
     </n-modal>
   </div>
 </template>
