@@ -3,3 +3,4 @@ django-ninja==0.18.0
 seldom==2.10.4
 django-cors-headers==3.13.0
 django-apscheduler==0.6.2
+django-redis==5.2.0

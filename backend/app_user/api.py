@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib.sessions.models import Session
 from app_user.api_schema import RegisterIn, LoginIn
-
+from app_utils.token import TokenMethod
 
 router = Router(tags=["user"])
 
@@ -43,17 +43,20 @@ def user_login(request, payload: LoginIn):
     用户登录
     auth=None 该接口不需要认证
     """
-    username1 = payload.username
-    password1 = payload.password
-    user = auth.authenticate(username=username1, password=password1)
-    if user is not None:
-        auth.login(request, user)  # 会向session表创建一条数据
-        token = Session.objects.last()  # last 最新的
-        user_info = {
-            "id": user.id,
-            "username": user.username,
-            "token": token.session_key
-        }
-        return response(result=user_info)
+    username = payload.username
+    password  = payload.password
+    if username == "" or password =="":
+        return  response(error=Error.USER_OR_PAWD_NULL)
     else:
-        return response(error=Error.USER_OR_PAWD_ERROR)
+        user = auth.authenticate(username=username,password=password)
+        if user is not None:
+            print(type(user.username))
+            token = TokenMethod.create_token(user.username)
+            user_info = {
+                "id": user.id,
+                "username": user.username,
+                "token": token
+            }
+            return response(result = user_info)
+        else:
+            return response(error=Error.USER_OR_PAWD_EROOR)

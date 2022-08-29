@@ -142,3 +142,14 @@ APSCHEDULER_RUN_NOW_TIMEOUT = 25
 
 # 目录配置
 REPORT_DIR = os.path.join(BASE_DIR, "reports")
+
+#redis地址
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
