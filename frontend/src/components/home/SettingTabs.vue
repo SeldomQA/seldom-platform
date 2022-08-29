@@ -13,7 +13,7 @@
       </span>
       <span class="span-breadcrumb">
         <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/main/Setting' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>配置管理</el-breadcrumb-item>
         </el-breadcrumb>
       </span>

@@ -5,6 +5,7 @@
 */
 import axios from 'axios'
 import { Loading } from 'element-ui'
+import { Message } from 'element-ui';
 import Qs from 'qs'
 
 
@@ -59,7 +60,39 @@ function commonRequest(requestType, url, dataOrParam, responseType, isLoading = 
   if (isLoading) {
     loadingInstance = Loading.service({ fullscreen: true })
   }
-
+  /* 请求拦截器 */
+  axios.interceptors.request.use(
+    function(config) {
+      let token = sessionStorage.token;
+      console.log('!11111', token)
+      if (token) {
+        token = `bearer ${token}`
+        config.headers.common.Authorization = token;
+      }
+      return config;
+    },
+    function(error) {
+      return Promise.reject(error);
+    }
+  );
+  // 添加响应拦截器
+  axios.interceptors.response.use(
+    function(res) {
+      // // 2xx 范围内的状态码都会触发该函数,对响应数据做点什么
+      return res;
+    },
+    function(error) {
+      // 超出 2xx 范围的状态码都会触发该函数。
+      // 对响应错误做点什么
+      console.log('返回错误', error);
+      if (error.response.status === 401) {
+        Message.error(new Error('token失效'));
+        this.$router.push({ path: '/' });
+        // sessionStorage.removeItem("token");
+      }
+      return Promise.reject(error);
+    }
+  );
   return makeRequest(requestType, url, dataOrParam, responseType, additionalHeader)
     .then(resp => {
       if (isLoading) {
