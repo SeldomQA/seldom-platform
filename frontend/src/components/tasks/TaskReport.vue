@@ -47,8 +47,8 @@
         label="总数"
         width="100">
         <template slot-scope="scope">
-          <span v-if="scope.row.error === 0">
-            <el-tag>{{scope.row.tests}}</el-tag>
+          <span v-if="scope.row.tests === 0">
+            {{scope.row.tests}}
           </span>
           <span v-else>
             <el-button @click="showReport(scope.row)" type="text" size="small">
@@ -63,7 +63,7 @@
         width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.passed === 0">
-            <el-tag type="success">{{scope.row.passed}}</el-tag>
+            {{scope.row.passed}}
           </span>
           <span v-else>
             <el-button @click="showReport(scope.row, 'success')" type="text" size="small">
@@ -78,7 +78,7 @@
         width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.error === 0">
-            <el-tag type="danger">{{scope.row.error}}</el-tag>
+            {{scope.row.error}}
           </span>
           <span v-else>
             <el-button @click="showReport(scope.row, 'error')" type="text" size="small">
@@ -93,7 +93,7 @@
         width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.failure === 0">
-            <el-tag type="warning">{{scope.row.failure}}</el-tag>
+            {{scope.row.failure}}
           </span>
           <span v-else>
             <el-button @click="showReport(scope.row, 'failure')" type="text" size="small">
@@ -108,7 +108,7 @@
         width="100">
         <template slot-scope="scope">
           <span v-if="scope.row.skipped === 0">
-            <el-tag type="info">{{scope.row.skipped}}</el-tag>
+            {{scope.row.skipped}}
           </span>
           <span v-else>
             <el-button @click="showReport(scope.row, 'skipped')" type="text" size="small">
