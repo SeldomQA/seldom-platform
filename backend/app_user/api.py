@@ -57,6 +57,6 @@ def user_login(request, payload: LoginIn):
                 "username": user.username,
                 "token": token
             }
-            return response(result = user_info)
+            return response(result=user_info)
         else:
             return response(error=Error.USER_OR_PAWD_EROOR)

@@ -7,18 +7,18 @@ import os
 import hashlib
 import subprocess
 from django.shortcuts import get_object_or_404
-from django.forms.models import model_to_dict
 from ninja import File
 from ninja import Router
-from ninja import Schema
 from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from seldom.utils import file
-from app_project.models import Project
+from app_project.models import Project, Env
+from app_project.api_schma import ProjectIn, EnvIn
 from app_case.models import TestCase
-from app_utils.response import response, Error
+from app_utils.response import response, Error, model_to_dict
 from backend.settings import BASE_DIR
+from random import randint
 
 # upload image
 IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
@@ -26,15 +26,8 @@ IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
 router = Router(tags=["project"])
 
 
-class ProjectItems(Schema):
-    name: str
-    address: str
-    cover_name: str = None
-    path_name: str = None
-
-
 @router.post('/create')
-def create_project(request, project: ProjectItems):
+def create_project(request, project: ProjectIn):
     """
     创建项目
     """
@@ -42,10 +35,15 @@ def create_project(request, project: ProjectItems):
     if project.cover_name == "" and project.path_name == "":
         project.cover_name = "seldom_logo.png"
         project.path_name = "2d82cb919cf05116adf720f8f7437ac9.png"
-
+    #设置默认目录
+    if project.case_dir == "":
+        project_case_dir = "test_dir"
+    else:
+        project_case_dir = project.case_dir
     project_obj = Project.objects.create(
         name=project.name,
         address=project.address,
+        case_dir=project_case_dir,
         cover_name=project.cover_name,
         path_name=project.path_name)
     return response(result=model_to_dict(project_obj))
@@ -88,13 +86,14 @@ def get_project(request, project_id: int):
 
 
 @router.put('/{project_id}/')
-def update_project(request, project_id: int, project: ProjectItems):
+def update_project(request, project_id: int, project: ProjectIn):
     """
     通过项目ID更新项目
     """
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.name = project.name
     project_obj.address = project.address
+    project_obj.case_dir = project.case_dir
     project_obj.cover_name = project.cover_name
     project_obj.path_name = project.path_name
     project_obj.save()
@@ -162,6 +161,7 @@ def delete_project(request, project_id: int):
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.is_delete = True
     project_obj.save()
+
     return response()
 
 
@@ -364,3 +364,73 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
         case_name.append(case_level_two)
 
     return response(result=case_name)
+
+
+@router.post('/env')
+def create_env(request, env: EnvIn):
+    """
+    创建环境
+    """
+    project_obj = Env.objects.create(
+        name=env.name,
+        env=env.env,
+        browser=env.browser,
+        base_url=env.base_url)
+    return response(result=model_to_dict(project_obj))
+
+
+@router.get('/env/{env_id}/')
+def get_env(request, env_id: int):
+    """
+    获取环境
+    """
+    try:
+        env = Env.objects.get(id=env_id)
+    except Env.DoesNotExist:
+        return response(error=Error.ENV_IS_NULL)
+
+    return response(result=model_to_dict(env))
+
+
+@router.get('/env/list')
+def get_env_list(request):
+    """
+    获取环境列表
+    """
+    envs = Env.objects.all()
+    env_list = []
+    for env in envs:
+        env_list.append(model_to_dict(env))
+    return response(result=env_list)
+
+
+@router.delete('/env/{env_id}/')
+def delete_env(request, env_id: int):
+    """
+    删除环境
+    """
+    try:
+        env = Env.objects.get(id=env_id)
+        env.delete()
+    except Env.DoesNotExist:
+        return response(error=Error.ENV_IS_NULL)
+
+    return response()
+
+
+@router.put('/env/{env_id}/')
+def update_env(request, env_id: int, env: EnvIn):
+    """
+    更新环境
+    """
+    try:
+        env_obj = Env.objects.get(id=env_id)
+        env_obj.name = env.name
+        env_obj.env = env.env
+        env_obj.browser = env.browser
+        env_obj.base_url = env.base_url
+        env_obj.save()
+    except Env.DoesNotExist:
+        return response(error=Error.ENV_IS_NULL)
+
+    return response()
