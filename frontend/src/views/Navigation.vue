@@ -14,19 +14,19 @@
             <div class="seldom-logo">
                 <img src="../assets/seldom-platform.gif" class="img-logo" />
             </div>
-            <router-link to="/">
+            <router-link to="/main/Setting">
               <el-menu-item index="1" class="menu-option">
                 <i class="el-icon-s-home"></i>
                 <template #title>配置管理</template>
               </el-menu-item>
             </router-link>
-            <router-link to="/cases">
+            <router-link to="/main/cases">
               <el-menu-item index="2" class="menu-option">
                 <i class="el-icon-folder-opened"></i>
                 <template #title>用例管理</template>
               </el-menu-item>
             </router-link>
-            <router-link to="/tasks">
+            <router-link to="/main/tasks">
               <el-menu-item index="3" class="menu-option">
                 <i class="el-icon-date"></i>
                 <template #title>任务管理</template>
@@ -71,9 +71,9 @@ export default {
   components: {},
   computed: {
     onRoutes() {
-      if (this.$route.path === '/cases') {
+      if (this.$route.path === '/main/cases') {
         return '2'
-      } else if (this.$route.path === '/reports') {
+      } else if (this.$route.path === '/main/tasks') {
         return '3'
       }
       return '1'

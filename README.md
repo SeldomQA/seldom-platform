@@ -1,8 +1,8 @@
 # seldom-platform
 
-> Based on the seldom formwork test platform.
+> Based on the seldom formwork test platform, End the platform VS framework debate.
 
-基于seldom框架的测试平台。
+基于seldom框架的测试平台, 结束平台与框架之争。
 
 ## Project
 
@@ -20,12 +20,16 @@
 ![](./architecture.png)
 
 ## ToDo
-- [x] 项目管理 ✔️
+
+- [x] 配置管理
+  - [x] 项目管理 ✔️
+  - [x] 环境管理 ✔️
+  - [ ] 团队管理  
+  - [ ] 邮件组
 - [x] 用例管理 ✔️
-- [x] 环境管理 ✔️
+- [x] 任务管理 ✔️
 - [ ] 登录注册 ⌛
-- [ ] 任务管理 ⌛
-- [ ] 任务报告
+
 
 ## Function
 

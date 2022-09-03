@@ -5,6 +5,7 @@ function: 项目管理
 """
 import os
 import hashlib
+import subprocess
 from django.shortcuts import get_object_or_404
 from django.forms.models import model_to_dict
 from ninja import File
@@ -13,9 +14,10 @@ from ninja import Schema
 from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
+from seldom.utils import file
 from app_project.models import Project
 from app_case.models import TestCase
-from utils.response import response, Error
+from app_utils.response import response, Error
 from backend.settings import BASE_DIR
 
 # upload image
@@ -46,7 +48,7 @@ def create_project(request, project: ProjectItems):
         address=project.address,
         cover_name=project.cover_name,
         path_name=project.path_name)
-    return response(data=model_to_dict(project_obj))
+    return response(result=model_to_dict(project_obj))
 
 
 @router.get('/list')
@@ -55,10 +57,25 @@ def get_projects(request):
     获取项目列表
     """
     projects = Project.objects.filter(is_delete=False)
+    for project in projects:
+        # 项目名
+        project_name = project.address.split("/")[-1].replace(".git", "")
+        # 本地github地址
+        local_github_dir = file.join(BASE_DIR, "github")
+        # 本地项目地址
+        project_address = file.join(local_github_dir, project_name)
+        # 判断本地是否有克隆文件
+        if os.path.isdir(project_address) is True:
+            # 调整为已克隆
+            project.is_clone = 1
+            project.save()
+        else:
+            project.is_clone = 0
+            project.save()
     project_list = []
     for project in projects:
         project_list.append(model_to_dict(project))
-    return response(data=project_list)
+    return response(result=project_list)
 
 
 @router.get('/{project_id}/')
@@ -67,7 +84,7 @@ def get_project(request, project_id: int):
     通过项目ID查询项目
     """
     project_obj = get_object_or_404(Project, pk=project_id, is_delete=False)
-    return response(data=model_to_dict(project_obj))
+    return response(result=model_to_dict(project_obj))
 
 
 @router.put('/{project_id}/')
@@ -81,7 +98,60 @@ def update_project(request, project_id: int, project: ProjectItems):
     project_obj.cover_name = project.cover_name
     project_obj.path_name = project.path_name
     project_obj.save()
-    return response(data=model_to_dict(project_obj))
+    return response(result=model_to_dict(project_obj))
+
+
+@router.get('/{project_id}/clone')
+def clone_project(request, project_id: int):
+    """
+    git克隆项目到本地
+    """
+    project_obj = get_object_or_404(Project, pk=project_id)
+    if "/" not in project_obj.address:
+        return response(error=Error.PROJECT_ADDRESS_ERROR)
+
+    # 项目名
+    project_name = project_obj.address.split("/")[-1].replace(".git", "")
+    # 本地github地址
+    local_github_dir = file.join(BASE_DIR, "github")
+    # 本地项目地址
+    project_address = file.join(local_github_dir, project_name)
+
+    if os.path.isdir(project_address) is False:
+        args = ["clone", project_obj.address]
+        try:
+            res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
+        except NotADirectoryError:
+            # 没有目录，创建目录
+            os.mkdir(local_github_dir)
+            res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
+        if res == 0:
+            #获取文件数量
+            test_num = 0
+            for dirpath, dirnames, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            #调整为已克隆
+            project_obj.is_clone = 1
+            project_obj.save()
+            return response()
+        else:
+            return response(error=Error.PROJECT_CLONE_ERROR)
+    else:
+        args = ["pull"]
+        res = subprocess.check_call(['git'] + list(args), cwd=project_address)
+        if res == 0:
+            #获取文件数量
+            test_num = 0
+            for dirpath, dirnames, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            project_obj.save()
+            return response()
+        else:
+            return response(error=Error.PROJECT_CLONE_ERROR)
 
 
 @router.delete('/{project_id}/')
@@ -119,7 +189,7 @@ def upload_project_image(request, file: UploadedFile = File(...)):
         for chunk in file.chunks():
             f.write(chunk)
 
-    return response(data={"name": file_name})
+    return response(result={"name": file_name})
 
 
 # @router.put("/cover/remove/{project_id}/", auth=None)
@@ -141,15 +211,30 @@ def update_project_cases(request, project_id: int):
     同步项目用例
     """
     project_obj = get_object_or_404(Project, pk=project_id)
-    # 项目本地目录
-    test_dir = os.path.join(project_obj.address, "test_dir")
+
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
+
+    # 项目本地目录
+    project_name = project_obj.address.split("/")[-1].replace(".git", "")
+    github_dir = file.join(BASE_DIR, "github")
+    project_address = file.join(github_dir, project_name)
+
+    # 把项目目录加到环境变量path
+    file.add_to_path(project_address)
+
+    test_dir = file.join(project_address, project_obj.case_dir)
+
+    if os.path.isdir(test_dir) is False:
+        return response(error=Error.PROJECT_DIR_NULL)
+
     # 收集测试用例信息
     main_extend = TestMainExtend(path=test_dir)
-    seldom_case = main_extend.collect_cases()
+    seldom_case = main_extend.collect_cases(json=False)
+    print(seldom_case)
+
     platform_case = TestCase.objects.filter(project=project_obj)
-    # project_case.delete()
+    print("platform_case", platform_case)
 
     # 从seldom项目中找到新增的用例
     for seldom in seldom_case:
@@ -159,6 +244,8 @@ def update_project_cases(request, project_id: int):
                     and seldom["method"]["name"] == platform.case_name):
                 break
         else:
+            print("seldom-file--->", seldom)
+            print("seldom-file--->", seldom["file"])
             TestCase.objects.create(
                 project_id=project_id,
                 file_name=seldom["file"],
@@ -216,7 +303,7 @@ def get_project_files(request, project_id: int):
 
             files.append(case_level_one)
 
-    return response(data={"case_number": case_number, "files": files})
+    return response(result={"case_number": case_number, "files": files})
 
 
 @router.get('/{project_id}/cases')
@@ -233,10 +320,10 @@ def get_project_file_cases(request, project_id: int, file_name: str):
         case_list = []
         for case in file_cases:
             case_list.append(model_to_dict(case))
-        # 通过接口返回
-        return response(data=case_list)
-    else:
-        return response(data=[])
+
+        return response(result=case_list)
+
+    return response()
 
 
 @router.get('/{project_id}/subdirectory')
@@ -276,4 +363,4 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
             }
         case_name.append(case_level_two)
 
-    return response(data=case_name)
+    return response(result=case_name)

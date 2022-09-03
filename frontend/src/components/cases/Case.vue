@@ -49,30 +49,37 @@
           </el-form-item>
         </el-form>
       </div>
-      <h1>用例列表</h1>
+      <div style="height: 40px;">
+        <span> 用例列表</span>
+        <span style="float: right">
+          <el-button v-if="fullName != ''" type="success" size="mini" @click="initFileCases()">刷新</el-button>
+        </span>
+      </div>
       <div style="min-height: 600px;">
-        <div style="width: 20%; float: left;">
-          <el-card style="min-height: 500px; overflow: scroll;">
-            <el-tree
-              :data="fileData"
-              node-key="id"
-              ref="tree"
-              lazy
-              highlight-current
-              :props="defaultProps"
-              @node-click="handleNodeClick"
-              >
-              <span class="custom-tree-node" slot-scope="{ node, data }">
-                <span v-if="data.is_leaf === 1">
-                  <i class="el-icon-tickets"></i>
+        <div class="case-dir-tree">
+          <div style="width: 100%; height: 600px;">
+            <el-scrollbar style="height:100%">
+              <el-tree
+                :data="fileData"
+                node-key="id"
+                ref="tree"
+                lazy
+                :props="defaultProps"
+                @node-click="handleNodeClick"
+                @node-expand="handleNodeClick"
+                >
+                <span slot-scope="{ node, data }">
+                  <span v-if="data.is_leaf === 1">
+                    <i class="el-icon-tickets"></i>
+                  </span>
+                  <span v-else>
+                    <i class="el-icon-folder"></i>
+                  </span>
+                    {{ data.label }}
                 </span>
-                <span v-else>
-                  <i class="el-icon-folder"></i>
-                </span>
-                  {{ data.label }}
-              </span>
-            </el-tree>
-          </el-card>
+              </el-tree>
+            </el-scrollbar>
+          </div>
         </div>
         <div style="width: 78%; float: right">
           <el-table :data="caseData" border  @row-click="caseRowClick" style="width: 100%"  height="500">
@@ -301,4 +308,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 /* 定义当前组件使用的CSS */
+.case-dir-tree {
+  width: 21%;
+  float: left;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1)
+}
 </style>

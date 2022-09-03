@@ -1,19 +1,20 @@
 <template>
   <div id="app">
-    <Navigation></Navigation>
+    <!-- <Navigation></Navigation> -->
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Navigation from './views/Navigation.vue'
+// import Navigation from './views/Navigation.vue'
 
-export default {
-  name: 'Home',
-  components: {
-    Navigation
-  }
-}
+// export default {
+//   name: 'Home',
+//   components: {
+//     // Navigation
+//   }
+// }
 </script>
 
 <style>
@@ -24,12 +25,18 @@ export default {
   text-align: center;
   color: #2c3e50;
   height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 body {
   margin: 0px 0px 0px;
 }
-
+html{
+  background-image: url("./assets/bg.png");
+  background-attachment: fixed;
+  background-size:100% 100%;
+  z-index: -1000;
+}
 html,
 body {
   height: 100%;
