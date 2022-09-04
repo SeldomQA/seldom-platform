@@ -38,7 +38,7 @@
            <el-tag>{{caseNumber}}</el-tag> 条
           </el-form-item>
           <el-form-item label="环境" style="float: right;">
-            <el-select v-model="runEnv.env" placeholder="选择项目" size="small">
+            <el-select v-model="env" placeholder="选择项目" size="small">
               <el-option
                 v-for="item in envOptions"
                 :key="item.value"
@@ -65,7 +65,6 @@
                 ref="tree"
                 lazy
                 :props="defaultProps"
-                @node-click="handleNodeClick"
                 @node-expand="handleNodeClick"
                 >
                 <span slot-scope="{ node, data }">
@@ -104,7 +103,6 @@
                 </span>
               </template>
             </el-table-column>
-            <el-table-column prop="result" label="结果"> </el-table-column>
             <el-table-column label="操作" width="120">
               <template slot-scope="scope">
               <el-button type="success" size="mini" @click="runCase(scope.row)" @click.stop="drawer = false">执行</el-button>
@@ -113,31 +111,14 @@
           </el-table>
         </div>
       </div>
+      <!-- 组件 -->
       <el-drawer
-        title="报告"
+        title="测试结果"
         :visible.sync="drawer"
         direction="rtl"
-        size="40%">
-        <span>
-          <el-tabs v-model="activeName" style="margin-left: 5px; margin-right: 5px;">
-            <el-tab-pane label="System Out" name="first">
-              <el-input
-                type="textarea"
-                :rows="25"
-                placeholder="system out is null"
-                v-model="caseInfo.system_out">
-              </el-input>
-            </el-tab-pane>
-            <el-tab-pane label="Error" name="second">
-              <el-input
-                type="textarea"
-                :rows="25"
-                placeholder="error info null"
-                v-model="caseInfo.error">
-              </el-input>
-            </el-tab-pane>
-          </el-tabs>
-        </span>
+        size="40%"
+      >
+        <ResultDialog v-if="drawer" :cid=caseId @cancel="cancelDialog"></ResultDialog>
       </el-drawer>
     </el-card>
   </div>
@@ -146,17 +127,22 @@
 <script>
 import ProjectApi from '../../request/project'
 import CaseApi from '../../request/case'
+import ResultDialog from './ResultDialog.vue'
+
 
 export default {
   name: 'case',
   components: {
     // 组件
+    ResultDialog
   },
   data() {
     return {
       loading: true,
       projectId: '',
+      caseId: '',
       caseNumber: 0,
+      fullName: '',
       fileData: [],
       caseData: [],
       defaultProps: {
@@ -167,9 +153,7 @@ export default {
       drawer: false,
       activeName: 'first',
       caseInfo: '',
-      runEnv: {
-        env: ''
-      },
+      env: '',
       envOptions: []
     }
   },
@@ -225,19 +209,23 @@ export default {
         this.$message.error(resp.error.message)
       }
     },
-
-    // 点击项目文件
+    // 获得文件用例
+    initFileCases() {
+      ProjectApi.getProjectCases(this.projectId, this.fullName).then(resp => {
+        if (resp.success === true) {
+          // this.$message.success('获取用例列表成功')
+          this.caseData = resp.result
+        } else {
+          this.$message.error(resp.error.message)
+        }
+      })
+    },
+    // 点击tree节点
     handleNodeClick(data) {
       // 如果是文件返回 类&方法
       if (data.label.match('.py')) {
-        ProjectApi.getProjectCases(this.projectId, data.full_name).then(resp => {
-          if (resp.success === true) {
-            this.$message.success('获取用例成功')
-            this.caseData = resp.result
-          } else {
-            this.$message.error(resp.error.message)
-          }
-        })
+        this.fullName = data.full_name
+        this.initFileCases()
       } else {
         // 如果目录返回下一级 目录&文件
         if (data.children.length > 0) {
@@ -246,7 +234,6 @@ export default {
         }
         ProjectApi.getProjectSubdirectory(this.projectId, data.full_name).then(resp => {
           if (resp.success === true) {
-            this.$message.success('获取用例成功')
             data.children = resp.result
           } else {
             this.$message.error(resp.error.message)
@@ -276,7 +263,11 @@ export default {
 
     // 运行用例
     async runCase(row) {
-      const resp = await CaseApi.runningCase(row.id, this.runEnv)
+      if (this.env === '') {
+        this.$message.error('请选择运行环境')
+        return
+      }
+      const resp = await CaseApi.runningCase(row.id, { env: this.env })
       if (resp.success === true) {
         this.$message.success('开始执行')
       } else {
@@ -290,8 +281,13 @@ export default {
     },
 
     caseRowClick(row) {
-      this.caseInfo = row
+      this.caseId = row.id
       this.drawer = true
+    },
+
+    // 子组件的回调
+    cancelDialog() {
+      this.drawer = false
     }
 
   }

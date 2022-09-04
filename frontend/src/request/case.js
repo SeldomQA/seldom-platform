@@ -6,6 +6,10 @@ class CaseApi {
     return request.post('/api/case/' + case_id + '/running', data)
   }
 
+  getCaseResult(case_id) {
+    return request.get('/api/case/' + case_id + '/result')
+  }
+
 }
 
 export default new CaseApi()
