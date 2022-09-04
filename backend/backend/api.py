@@ -18,9 +18,11 @@ class InvalidToken(Exception):
 
 
 class GlobalAuth(HttpBearer):
-    def authenticate(self, request,token):
-        bool = TokenMethod.check_token(token)
-        if bool == False:
+
+    def authenticate(self, request, token):
+        token_method = TokenMethod()
+        is_token = token_method.check_token(token)
+        if is_token is False:
             raise InvalidToken
         else:
             return token
