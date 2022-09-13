@@ -64,7 +64,6 @@ function commonRequest(requestType, url, dataOrParam, responseType, isLoading = 
   axios.interceptors.request.use(
     function(config) {
       let token = sessionStorage.token;
-      console.log('!11111', token)
       if (token) {
         token = `bearer ${token}`
         config.headers.common.Authorization = token;
@@ -87,8 +86,8 @@ function commonRequest(requestType, url, dataOrParam, responseType, isLoading = 
       console.log('返回错误', error);
       if (error.response.status === 401) {
         Message.error(new Error('token失效'));
-        this.$router.push({ path: '/' });
-        // sessionStorage.removeItem("token");
+        // this.$router.push({ path: '/' });
+        sessionStorage.removeItem('token');
       }
       return Promise.reject(error);
     }
