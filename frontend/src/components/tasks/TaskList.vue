@@ -67,6 +67,10 @@
             label="定时任务">
           </el-table-column>
           <el-table-column
+            prop="execute_count"
+            label="执行次数">
+          </el-table-column>
+          <el-table-column
             prop="status"
             label="状态">
             <template slot-scope="scope">

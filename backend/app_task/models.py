@@ -13,6 +13,7 @@ class TestTask(models.Model):
     env = models.CharField("环境", max_length=200, null=True)
     email = models.CharField("发送告警邮箱", max_length=100, null=True)
     timed = models.CharField("定时任务", max_length=50, null=True, default="")
+    execute_count = models.IntegerField("执行次数", null=True, default=0)
     job_id = models.CharField("定时任务ID", max_length=100, null=True, default="")
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
     update_time = models.DateTimeField("更新时间", auto_now=True)
@@ -63,7 +64,6 @@ class ReportDetails(models.Model):
     failure_out = models.TextField("用例错误", null=True, default="")
     error_out = models.TextField("用例错误", null=True, default="")
     skipped_message = models.TextField("用例错误", null=True, default="")
-    skipped_msg = models.FloatField("运行时长", default=0)
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
 
     def __str__(self):
