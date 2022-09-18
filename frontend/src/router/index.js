@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import SettingTabs from '../components/home/SettingTabs.vue'
 import Case from '../components/cases/Case.vue'
 import TaskList from '../components/tasks/TaskList.vue'
+import TeamList from '../components/home/TeamList.vue'
 import Report from '../components/reports/Report.vue'
 import Login from '../views/Login.vue';
 import Navigation from '../views/Navigation.vue';
@@ -42,6 +43,11 @@ const routes = [
         path: 'tasks',
         name: 'Task',
         component: TaskList
+      },
+      {
+        path: 'teams',
+        name: 'Team',
+        component: TeamList
       },
       {
         path: 'reports',
