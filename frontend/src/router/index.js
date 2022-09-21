@@ -17,7 +17,7 @@ const routes = [
   // },
   {
     path: '/',
-    redirect: '/main/Setting'
+    redirect: '/main/settings'
   },
   {
     path: '/login',
@@ -30,7 +30,7 @@ const routes = [
     component: Navigation,
     children: [
       {
-        path: 'Setting',
+        path: 'settings',
         name: 'Setting',
         component: SettingTabs
       },
@@ -59,7 +59,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'hash', // 模式: hash/history
+  mode: 'history', // 模式: hash/history
   base: process.env.BASE_URL,
   routes
 })

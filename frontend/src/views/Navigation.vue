@@ -14,7 +14,7 @@
             <div class="seldom-logo">
                 <img src="../assets/seldom-platform.gif" class="img-logo" />
             </div>
-            <router-link to="/main/Setting">
+            <router-link to="/main/settings">
               <el-menu-item index="1" class="menu-option">
                 <i class="el-icon-s-home"></i>
                 <template #title>配置管理</template>
@@ -32,12 +32,12 @@
                 <template #title>任务管理</template>
               </el-menu-item>
             </router-link>
-            <router-link to="/reports">
+            <!-- <router-link to="/reports">
               <el-menu-item index="4" class="menu-option">
                 <i class="el-icon-document-copy"></i>
                 <template #title>报告管理</template>
               </el-menu-item>
-            </router-link>
+            </router-link> -->
           </el-menu>
         </el-aside>
         <el-container>
