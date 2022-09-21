@@ -82,8 +82,6 @@
 
 <script>
 import { Message } from 'element-ui';
-
-
 import UserApi from '../request/user';
 
 export default {
@@ -120,20 +118,18 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           // alert("submit!");
-          console.log('登陆测')
           UserApi.login(this.loginForm).then(resp => {
             if (resp.success === true) {
               sessionStorage.token = resp.result.token;
               sessionStorage.user = resp.result.username;
               this.$router.push({ path: '/main/Setting' });
-              // this.$message.success("登录成功！");
-              Message.success('登陆成功');
+              Message.success('登陆成功！');
             } else {
-              this.$message.error('登录失败！');
+              this.$message.error(resp.error.message);
             }
           });
         } else {
-          console.log('error submit!!');
+          console.log('错误提交');
           return false;
         }
       });
@@ -148,7 +144,7 @@ export default {
             if (resp.success === true) {
               this.$message.success('注册成功！');
             } else {
-              this.$message.error(resp.error.msg);
+              this.$message.error(resp.error.message);
             }
           });
         } else {

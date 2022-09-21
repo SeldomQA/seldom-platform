@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'app_project',
     'app_case',
     'app_task',
+    'app_team',
     'corsheaders',  # 跨域
     'django_apscheduler',  # 定时任务
 ]

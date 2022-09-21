@@ -32,12 +32,12 @@
                 <template #title>任务管理</template>
               </el-menu-item>
             </router-link>
-            <!-- <router-link to="/reports">
+            <router-link to="/reports">
               <el-menu-item index="4" class="menu-option">
                 <i class="el-icon-document-copy"></i>
                 <template #title>报告管理</template>
               </el-menu-item>
-            </router-link> -->
+            </router-link>
           </el-menu>
         </el-aside>
         <el-container>
