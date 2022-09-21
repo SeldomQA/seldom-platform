@@ -63,6 +63,10 @@
             label="环境">
           </el-table-column>
           <el-table-column
+            prop="team"
+            label="团队">
+          </el-table-column>
+          <el-table-column
             prop="timed"
             label="定时任务">
           </el-table-column>

@@ -22,12 +22,11 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     :return:
     """
     task = TestTask.objects.get(id=task_id)
-    env = task.env
     task.status = 1
     task.save()
 
     # 环境判断
-    env = Env.objects.get(id=env)
+    env = Env.objects.get(id=task.env_id)
     if env.browser == "":
         browser = None
     else:

@@ -1,6 +1,7 @@
 import request from '@/HttpCommon.js'
 
 class TeamApi {
+
   createTeam(data) {
     return request.post('/api/team/create', data)
   }

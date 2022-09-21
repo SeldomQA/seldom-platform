@@ -6,10 +6,20 @@
           <el-form-item label="任务名称" prop="name">
             <el-input v-model="taskform.name"></el-input>
           </el-form-item>
-          <el-form-item label="运行环境" prop="env">
-           <el-select v-model="taskform.env" placeholder="选择环境">
+          <el-form-item label="运行环境" prop="env_id">
+           <el-select v-model="taskform.env_id" placeholder="选择环境">
               <el-option
                 v-for="item in envOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="团队" prop="team_id">
+           <el-select v-model="taskform.team_id" placeholder="选择团队">
+              <el-option
+                v-for="item in teamOptions"
                 :key="item.value"
                 :label="item.label"
                 :value="item.value">
@@ -70,6 +80,7 @@
 <script>
 import ProjectApi from '../../request/project'
 import TaskApi from '../../request/task'
+import TeamApi from '../../request/team'
 
 export default {
   props: ['pid', 'tid'],
@@ -79,7 +90,8 @@ export default {
       showTitle: '',
       taskform: {
         name: '',
-        env: '',
+        env_id: 1,
+        team_id: 1,
         cases: []
       },
       group_list: [],
@@ -87,8 +99,11 @@ export default {
         name: [
           { required: true, message: '请输入任务名称', trigger: 'blur' }
         ],
-        env: [
-          { required: true, message: '请输入运行环境', trigger: 'blur' }
+        env_id: [
+          { required: true, message: '请选择运行环境', trigger: 'blur' }
+        ],
+        team_id: [
+          { required: true, message: '请选择团队', trigger: 'blur' }
         ]
       },
       caseNumber: 0,
@@ -98,7 +113,8 @@ export default {
         children: 'children',
         label: 'label'
       },
-      envOptions: []
+      envOptions: [],
+      teamOptions: []
     }
   },
   created() {
@@ -113,16 +129,31 @@ export default {
   mounted() {
   // 初始化方法
     this.initProjectFile()
-    this.initEvn()
+    this.initEnv()
+    this.initTeam()
   },
   methods: {
     // 获取环境列表
-    async initEvn() {
+    async initEnv() {
       const resp = await ProjectApi.getEnvs()
-      console.log('resp', resp)
       if (resp.success === true) {
         for (let i = 0; i < resp.result.length; i++) {
           this.envOptions.push({
+            value: resp.result[i].id,
+            label: resp.result[i].name
+          })
+        }
+      } else {
+        this.$message.error(resp.error.message)
+      }
+    },
+
+    // 获取团队列表
+    async initTeam() {
+      const resp = await TeamApi.getTeamAll()
+      if (resp.success === true) {
+        for (let i = 0; i < resp.result.length; i++) {
+          this.teamOptions.push({
             value: resp.result[i].id,
             label: resp.result[i].name
           })
