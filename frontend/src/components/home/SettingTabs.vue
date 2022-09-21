@@ -25,7 +25,9 @@
       <el-tab-pane label="环境管理" name="env">
         <EnvList v-if="showTab == 2"></EnvList>
       </el-tab-pane>
-      <el-tab-pane label="团队管理" name="team">团队管理</el-tab-pane>
+      <el-tab-pane label="团队管理" name="team">
+        <TeamList v-if="showTab == 3"></TeamList>
+      </el-tab-pane>
       <el-tab-pane label="邮件组" name="emailGroup">邮件组</el-tab-pane>
     </el-tabs>
   </div>
@@ -34,12 +36,14 @@
 <script>
 import ProjectList from './ProjectList'
 import EnvList from './EnvList'
+import TeamList from './TeamList'
 
 export default {
   components: {
     // 组件
     ProjectList,
-    EnvList
+    EnvList,
+    TeamList
   },
   data() {
     return {
@@ -61,6 +65,8 @@ export default {
         this.showTab = 1
       } else if (tab.name === 'env') {
         this.showTab = 2
+      } else if (tab.name === 'team') {
+        this.showTab = 3
       }
     }
   }

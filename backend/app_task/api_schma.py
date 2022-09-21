@@ -6,7 +6,8 @@ class TaskIn(Schema):
     """任务入参"""
     project: str
     name: str
-    env: str
+    env_id: int
+    team_id: int
     cases: list
 
 

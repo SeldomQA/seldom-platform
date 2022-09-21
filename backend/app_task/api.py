@@ -11,6 +11,7 @@ from django_apscheduler.jobstores import DjangoJobStore, register_events, regist
 from app_project.models import Project, Env
 from app_case.models import TestCase
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
+from app_team.models import Team
 from app_task.api_schma import TaskIn, TimedIn, ReportOut, ReportIn
 from app_task.api_utils import thread_run_task
 from app_utils.response import response, model_to_dict, Error
@@ -33,7 +34,7 @@ def create_task(request, task: TaskIn):
     """
     task_obj = TestTask.objects.create(
         name=task.name,
-        env=task.env,
+        env_id=task.env_id,
         project_id=task.project,
     )
 
@@ -65,7 +66,7 @@ def get_task(request, task_id: int):
         })
     task_dict = model_to_dict(task_obj)
 
-    env = Env.objects.get(id=task_obj.env)
+    env = Env.objects.get(id=task_obj.env_id)
     task_dict["env"] = env.id
     task_dict["cases"] = cases
     task_dict["case_list"] = case_list
@@ -81,8 +82,18 @@ def get_task_list(request, project_id: int):
     task_list = []
     for task in tasks:
         task_dict = model_to_dict(task)
-        env = Env.objects.get(id=task.env)
-        task_dict["env"] = env.name
+        try:
+            env = Env.objects.get(id=task.env_id)
+            task_dict["env"] = env.name
+        except Env.DoesNotExist:
+            task_dict["env"] = ""
+
+        try:
+            team = Team.objects.get(id=task.team_id)
+            task_dict["team"] = team.name
+        except team.DoesNotExist:
+            task_dict["team"] = ""
+
         if task_dict["timed"] == "":
             task_dict["timed_dict"] = {
                 "minute": "*", "hour": "*", "day_of_week": "*", "day": "*", "month": "*"
@@ -102,9 +113,9 @@ def update_task(request, task_id: int, task: TaskIn):
     更新任务
     """
     task_obj = TestTask.objects.get(id=task_id)
-    env = Env.objects.get(id=task.env)
     task_obj.name = task.name
-    task_obj.env = env.id
+    task_obj.env_id = task.env_id
+    task_obj.team_id = task.team_id
     task_obj.save()
 
     TaskCaseRelevance.objects.filter(task=task_obj).delete()

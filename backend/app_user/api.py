@@ -27,7 +27,7 @@ def register_user(request, reg: RegisterIn):
     except User.DoesNotExist:
         pass
     else:
-        return response(error=Error.USER_EXIST)
+        return response(error=Error.USER_HAS_REGISTERED)
 
     user = User.objects.create_user(username=username, password=password)
     user_info = {
@@ -38,20 +38,20 @@ def register_user(request, reg: RegisterIn):
 
 
 @router.post("/login", auth=None)
-def user_login(request, payload: LoginIn):
+def login_user(request, payload: LoginIn):
     """
     用户登录
     auth=None 该接口不需要认证
     """
     username = payload.username
-    password  = payload.password
-    if username == "" or password =="":
-        return  response(error=Error.USER_OR_PAWD_NULL)
+    password = payload.password
+    if username == "" or password == "":
+        return response(error=Error.USER_OR_PAWD_NULL)
     else:
-        user = auth.authenticate(username=username,password=password)
+        user = auth.authenticate(username=username, password=password)
         if user is not None:
-            print(type(user.username))
-            token = TokenMethod.create_token(user.username)
+            token_method = TokenMethod()
+            token = token_method.create_token(user.username)
             user_info = {
                 "id": user.id,
                 "username": user.username,
@@ -59,4 +59,4 @@ def user_login(request, payload: LoginIn):
             }
             return response(result=user_info)
         else:
-            return response(error=Error.USER_OR_PAWD_EROOR)
+            return response(error=Error.USER_OR_PAWD_ERROR)

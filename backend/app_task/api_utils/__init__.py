@@ -6,7 +6,7 @@ from seldom.utils import file
 from seldom.logging import log
 from seldom import TestMainExtend
 from seldom import Seldom
-from seldom import ChromeConfig,FirefoxConfig, EdgeConfig
+from seldom import ChromeConfig, FirefoxConfig, EdgeConfig
 from app_project.models import Project, Env
 from app_task.models import TestTask, TaskReport, ReportDetails
 from backend.settings import BASE_DIR, REPORT_DIR
@@ -22,12 +22,11 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     :return:
     """
     task = TestTask.objects.get(id=task_id)
-    env = task.env
     task.status = 1
     task.save()
 
     # 环境判断
-    env = Env.objects.get(id=env)
+    env = Env.objects.get(id=task.env_id)
     if env.browser == "":
         browser = None
     else:
@@ -134,6 +133,7 @@ def seldom_running(test_dir, case_info, report_name, task_id):
         # 修改状态（2-已运行）
         test_case = TestTask.objects.get(id=task_id)
         test_case.status = 2
+        test_case.execute_count = test_case.execute_count + 1
         test_case.save()
 
         # 删除报告文件

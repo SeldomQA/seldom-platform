@@ -22,15 +22,15 @@
                     style="height: 120px; width: 120px"
                   />
                 </div>
-                <!-- <div style="margin-top: 10px;">
-                  <el-tag>{{item.address}}</el-tag>
-                </div> -->
-                <div style="margin-top: 10px;">
-                  <el-tag>测试目录：{{item.case_dir}}</el-tag>
-                </div>
-                <div style="margin-top: 10px;">
-                  <el-tag>文件数量：{{item.test_num}}</el-tag>
-                </div>
+                <el-descriptions title="  " :column="3">
+                  <el-descriptions-item label="测试目录">{{item.case_dir}}</el-descriptions-item>
+                  <el-descriptions-item label="文件数量">{{item.test_num}}</el-descriptions-item>
+                  <el-descriptions-item label="状态">
+                    <el-tag size="small" v-if="item.is_clone==0">未克隆</el-tag>
+                    <el-tag size="small" v-else>已克隆</el-tag>
+                  </el-descriptions-item>
+                  <el-descriptions-item label="Git地址">{{item.address}}</el-descriptions-item>
+                </el-descriptions>
               <div slot="header" class="clearfix">
                 <span>【{{item.id}}】{{item.name}} </span>
                 <span style="float: right; padding: 3px 0">
