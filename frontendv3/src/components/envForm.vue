@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { FormInst, useMessage } from "naive-ui";
-import { defineComponent, defineProps, reactive, ref, onMounted } from "vue";
+import { defineComponent, reactive, ref, onMounted } from "vue";
 import ProjectApi from "~/request/project";
 
 type Tform = {

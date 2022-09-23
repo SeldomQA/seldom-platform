@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, onMounted } from "vue";
 import { useMessage } from "naive-ui";
-import { SettingsOutline } from "@vicons/ionicons5";
+import { SettingsOutline, DocumentTextOutline, GitMergeOutline } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
 import ProjectDialog from "@/projectDialog.vue";
 import baseUrl from "~/config/base-url";
@@ -108,6 +108,7 @@ onMounted(() => {
         <span>项目管理</span>
         <n-breadcrumb separator=">">
           <n-breadcrumb-item href="/">首页</n-breadcrumb-item>
+          <n-breadcrumb-item>配置管理</n-breadcrumb-item>
           <n-breadcrumb-item>项目管理</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
@@ -115,29 +116,16 @@ onMounted(() => {
     <n-card class="main-card">
       <div class="filter-line">
         <n-space>
-          <n-button
-            cy-data="create-project"
-            type="primary"
-            @click="showCreate()"
-            >创建</n-button
-          ></n-space
-        >
+          <n-button cy-data="create-project" type="primary" @click="showCreate()">创建</n-button>
+        </n-space>
       </div>
       <div class="card-group">
         <n-space>
           <div v-for="(item, index) in datas.tableData" :key="index">
-            <n-card
-              :title="item.name"
-              style="width: 350px; height: 240px"
-              content-style="padding: 24;height:50%"
-              footer-style="padding: 0;height:100%"
-            >
+            <n-card :title="item.name" style="width:350px" content-style="padding: 24;height:50%"
+              footer-style="padding: 0;height:100%">
               <template #header-extra>
-                <n-dropdown
-                  trigger="hover"
-                  :options="options"
-                  @select="(key) => handleSelect(key, item.id)"
-                >
+                <n-dropdown trigger="hover" :options="options" @select="(key) => handleSelect(key, item.id)">
                   <n-icon>
                     <SettingsOutline />
                   </n-icon>
@@ -147,13 +135,21 @@ onMounted(() => {
                 <n-empty description="no cover"> </n-empty>
               </div>
               <div v-else style="height: 100%; width;: 100%">
-                <img
-                  :src="baseUrl + '/static/images/' + item.path_name"
-                  style="height: 100%; width: auto"
-                />
+                <img :src="baseUrl + '/static/images/' + item.path_name" style="height: 100%; width: 100%" />
               </div>
               <template #footer>
-                {{ item.address }}
+                <p>
+                  <n-icon>
+                    <GitMergeOutline />
+                  </n-icon> {{ item.address }}
+                </p>
+              </template>
+              <template #action>
+                <div>
+                  <n-icon>
+                    <DocumentTextOutline />
+                  </n-icon> {{ item.test_num }}
+                </div>
               </template>
             </n-card>
           </div>
@@ -161,26 +157,11 @@ onMounted(() => {
       </div>
     </n-card>
     <n-modal v-model:show="datas.showDailog" style="min-width: 600px">
-      <n-card
-        style="width: 600px"
-        v-if="datas.projectId == 0"
-        title="创建项目"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
+      <n-card style="width: 600px" v-if="datas.projectId == 0" title="创建项目" :bordered="false" size="huge" role="dialog"
+        aria-modal="true">
         <ProjectDialog :pid="datas.projectId" @cancel="cancelProject" />
       </n-card>
-      <n-card
-        style="width: 600px"
-        v-else
-        title="编辑项目"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
+      <n-card style="width: 600px" v-else title="编辑项目" :bordered="false" size="huge" role="dialog" aria-modal="true">
         <ProjectDialog :pid="datas.projectId" @cancel="cancelProject" />
       </n-card>
     </n-modal>
@@ -191,10 +172,13 @@ onMounted(() => {
 .filter-line {
   padding-bottom: 24px;
 }
+
 .main {
   padding: 20px;
 }
+
 .card-group {
   text-align: center;
+
 }
 </style>

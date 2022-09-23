@@ -95,10 +95,11 @@ onMounted(() => {
   <div class="body">
     <div class="pageheader">
       <n-space justify="space-between">
-        <span>环境配置</span>
+        <span>环境管理</span>
         <n-breadcrumb separator=">">
           <n-breadcrumb-item href="/">首页</n-breadcrumb-item>
-          <n-breadcrumb-item>环境配置</n-breadcrumb-item>
+          <n-breadcrumb-item>配置管理</n-breadcrumb-item>
+          <n-breadcrumb-item>环境管理</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
     </div>
