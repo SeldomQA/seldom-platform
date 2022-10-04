@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import SettingTabs from '../components/home/SettingTabs.vue'
-import Case from '../components/cases/Case.vue'
+import CaseList from '../components/cases/CaseList.vue'
 import TaskList from '../components/tasks/TaskList.vue'
 import TeamList from '../components/home/TeamList.vue'
 import Report from '../components/reports/Report.vue'
@@ -17,7 +17,7 @@ const routes = [
   // },
   {
     path: '/',
-    redirect: '/main/Setting'
+    redirect: '/main/settings'
   },
   {
     path: '/login',
@@ -30,14 +30,14 @@ const routes = [
     component: Navigation,
     children: [
       {
-        path: 'Setting',
+        path: 'settings',
         name: 'Setting',
         component: SettingTabs
       },
       {
         path: 'cases',
-        name: 'Case',
-        component: Case
+        name: 'CaseList',
+        component: CaseList
       },
       {
         path: 'tasks',
@@ -59,7 +59,7 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'hash', // 模式: hash/history
+  mode: 'history', // 模式: hash/history
   base: process.env.BASE_URL,
   routes
 })

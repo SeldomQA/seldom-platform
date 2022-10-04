@@ -86,7 +86,7 @@ export default {
         this.form = resp.result
         this.fileList.push({
           name: resp.result.path_name,
-          url: 'static/images/' + resp.result.path_name
+          url: origin + '/static/images/' + resp.result.path_name
         })
       } else {
         this.$message.error(resp.error.message);

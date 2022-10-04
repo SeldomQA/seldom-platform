@@ -18,7 +18,7 @@ fs.writeFileSync(versionFile, JSON.stringify({
 
 module.exports = {
   runtimeCompiler: true,
-  publicPath: './', // 设置打包文件相对路径
+  publicPath: '/', // 设置打包文件相对路径
   outputDir: 'dist', // 构建时输出的目录根路径
   // assetsDir: 'static',  // 放置静态资源的目录
   // indexPath: 'index.html', // HTML输出的路径

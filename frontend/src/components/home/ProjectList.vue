@@ -17,7 +17,7 @@
             <el-card>
               <div>
                   <img
-                    :src="'static/images/' + item.path_name  + '/'"
+                    :src="item.path_name"
                     class="image"
                     style="height: 120px; width: 120px"
                   />
@@ -94,9 +94,13 @@ export default {
     // 定义方法
     async initProjects() {
       this.loading = true
+      console.log('path', window.location.origin)
       const resp = await ProjectApi.getProjects()
       if (resp.success === true) {
         this.tableData = resp.result
+        for (let i = 0; i < resp.result.length; i++) {
+          this.tableData[i].path_name = origin + '/static/images/' + resp.result[i].path_name + '/'
+        }
       } else {
         this.$message.error(resp.error.message)
       }
@@ -119,7 +123,7 @@ export default {
     },
     // 克隆项目到本地
     async cloneProject(pid) {
-      const resp = await ProjectApi.cloneProject(pid)
+      const resp = await ProjectApi.syncCode(pid)
       if (resp.success === true) {
         this.$message.success('克隆&拉取完成！')
         this.initProjects()

@@ -9,12 +9,12 @@
   <div class="workbench">
     <div style="padding-bottom: 20px; height: 30px;">
       <span class="span-left">
-        <span class="page-title">配置管理</span>
+        <span class="page-title">配置中心</span>
       </span>
       <span class="span-breadcrumb">
         <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/main/Setting' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>配置管理</el-breadcrumb-item>
+          <el-breadcrumb-item>配置中心</el-breadcrumb-item>
         </el-breadcrumb>
       </span>
     </div>
