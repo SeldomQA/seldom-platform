@@ -18,7 +18,7 @@ from app_project.models import Project, Env
 from app_project.api_schma import ProjectIn, EnvIn, MergeCase
 from app_case.models import TestCase, TestCaseTemp
 from app_utils.response import response, Error, model_to_dict
-from app_utils.project_utils import github_dir, project_dir, get_hash
+from app_utils.project_utils import github_dir, project_dir, get_hash, copytree
 from backend.settings import BASE_DIR
 
 # upload image
@@ -161,11 +161,8 @@ def sync_project_case(request, project_id: int):
     # 收集测试用例信息
     main_extend = TestMainExtend(path=test_dir)
     seldom_case = main_extend.collect_cases(json=False)
-    print("seldom-case", seldom_case)
 
-    platform_case = TestCaseTemp.objects.filter(project=project_obj)
-    platform_case.delete()
-    print("platform_case", platform_case)
+    TestCaseTemp.objects.filter(project=project_obj).delete()
 
     # 从seldom项目中找到新增的用例
     for seldom in seldom_case:
@@ -191,12 +188,9 @@ def async_project_result(request, project_id: int):
     project_obj = get_object_or_404(Project, pk=project_id)
 
     temp_case = TestCaseTemp.objects.filter(project=project_obj)
-    print(temp_case)
-
     project_case = TestCase.objects.filter(project=project_obj)
-    print("project_case", project_case)
 
-    # 从seldom项目中找到新增的用例
+    # 用例备份表中找到新增的用例
     add_case = []
     del_case = []
     for temp in temp_case:
@@ -204,8 +198,6 @@ def async_project_result(request, project_id: int):
             if temp.case_hash == project.case_hash:
                 break
         else:
-            print("seldom-file--->", temp)
-            print("seldom-file--->", temp.file_name)
             add_case.append({
                 "file_name": temp.file_name,
                 "class_name": temp.class_name,
@@ -215,7 +207,7 @@ def async_project_result(request, project_id: int):
                 "case_hash": temp.case_hash
             })
 
-    # 从platform找出已删除的用例
+    # 项目用例表找出已删除的用例
     for project in project_case:
         for temp in temp_case:
             if project.case_hash == temp.case_hash:
@@ -229,18 +221,16 @@ def async_project_result(request, project_id: int):
                 "case_doc": project.case_doc,
                 "case_hash": project.case_hash
             })
-            # test_case = TestCase.objects.filter(project=project_obj, id=project.id)
-            # test_case.delete()
 
     return response(result={"project_id": project_id, "add_case": add_case, "del_case": del_case})
 
 
 @router.post("/{project_id}/sync_merge")
-def async_project_merge(request, param: MergeCase):
+def async_project_merge(request, project_id: int, param: MergeCase):
     """
     第四步：合并用例
     """
-    project_obj = get_object_or_404(Project, pk=param.project_id)
+    project_obj = get_object_or_404(Project, pk=project_id)
 
     # 添加用例
     add_case = param.add_case
@@ -264,7 +254,7 @@ def async_project_merge(request, param: MergeCase):
     project_path = project_dir(project_obj.address, temp=False)
     project_path_temp = project_dir(project_obj.address, temp=True)
 
-    shutil.copytree(project_path, project_path_temp)
+    copytree(project_path, project_path_temp)
 
     return response()
 
@@ -307,65 +297,6 @@ def upload_project_image(request, file: UploadedFile = File(...)):
 #     project_obj.path_name = ""
 #     project_obj.save()
 #     return response()
-
-
-@router.get("/{project_id}/sync")
-def update_project_cases(request, project_id: int):
-    """
-    同步项目用例
-    """
-    project_obj = get_object_or_404(Project, pk=project_id)
-    # 项目本地目录
-    project_address_temp = project_dir(project_obj.address, temp=True)
-
-    # 开启收集测试用例
-    SeldomTestLoader.collectCaseInfo = True
-    file.add_to_path(project_address_temp)
-
-    test_dir = file.join(project_address_temp, project_obj.case_dir)
-
-    if os.path.isdir(test_dir) is False:
-        return response(error=Error.PROJECT_DIR_NULL)
-
-    # 收集测试用例信息
-    main_extend = TestMainExtend(path=test_dir)
-    seldom_case = main_extend.collect_cases(json=False)
-    print(seldom_case)
-
-    platform_case = TestCaseTemp.objects.filter(project=project_obj)
-    print("platform_case", platform_case)
-
-    # 从seldom项目中找到新增的用例
-    for seldom in seldom_case:
-        for platform in platform_case:
-            if (seldom["file"] == platform.file_name
-                    and seldom["class"]["name"] == platform.class_name
-                    and seldom["method"]["name"] == platform.case_name):
-                break
-        else:
-            print("seldom-file--->", seldom)
-            print("seldom-file--->", seldom["file"])
-            TestCase.objects.create(
-                project_id=project_id,
-                file_name=seldom["file"],
-                class_name=seldom["class"]["name"],
-                class_doc=seldom["class"]["doc"],
-                case_name=seldom["method"]["name"],
-                case_doc=seldom["method"]["doc"],
-            )
-
-    # 从platform找出已删除的用例
-    for platform in platform_case:
-        for seldom in seldom_case:
-            if (platform.file_name == seldom["file"]
-                    and platform.class_name == seldom["class"]["name"]
-                    and platform.case_name == seldom["method"]["name"]):
-                break
-        else:
-            test_case = TestCase.objects.filter(project=project_obj, id=platform.id)
-            test_case.delete()
-
-    return response()
 
 
 @router.get("/{project_id}/files")

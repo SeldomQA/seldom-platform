@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import SettingTabs from '../components/home/SettingTabs.vue'
-import Case from '../components/cases/Case.vue'
+import CaseList from '../components/cases/CaseList.vue'
 import TaskList from '../components/tasks/TaskList.vue'
 import TeamList from '../components/home/TeamList.vue'
 import Report from '../components/reports/Report.vue'
@@ -36,8 +36,8 @@ const routes = [
       },
       {
         path: 'cases',
-        name: 'Case',
-        component: Case
+        name: 'CaseList',
+        component: CaseList
       },
       {
         path: 'tasks',

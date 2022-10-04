@@ -22,8 +22,20 @@ class ProjectApi {
     return request.put('/api/project/' + pid + '/', data)
   }
 
-  cloneProject(pid) {
-    return request.get('/api/project/' + pid + '/clone')
+  syncCode(pid) {
+    return request.get('/api/project/' + pid + '/sync_code')
+  }
+
+  syncCase(pid) {
+    return request.get('/api/project/' + pid + '/sync_case')
+  }
+
+  syncResult(pid) {
+    return request.get('/api/project/' + pid + '/sync_result')
+  }
+
+  syncMerge(pid, data) {
+    return request.post('/api/project/' + pid + '/sync_merge', data)
   }
 
   deleteProject(pid) {

@@ -21,6 +21,5 @@ class EnvIn(Schema):
 
 class MergeCase(Schema):
     """合并用例"""
-    project_id: int
     add_case: list
     del_case: list

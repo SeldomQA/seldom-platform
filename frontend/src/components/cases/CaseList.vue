@@ -32,7 +32,7 @@
             </el-select>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="syncProject" size="small">同步</el-button>
+            <el-button type="primary" @click="showSync" size="small">同步</el-button>
           </el-form-item>
           <el-form-item label="用例" style="float: right;">
            <el-tag>{{caseNumber}}</el-tag> 条
@@ -120,6 +120,7 @@
       >
         <ResultDialog v-if="drawer" :cid=caseId @cancel="cancelDialog"></ResultDialog>
       </el-drawer>
+      <syncDialog v-if="showSyncDialog" :pid=projectId @cancel="cancelSync"></syncDialog>
     </el-card>
   </div>
 </template>
@@ -128,17 +129,20 @@
 import ProjectApi from '../../request/project'
 import CaseApi from '../../request/case'
 import ResultDialog from './ResultDialog.vue'
+import syncDialog from './syncDialog.vue'
 
 
 export default {
   name: 'case',
   components: {
     // 组件
-    ResultDialog
+    ResultDialog,
+    syncDialog
   },
   data() {
     return {
       loading: true,
+      showSyncDialog: false,
       projectId: '',
       caseId: '',
       caseNumber: 0,
@@ -243,18 +247,13 @@ export default {
     },
 
     // 同步项目用例
-    async syncProject() {
-      if (this.projectId === '') {
-        this.$message.error('请选择项目')
-        return
-      }
-      const resp = await ProjectApi.syncProjectCase(this.projectId)
-      if (resp.success === true) {
-        this.initProjectFile()
-        this.$message.success('同步成功')
-      } else {
-        this.$message.error(resp.error.message)
-      }
+    async showSync() {
+      this.showSyncDialog = true
+    },
+    // 子组件的回调
+    cancelSync() {
+      this.showSyncDialog = false
+      this.initProjectFile()
     },
 
     changeProject() {

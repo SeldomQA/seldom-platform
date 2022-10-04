@@ -1,4 +1,7 @@
 import os
+import stat
+import errno
+import shutil
 import hashlib
 from seldom.utils import file
 from backend.settings import BASE_DIR
@@ -44,3 +47,23 @@ def get_hash(string: str) -> str:
     md5.update(sign_bytes_utf8)
     string_hash = md5.hexdigest()
     return string_hash
+
+
+def copytree(project_dir: str, copy_dir: str) -> None:
+    """
+    复制项目目录
+    :param project_dir:
+    :param copy_dir:
+    """
+    def handle_remove_read_only(func, path, exc):
+        excvalue = exc[1]
+        if func in (os.rmdir, os.remove, os.unlink) and excvalue.errno == errno.EACCES:
+            os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
+            func(path)
+        else:
+            raise
+
+    # 删除
+    shutil.rmtree(copy_dir, onerror=handle_remove_read_only)
+    # 复制
+    shutil.copytree(project_dir, copy_dir)
