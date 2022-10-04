@@ -123,7 +123,7 @@ export default {
     },
     // 克隆项目到本地
     async cloneProject(pid) {
-      const resp = await ProjectApi.cloneProject(pid)
+      const resp = await ProjectApi.syncCode(pid)
       if (resp.success === true) {
         this.$message.success('克隆&拉取完成！')
         this.initProjects()

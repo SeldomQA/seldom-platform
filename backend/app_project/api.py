@@ -56,13 +56,10 @@ def get_projects(request):
     获取项目列表
     """
     projects = Project.objects.filter(is_delete=False)
+    project_list = []
     for project in projects:
-        # 项目名
-        project_name = project.address.split("/")[-1].replace(".git", "")
-        # 本地github地址
-        local_github_dir = file.join(BASE_DIR, "github")
         # 本地项目地址
-        project_address = file.join(local_github_dir, project_name)
+        project_address = project_dir(project.address)
         # 判断本地是否有克隆文件
         if os.path.isdir(project_address) is True:
             # 调整为已克隆
@@ -71,9 +68,8 @@ def get_projects(request):
         else:
             project.is_clone = 0
             project.save()
-    project_list = []
-    for project in projects:
         project_list.append(model_to_dict(project))
+
     return response(result=project_list)
 
 
@@ -128,6 +124,14 @@ def async_project_code(request, project_id: int):
         args = ["clone", project_obj.address]
         res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
         if res == 0:
+            # 获取文件数量
+            test_num = 0
+            for _, _, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            project_obj.is_clone = 1
+            project_obj.save()
             return response()
         else:
             return response(error=Error.PROJECT_CLONE_ERROR)
@@ -136,6 +140,13 @@ def async_project_code(request, project_id: int):
         args = ["pull"]
         res = subprocess.check_call(['git'] + list(args), cwd=project_address)
         if res == 0:
+            # 获取文件数量
+            test_num = 0
+            for _, _, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            project_obj.save()
             return response()
         else:
             return response(error=Error.PROJECT_CLONE_ERROR)
