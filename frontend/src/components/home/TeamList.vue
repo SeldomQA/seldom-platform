@@ -54,13 +54,12 @@ export default {
   methods: {
     // 初始化获取团队列表
     async initTeamList() {
-      console.log('获取团队列表');
-      const resp = await TeamApi.getTeamAll();
+      const resp = await TeamApi.getTeamAll()
       if (resp.success === true) {
-        this.teamData = resp.result;
-        // this.$message.success("查询成功");
+        this.teamData = resp.result
+        // this.$message.success("查询成功")
       } else {
-        this.$message.error('查询失败!');
+        this.$message.error('查询失败!')
       }
     },
     // 显示创建窗口
@@ -83,11 +82,11 @@ export default {
       this.teamid = obj.id
       const resp = await TeamApi.deleteTeam(this.teamid)
       if (resp.success === true) {
-        this.$message.success('删除成功');
+        this.$message.success('删除成功')
         this.initTeamList()
         this.teamid = 0
       } else {
-        this.$message.error('删除失败!');
+        this.$message.error('删除失败!')
       }
     }
   }

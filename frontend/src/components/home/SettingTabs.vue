@@ -60,7 +60,6 @@ export default {
   methods: {
     // 切换tab标签页
     tabClick(tab) {
-      console.log(tab.name)
       if (tab.name === 'project') {
         this.showTab = 1
       } else if (tab.name === 'env') {

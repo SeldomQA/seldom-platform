@@ -26,8 +26,8 @@
 </template>
 
 <script>
-
 import EnvApi from '../../request/env'
+
 export default {
   props: ['eid'],
   data() {
@@ -77,12 +77,12 @@ export default {
                 this.$message.success('更新成功！')
                 this.cancelEnv()
               } else {
-                this.$message.error('更新失败！');
+                this.$message.error('更新失败！')
               }
             })
           }
         } else {
-          return false;
+          return false
         }
       })
     },
@@ -92,7 +92,7 @@ export default {
       if (resp.success === true) {
         this.form = resp.result
       } else {
-        this.$message.error(resp.error.message);
+        this.$message.error(resp.error.message)
       }
     },
     // 关闭dialog

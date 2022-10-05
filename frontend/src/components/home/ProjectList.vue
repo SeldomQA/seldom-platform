@@ -94,7 +94,6 @@ export default {
     // 定义方法
     async initProjects() {
       this.loading = true
-      console.log('path', window.location.origin)
       const resp = await ProjectApi.getProjects()
       if (resp.success === true) {
         this.tableData = resp.result
@@ -128,7 +127,7 @@ export default {
         this.$message.success('克隆&拉取完成！')
         this.initProjects()
       } else {
-        this.$message.error('克隆失败');
+        this.$message.error('克隆失败')
       }
     },
     // 删除一条项目信息
@@ -138,7 +137,7 @@ export default {
         this.$message.success('删除成功！')
         this.initProjects()
       } else {
-        this.$message.error('删除失败');
+        this.$message.error('删除失败')
       }
     }
   }

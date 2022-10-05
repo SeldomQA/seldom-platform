@@ -170,14 +170,13 @@ export default {
           { required: true, message: '请输入确认密码', trigger: 'blur' }
         ]
       }
-    };
+    }
   },
   methods: {
     // 用户登录
     submitLogin(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          // alert("submit!");
           UserApi.login(this.loginForm).then(resp => {
             if (resp.success === true) {
               sessionStorage.token = resp.result.token
@@ -187,34 +186,30 @@ export default {
             } else {
               this.$message.error(resp.error.message)
             }
-          });
+          })
         } else {
-          console.log('错误提交')
-          return false;
+          return false
         }
-      });
+      })
     },
     // 用户注册
     submitRegister(formName) {
-      console.log(this.$refs[formName].validate());
       this.$refs[formName].validate(valid => {
         if (valid) {
-          // alert('submit!');
           UserApi.register(this.registerForm).then(resp => {
             if (resp.success === true) {
               this.$message.success('注册成功！')
             } else {
               this.$message.error(resp.error.message)
             }
-          });
+          })
         } else {
-          console.log('错误提交')
           return false
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style>
@@ -227,7 +222,7 @@ export default {
   position: absolute;
   width: 600px;
   top: 20%;
-  left: 20%;
+  left: 18%;
 }
 
 .home-logo {

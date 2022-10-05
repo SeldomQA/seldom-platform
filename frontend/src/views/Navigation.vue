@@ -105,12 +105,12 @@ export default {
               this.$message.error('退出失败！')
             }
           })
-          break;
+          break
         case 'help_documentation':
           window.open('https://github.com/SeldomQA/seldom-platform', '_blank')
-          break;
+          break
         default:
-          break;
+          break
       }
     }
 

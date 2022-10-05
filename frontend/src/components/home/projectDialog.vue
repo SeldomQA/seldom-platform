@@ -89,7 +89,7 @@ export default {
           url: origin + '/static/images/' + resp.result.path_name
         })
       } else {
-        this.$message.error(resp.error.message);
+        this.$message.error(resp.error.message)
       }
     },
     // 关闭dialog
@@ -106,7 +106,7 @@ export default {
                 this.$message.success('创建成功！')
                 this.cancelProject()
               } else {
-                this.$message.error('创建失败！');
+                this.$message.error('创建失败！')
               }
             })
           } else {
@@ -115,12 +115,12 @@ export default {
                 this.$message.success('更新成功！')
                 this.cancelProject()
               } else {
-                this.$message.error('更新失败！');
+                this.$message.error('更新失败！')
               }
             })
           }
         } else {
-          return false;
+          return false
         }
       });
     },

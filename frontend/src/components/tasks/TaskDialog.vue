@@ -245,7 +245,7 @@ export default {
                 this.$message.success('创建成功！')
                 this.cancelDialog()
               } else {
-                this.$message.error('创建失败！');
+                this.$message.error('创建失败！')
               }
             })
           } else {
@@ -255,14 +255,14 @@ export default {
                 this.$message.success('更新成功！')
                 this.cancelDialog()
               } else {
-                this.$message.error('更新失败！');
+                this.$message.error('更新失败！')
               }
             })
           }
         } else {
-          return false;
+          return false
         }
-      });
+      })
     }
 
   }

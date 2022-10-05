@@ -74,13 +74,13 @@ export default {
             this.syncStatus = 3
             this.req = resp.result
           } else {
-            this.$message.error(resp.error.message);
+            this.$message.error(resp.error.message)
           }
         } else {
-          this.$message.error(resp.error.message);
+          this.$message.error(resp.error.message)
         }
       } else {
-        this.$message.error(resp.error.message);
+        this.$message.error(resp.error.message)
       }
     },
 
@@ -96,7 +96,7 @@ export default {
         this.$message.success('合并成功！')
         this.cancelSync()
       } else {
-        this.$message.error(resp.error.message);
+        this.$message.error(resp.error.message)
       }
     }
 

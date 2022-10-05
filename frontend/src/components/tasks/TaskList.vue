@@ -162,7 +162,6 @@ export default {
   methods: {
     // 显示创建任务
     showCreateTask() {
-      console.log('showCreateTask', this.projectId)
       this.taskDailog = true
     },
     // 显示编辑任务
@@ -260,9 +259,7 @@ export default {
     },
     // 显示任务报告列表
     clickTaskName(row) {
-      console.log(row)
       this.taskId = row.id
-      console.log('aaa', this.taskId)
       this.taskFlag = false
     },
     // 返回任务列表

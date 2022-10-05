@@ -58,13 +58,12 @@ export default {
   methods: {
     // 初始化获取环境列表
     async initEnvList() {
-      console.log('获取环境列表');
       const resp = await EnvApi.GetEnvList();
       if (resp.success === true) {
         this.envData = resp.result;
-        // this.$message.success("查询成功");
+        // this.$message.success("查询成功")
       } else {
-        this.$message.error('查询失败!');
+        this.$message.error('查询失败!')
       }
     },
     // 显示创建窗口
@@ -87,11 +86,11 @@ export default {
       this.envid = obj.id
       const resp = await EnvApi.DeleteEnv(this.envid);
       if (resp.success === true) {
-        this.$message.success('删除成功');
+        this.$message.success('删除成功')
         this.initEnvList()
         this.envid = 0
       } else {
-        this.$message.error('删除失败!');
+        this.$message.error('删除失败!')
       }
     }
   }
