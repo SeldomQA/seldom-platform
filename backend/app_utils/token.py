@@ -44,6 +44,13 @@ class TokenMethod:
         cache.set(username, token, TIME_OUT)
         return token
 
+    def delete_token(self, token):
+        """
+        删除token
+        """
+        username = self.get_username(token)
+        cache.delete(username)
+
     def get_payload(self, token):
         """
         获取参数

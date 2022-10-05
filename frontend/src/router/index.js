@@ -11,14 +11,14 @@ Vue.use(VueRouter)
 
 const routes = [
   // 开启登陆页
-  // {
-  //   path: '/',
-  //   redirect: '/login'
-  // },
   {
     path: '/',
-    redirect: '/main/settings'
+    redirect: '/login'
   },
+  // {
+  //   path: '/',
+  //   redirect: '/main/settings'
+  // },
   {
     path: '/login',
     name: 'Login',
@@ -65,20 +65,20 @@ const router = new VueRouter({
 })
 
 // 开启登陆页
-// // 导航守卫，控制一些页面登录才能访问
-// router.beforeEach((to, from, next) => {
-//   if (to.path === '/login') {
-//     // 当路由为login时就直接下一步操作
-//     next();
-//   } else {
-//     // 否则就需要判断
-//     if (sessionStorage.token) {
-//       // 如果有用户名就进行下一步操作
-//       next();
-//     } else {
-//       next({ path: '/login' }); // 没有用户名就跳转到login页面
-//     }
-//   }
-// });
+// 导航守卫，控制一些页面登录才能访问
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    // 当路由为login时就直接下一步操作
+    next();
+  } else {
+    // 否则就需要判断
+    if (sessionStorage.token) {
+      // 如果有用户名就进行下一步操作
+      next();
+    } else {
+      next({ path: '/login' }); // 没有用户名就跳转到login页面
+    }
+  }
+});
 
 export default router

@@ -25,16 +25,16 @@
   text-align: center;
   color: #2c3e50;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 body {
   margin: 0px 0px 0px;
 }
 html{
-  background-image: url("./assets/bg.png");
+  /* background-image: url("./assets/home-bg.png"); */
   background-attachment: fixed;
-  background-size:100% 100%;
+  background-size: 100% 100%;
   z-index: -1000;
 }
 html,

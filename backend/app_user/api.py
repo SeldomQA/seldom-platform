@@ -3,21 +3,21 @@ from app_utils.response import response, Error
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib.sessions.models import Session
-from app_user.api_schema import RegisterIn, LoginIn
+from app_user.api_schema import RegisterIn, LoginIn, LogoutIn
 from app_utils.token import TokenMethod
 
 router = Router(tags=["user"])
 
 
 @router.post("/register")
-def register_user(request, reg: RegisterIn):
+def register(request, params: RegisterIn):
     """
     用户注册
     auth=None 该接口不需要认证
     """
-    username = reg.username
-    password = reg.password
-    password2 = reg.password2
+    username = params.username
+    password = params.password
+    password2 = params.password2
 
     if password != password2:
         return response(error=Error.PAWD_ERROR)
@@ -38,13 +38,13 @@ def register_user(request, reg: RegisterIn):
 
 
 @router.post("/login", auth=None)
-def login_user(request, payload: LoginIn):
+def login(request, params: LoginIn):
     """
     用户登录
     auth=None 该接口不需要认证
     """
-    username = payload.username
-    password = payload.password
+    username = params.username
+    password = params.password
     if username == "" or password == "":
         return response(error=Error.USER_OR_PAWD_NULL)
     else:
@@ -60,3 +60,16 @@ def login_user(request, payload: LoginIn):
             return response(result=user_info)
         else:
             return response(error=Error.USER_OR_PAWD_ERROR)
+
+
+@router.post("/logout", auth=None)
+def logout(request, params: LogoutIn):
+    """
+    退出登录
+    auth=None 该接口不需要认证R
+    """
+    print(params.token)
+    token_method = TokenMethod()
+    token_method.delete_token(params.token)
+
+    return response(success=True)
