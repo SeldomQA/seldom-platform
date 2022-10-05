@@ -46,7 +46,7 @@ onMounted(() => {
             <router-view></router-view>
           </n-layout>
         </n-layout>
-        <n-layout-footer bordered position="absolute">
+        <n-layout-footer bordered position="absolute" style="text-align:center">
           © 2022 Powered by SeldomQA Team
         </n-layout-footer>
       </n-layout>
