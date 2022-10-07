@@ -17,3 +17,9 @@ class EnvIn(Schema):
     env: Optional[str] = None
     browser: Optional[str] = None
     base_url: Optional[str] = None
+
+
+class MergeCase(Schema):
+    """合并用例"""
+    add_case: list
+    del_case: list

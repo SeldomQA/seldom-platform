@@ -74,11 +74,19 @@ def get_task(request, task_id: int):
 
 
 @router.get('/list')
-def get_task_list(request, project_id: int):
+def get_task_list(request, project_id: int, team_id: str = None, name: str = None):
     """
     获得任务列表
     """
-    tasks = TestTask.objects.filter(project_id=project_id)
+
+    query = {"project_id": project_id}
+    if team_id is not None and team_id != "":
+        query["team_id"] = int(team_id)
+    if name is not None and name != "":
+        query["name__contains"] = name
+
+    tasks = TestTask.objects.filter(**query)
+
     task_list = []
     for task in tasks:
         task_dict = model_to_dict(task)

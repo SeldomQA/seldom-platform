@@ -6,7 +6,7 @@ class UserApi {
   }
 
   logout(data) {
-    return request.delete('/api/user/login/', data);
+    return request.post('/api/user/logout', data);
   }
 
   register(data) {

@@ -16,3 +16,10 @@ class LoginIn(Schema):
     """
     username: str
     password: str
+
+
+class LogoutIn(Schema):
+    """
+    退出入参
+    """
+    token: str

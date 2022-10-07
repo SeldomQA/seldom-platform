@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import SettingTabs from '../components/home/SettingTabs.vue'
-import Case from '../components/cases/Case.vue'
+import CaseList from '../components/cases/CaseList.vue'
 import TaskList from '../components/tasks/TaskList.vue'
 import TeamList from '../components/home/TeamList.vue'
 import Report from '../components/reports/Report.vue'
@@ -11,14 +11,14 @@ Vue.use(VueRouter)
 
 const routes = [
   // 开启登陆页
-  // {
-  //   path: '/',
-  //   redirect: '/login'
-  // },
   {
     path: '/',
-    redirect: '/main/Setting'
+    redirect: '/login'
   },
+  // {
+  //   path: '/',
+  //   redirect: '/main/settings'
+  // },
   {
     path: '/login',
     name: 'Login',
@@ -30,14 +30,14 @@ const routes = [
     component: Navigation,
     children: [
       {
-        path: 'Setting',
+        path: 'settings',
         name: 'Setting',
         component: SettingTabs
       },
       {
         path: 'cases',
-        name: 'Case',
-        component: Case
+        name: 'CaseList',
+        component: CaseList
       },
       {
         path: 'tasks',
@@ -59,26 +59,26 @@ const routes = [
 ]
 
 const router = new VueRouter({
-  mode: 'hash', // 模式: hash/history
+  mode: 'history', // 模式: hash/history
   base: process.env.BASE_URL,
   routes
 })
 
 // 开启登陆页
-// // 导航守卫，控制一些页面登录才能访问
-// router.beforeEach((to, from, next) => {
-//   if (to.path === '/login') {
-//     // 当路由为login时就直接下一步操作
-//     next();
-//   } else {
-//     // 否则就需要判断
-//     if (sessionStorage.token) {
-//       // 如果有用户名就进行下一步操作
-//       next();
-//     } else {
-//       next({ path: '/login' }); // 没有用户名就跳转到login页面
-//     }
-//   }
-// });
+// 导航守卫，控制一些页面登录才能访问
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    // 当路由为login时就直接下一步操作
+    next();
+  } else {
+    // 否则就需要判断
+    if (sessionStorage.token) {
+      // 如果有用户名就进行下一步操作
+      next();
+    } else {
+      next({ path: '/login' }); // 没有用户名就跳转到login页面
+    }
+  }
+});
 
 export default router

@@ -4,6 +4,7 @@ date: 2022-02-07
 function: 项目管理
 """
 import os
+import shutil
 import hashlib
 import subprocess
 from django.shortcuts import get_object_or_404
@@ -14,11 +15,11 @@ from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from seldom.utils import file
 from app_project.models import Project, Env
-from app_project.api_schma import ProjectIn, EnvIn
-from app_case.models import TestCase
+from app_project.api_schma import ProjectIn, EnvIn, MergeCase
+from app_case.models import TestCase, TestCaseTemp
 from app_utils.response import response, Error, model_to_dict
+from app_utils.project_utils import github_dir, project_dir, get_hash, copytree
 from backend.settings import BASE_DIR
-from random import randint
 
 # upload image
 IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
@@ -35,7 +36,7 @@ def create_project(request, project: ProjectIn):
     if project.cover_name == "" and project.path_name == "":
         project.cover_name = "seldom_logo.png"
         project.path_name = "2d82cb919cf05116adf720f8f7437ac9.png"
-    #设置默认目录
+    # 设置默认目录
     if project.case_dir == "":
         project_case_dir = "test_dir"
     else:
@@ -55,13 +56,10 @@ def get_projects(request):
     获取项目列表
     """
     projects = Project.objects.filter(is_delete=False)
+    project_list = []
     for project in projects:
-        # 项目名
-        project_name = project.address.split("/")[-1].replace(".git", "")
-        # 本地github地址
-        local_github_dir = file.join(BASE_DIR, "github")
         # 本地项目地址
-        project_address = file.join(local_github_dir, project_name)
+        project_address = project_dir(project.address)
         # 判断本地是否有克隆文件
         if os.path.isdir(project_address) is True:
             # 调整为已克隆
@@ -70,9 +68,8 @@ def get_projects(request):
         else:
             project.is_clone = 0
             project.save()
-    project_list = []
-    for project in projects:
         project_list.append(model_to_dict(project))
+
     return response(result=project_list)
 
 
@@ -100,59 +97,6 @@ def update_project(request, project_id: int, project: ProjectIn):
     return response(result=model_to_dict(project_obj))
 
 
-@router.get('/{project_id}/clone')
-def clone_project(request, project_id: int):
-    """
-    git克隆项目到本地
-    """
-    project_obj = get_object_or_404(Project, pk=project_id)
-    if "/" not in project_obj.address:
-        return response(error=Error.PROJECT_ADDRESS_ERROR)
-
-    # 项目名
-    project_name = project_obj.address.split("/")[-1].replace(".git", "")
-    # 本地github地址
-    local_github_dir = file.join(BASE_DIR, "github")
-    # 本地项目地址
-    project_address = file.join(local_github_dir, project_name)
-
-    if os.path.isdir(project_address) is False:
-        args = ["clone", project_obj.address]
-        try:
-            res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
-        except NotADirectoryError:
-            # 没有目录，创建目录
-            os.mkdir(local_github_dir)
-            res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
-        if res == 0:
-            #获取文件数量
-            test_num = 0
-            for dirpath, dirnames, filenames in os.walk(project_address):
-                file_counts = len(filenames)
-                test_num = test_num + file_counts
-            project_obj.test_num = test_num
-            #调整为已克隆
-            project_obj.is_clone = 1
-            project_obj.save()
-            return response()
-        else:
-            return response(error=Error.PROJECT_CLONE_ERROR)
-    else:
-        args = ["pull"]
-        res = subprocess.check_call(['git'] + list(args), cwd=project_address)
-        if res == 0:
-            #获取文件数量
-            test_num = 0
-            for dirpath, dirnames, filenames in os.walk(project_address):
-                file_counts = len(filenames)
-                test_num = test_num + file_counts
-            project_obj.test_num = test_num
-            project_obj.save()
-            return response()
-        else:
-            return response(error=Error.PROJECT_CLONE_ERROR)
-
-
 @router.delete('/{project_id}/')
 def delete_project(request, project_id: int):
     """
@@ -161,6 +105,167 @@ def delete_project(request, project_id: int):
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.is_delete = True
     project_obj.save()
+
+    return response()
+
+
+@router.get('/{project_id}/sync_code')
+def async_project_code(request, project_id: int):
+    """
+    第一步：git克隆&拉取项目代码
+    """
+    project_obj = get_object_or_404(Project, pk=project_id)
+
+    local_github_dir = github_dir()
+    project_address = project_dir(project_obj.address, temp=False)
+
+    if os.path.isdir(project_address) is False:
+        print("==> git clone")
+        args = ["clone", project_obj.address]
+        res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
+        if res == 0:
+            # 获取文件数量
+            test_num = 0
+            for _, _, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            project_obj.is_clone = 1
+            project_obj.save()
+            return response()
+        else:
+            return response(error=Error.PROJECT_CLONE_ERROR)
+    else:
+        print("==> git pull")
+        args = ["pull"]
+        res = subprocess.check_call(['git'] + list(args), cwd=project_address)
+        if res == 0:
+            # 获取文件数量
+            test_num = 0
+            for _, _, filenames in os.walk(project_address):
+                file_counts = len(filenames)
+                test_num = test_num + file_counts
+            project_obj.test_num = test_num
+            project_obj.save()
+            return response()
+        else:
+            return response(error=Error.PROJECT_CLONE_ERROR)
+
+
+@router.get("/{project_id}/sync_case")
+def sync_project_case(request, project_id: int):
+    """
+    第二步：同步项目用例
+    """
+    project_obj = get_object_or_404(Project, pk=project_id)
+    project_address = project_dir(project_obj.address, temp=False)
+
+    # 开启收集测试用例
+    SeldomTestLoader.collectCaseInfo = True
+    # 把项目目录加到环境变量path
+    file.add_to_path(project_address)
+
+    test_dir = file.join(project_address, project_obj.case_dir)
+    if os.path.isdir(test_dir) is False:
+        return response(error=Error.PROJECT_DIR_NULL)
+
+    # 收集测试用例信息
+    main_extend = TestMainExtend(path=test_dir)
+    seldom_case = main_extend.collect_cases(json=False)
+
+    TestCaseTemp.objects.filter(project=project_obj).delete()
+
+    # 从seldom项目中找到新增的用例
+    for seldom in seldom_case:
+        case_hash = get_hash(f"""{seldom["file"]}.{seldom["class"]["name"]}.{seldom["method"]["name"]}""")
+        TestCaseTemp.objects.create(
+            project_id=project_id,
+            file_name=seldom["file"],
+            class_name=seldom["class"]["name"],
+            class_doc=seldom["class"]["doc"],
+            case_name=seldom["method"]["name"],
+            case_doc=seldom["method"]["doc"],
+            case_hash=case_hash
+        )
+
+    return response()
+
+
+@router.get("/{project_id}/sync_result")
+def async_project_result(request, project_id: int):
+    """
+    第三步：同步项目用例结果
+    """
+    project_obj = get_object_or_404(Project, pk=project_id)
+
+    temp_case = TestCaseTemp.objects.filter(project=project_obj)
+    project_case = TestCase.objects.filter(project=project_obj)
+
+    # 用例备份表中找到新增的用例
+    add_case = []
+    del_case = []
+    for temp in temp_case:
+        for project in project_case:
+            if temp.case_hash == project.case_hash:
+                break
+        else:
+            add_case.append({
+                "file_name": temp.file_name,
+                "class_name": temp.class_name,
+                "class_doc": temp.class_doc,
+                "case_name": temp.case_name,
+                "case_doc": temp.case_doc,
+                "case_hash": temp.case_hash
+            })
+
+    # 项目用例表找出已删除的用例
+    for project in project_case:
+        for temp in temp_case:
+            if project.case_hash == temp.case_hash:
+                break
+        else:
+            del_case.append({
+                "file_name": project.file_name,
+                "class_name": project.class_name,
+                "class_doc": project.class_doc,
+                "case_name": project.case_name,
+                "case_doc": project.case_doc,
+                "case_hash": project.case_hash
+            })
+
+    return response(result={"project_id": project_id, "add_case": add_case, "del_case": del_case})
+
+
+@router.post("/{project_id}/sync_merge")
+def async_project_merge(request, project_id: int, param: MergeCase):
+    """
+    第四步：合并用例
+    """
+    project_obj = get_object_or_404(Project, pk=project_id)
+
+    # 添加用例
+    add_case = param.add_case
+    del_case = param.del_case
+    for case in add_case:
+        TestCase.objects.create(
+            project=project_obj,
+            file_name=case["file_name"],
+            class_name=case["class_name"],
+            class_doc=case["class_doc"],
+            case_name=case["case_name"],
+            case_doc=case["case_doc"],
+            case_hash=case["case_hash"]
+        )
+
+    # 删除用例
+    for case in del_case:
+        test_case = TestCase.objects.get(project=project_obj, case_hash=case["case_hash"])
+        test_case.delete()
+
+    project_path = project_dir(project_obj.address, temp=False)
+    project_path_temp = project_dir(project_obj.address, temp=True)
+
+    copytree(project_path, project_path_temp)
 
     return response()
 
@@ -203,70 +308,6 @@ def upload_project_image(request, file: UploadedFile = File(...)):
 #     project_obj.path_name = ""
 #     project_obj.save()
 #     return response()
-
-
-@router.get("/{project_id}/sync")
-def update_project_cases(request, project_id: int):
-    """
-    同步项目用例
-    """
-    project_obj = get_object_or_404(Project, pk=project_id)
-
-    # 开启收集测试用例
-    SeldomTestLoader.collectCaseInfo = True
-
-    # 项目本地目录
-    project_name = project_obj.address.split("/")[-1].replace(".git", "")
-    github_dir = file.join(BASE_DIR, "github")
-    project_address = file.join(github_dir, project_name)
-
-    # 把项目目录加到环境变量path
-    file.add_to_path(project_address)
-
-    test_dir = file.join(project_address, project_obj.case_dir)
-
-    if os.path.isdir(test_dir) is False:
-        return response(error=Error.PROJECT_DIR_NULL)
-
-    # 收集测试用例信息
-    main_extend = TestMainExtend(path=test_dir)
-    seldom_case = main_extend.collect_cases(json=False)
-    print(seldom_case)
-
-    platform_case = TestCase.objects.filter(project=project_obj)
-    print("platform_case", platform_case)
-
-    # 从seldom项目中找到新增的用例
-    for seldom in seldom_case:
-        for platform in platform_case:
-            if (seldom["file"] == platform.file_name
-                    and seldom["class"]["name"] == platform.class_name
-                    and seldom["method"]["name"] == platform.case_name):
-                break
-        else:
-            print("seldom-file--->", seldom)
-            print("seldom-file--->", seldom["file"])
-            TestCase.objects.create(
-                project_id=project_id,
-                file_name=seldom["file"],
-                class_name=seldom["class"]["name"],
-                class_doc=seldom["class"]["doc"],
-                case_name=seldom["method"]["name"],
-                case_doc=seldom["method"]["doc"],
-            )
-
-    # 从platform找出已删除的用例
-    for platform in platform_case:
-        for seldom in seldom_case:
-            if (platform.file_name == seldom["file"]
-                    and platform.class_name == seldom["class"]["name"]
-                    and platform.case_name == seldom["method"]["name"]):
-                break
-        else:
-            test_case = TestCase.objects.filter(project=project_obj, id=platform.id)
-            test_case.delete()
-
-    return response()
 
 
 @router.get("/{project_id}/files")

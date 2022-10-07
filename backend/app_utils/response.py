@@ -22,6 +22,7 @@ class Error:
     PROJECT_ADDRESS_ERROR = {"10024": "项目地址错误"}
     PROJECT_CLONE_ERROR = {"10025": "项目克隆失败"}
     PROJECT_DIR_NULL = {"10026": "项目测试目录不存在"}
+    PROJECT_PULL_ERROR = {"10027": "项目拉取失败"}
 
     FILE_TYPE_ERROR = {"10031": "文件类型错误"}
     FILE_SIZE_ERROR = {"10032": "超出文件大小"}

@@ -14,10 +14,10 @@
             <div class="seldom-logo">
                 <img src="../assets/seldom-platform.gif" class="img-logo" />
             </div>
-            <router-link to="/main/Setting">
+            <router-link to="/main/settings">
               <el-menu-item index="1" class="menu-option">
-                <i class="el-icon-s-home"></i>
-                <template #title>配置管理</template>
+                <i class="el-icon-setting"></i>
+                <template #title>配置中心</template>
               </el-menu-item>
             </router-link>
             <router-link to="/main/cases">
@@ -32,12 +32,12 @@
                 <template #title>任务管理</template>
               </el-menu-item>
             </router-link>
-            <router-link to="/reports">
+            <!-- <router-link to="/reports">
               <el-menu-item index="4" class="menu-option">
                 <i class="el-icon-document-copy"></i>
                 <template #title>报告管理</template>
               </el-menu-item>
-            </router-link>
+            </router-link> -->
           </el-menu>
         </el-aside>
         <el-container>
@@ -65,6 +65,7 @@
 
 
 <script>
+import UserApi from '../request/user'
 
 export default {
   name: 'navigation',
@@ -82,11 +83,13 @@ export default {
   data() {
     return {
       // 定义变量
-      circleUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
+      circleUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
+      token: ''
     }
   },
   mounted() {
     // 初始化方法
+    this.token = sessionStorage.getItem('token')
   },
 
   methods: {
@@ -94,13 +97,20 @@ export default {
     handleCommand(command) {
       switch (command) {
         case 'logout':
-          document.getElementsByClassName('sign-out-btn')[0].click();
-          break;
+          UserApi.logout({ token: this.token }).then(resp => {
+            if (resp.success === true) {
+              sessionStorage.clear()
+              this.$router.push('/login')
+            } else {
+              this.$message.error('退出失败！')
+            }
+          })
+          break
         case 'help_documentation':
-          window.open('https://docs.google.com/document/d/1Pq46C6rUrp36QiRcf9PN0JZqclPPLmkPFZrIjeJ1hZs/edit?usp=sharing', '_blank')
-          break;
+          window.open('https://github.com/SeldomQA/seldom-platform', '_blank')
+          break
         default:
-          break;
+          break
       }
     }
 
