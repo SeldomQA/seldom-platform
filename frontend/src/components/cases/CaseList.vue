@@ -56,9 +56,6 @@
       </div>
       <div style="height: 40px;">
         <span> 用例列表</span>
-        <span style="float: right">
-          <el-button v-if="fullName != ''" type="success" size="mini" @click="initFileCases()">刷新</el-button>
-        </span>
       </div>
       <div style="min-height: 600px;">
         <div class="case-dir-tree">
@@ -172,8 +169,14 @@ export default {
     // 初始化方法
     this.initProjectList()
     this.initEnv()
+    this.resultHeartbeat = setInterval(() => {
+      this.initFileCases()
+    }, 5000);
   },
-
+  destroyed() {
+    // 销毁时候清除定时器
+    clearInterval(this.resultHeartbeat);
+  },
   methods: {
     // 获取项目列表
     async initProjectList() {
@@ -197,7 +200,6 @@ export default {
         }
       }
       this.initProjectFile()
-      this.initTaskList()
     },
     // 初始化项目文件列表
     async initProjectFile() {
@@ -226,6 +228,9 @@ export default {
     },
     // 获得文件用例
     initFileCases() {
+      if (this.projectId === '' || this.fullName === '') {
+        return
+      }
       ProjectApi.getProjectCases(this.projectId, this.fullName).then(resp => {
         if (resp.success === true) {
           // this.$message.success('获取用例列表成功')
@@ -280,6 +285,7 @@ export default {
       const resp = await CaseApi.runningCase(row.id, { env: this.env })
       if (resp.success === true) {
         this.$message.success('开始执行')
+        this.initFileCases()
       } else {
         this.$message.error('运行失败')
       }

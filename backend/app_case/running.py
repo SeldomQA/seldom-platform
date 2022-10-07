@@ -9,8 +9,14 @@ from seldom import TestMainExtend
 from app_project.models import Env
 from app_case.models import TestCase, CaseResult
 from backend.settings import REPORT_DIR
+from app_utils import background
 
 
+# Use 10 background threads.
+background.n = 10
+
+
+@background.task
 def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: int, env: int):
     """
     seldom运行用例
@@ -104,14 +110,14 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
     log.info("running end!!")
 
 
-def thread_run_case(test_dir, case_info, report_name, case_id, env):
-    """
-    线程运行用例
-    """
-    threads = []
-    t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, case_id, env, ))
-    threads.append(t)
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
+# def thread_run_case(test_dir, case_info, report_name, case_id, env):
+#     """
+#     线程运行用例
+#     """
+#     threads = []
+#     t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, case_id, env, ))
+#     threads.append(t)
+#     for t in threads:
+#         t.start()
+#     for t in threads:
+#         t.join()

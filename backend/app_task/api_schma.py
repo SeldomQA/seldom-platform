@@ -11,15 +11,6 @@ class TaskIn(Schema):
     cases: list
 
 
-class TimedIn(Schema):
-    """定时入参"""
-    minute: str
-    hour: str
-    day_of_week: str
-    day: str
-    month: str
-
-
 class ReportIn(Schema):
     """报告查询入参"""
     type: str = None

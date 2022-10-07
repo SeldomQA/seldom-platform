@@ -9,7 +9,7 @@
   <div class="main-card">
     <div shadow="never">
       <div class="filter-line">
-        <el-button cy-data="create-project" type="primary" @click="showCreate()">创建</el-button>
+        <el-button cy-data="create-project" type="primary" size="small" @click="showCreate()">创建</el-button>
       </div>
       <el-row>
         <div v-for="(item, index) in tableData" :key="index">
@@ -22,7 +22,7 @@
                     style="height: 120px; width: 120px"
                   />
                 </div>
-                <el-descriptions title="  " :column="3">
+                <el-descriptions title="  " :column="1">
                   <el-descriptions-item label="测试目录">{{item.case_dir}}</el-descriptions-item>
                   <el-descriptions-item label="文件数量">{{item.test_num}}</el-descriptions-item>
                   <el-descriptions-item label="状态">
