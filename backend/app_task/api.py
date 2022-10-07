@@ -13,9 +13,10 @@ from app_case.models import TestCase
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_team.models import Team
 from app_task.api_schma import TaskIn, TimedIn, ReportOut, ReportIn
-from app_task.api_utils import thread_run_task
+from app_task.running import seldom_running
 from app_utils.response import response, model_to_dict, Error
 from app_utils.pagination import CustomPagination
+from app_utils.project_utils import project_dir
 from backend.settings import BASE_DIR
 
 
@@ -172,19 +173,19 @@ def running_task(request, task_id: int):
     # 项目目录添加环境变量
     project = Project.objects.get(id=task.project_id)
 
-    project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
-    file.add_to_path(project_dir)
-    test_dir = file.join(project_dir, project.case_dir)
+    # 项目相关目录
+    project_base_dir = project_dir(project.address, temp=True)
+    project_case_dir = file.join(project_base_dir, project.case_dir)
 
-    if os.path.exists(test_dir) is False:
-        return response(error=Error.CASE_DIR_ERROR)
+    # 添加环境变量
+    file.add_to_path(project_base_dir)
 
     # 定义报告
     report_name = f'{task.name}_{str(time.time()).split(".")[0]}.xml'
 
     # 丢给线程执行用例
     threads = []
-    t = threading.Thread(target=thread_run_task, args=(test_dir, case_list, report_name, task_id,))
+    t = threading.Thread(target=seldom_running, args=(project_case_dir, case_list, report_name, task_id,))
     threads.append(t)
     for t in threads:
         t.start()
@@ -231,25 +232,25 @@ def add_timed(request, task_id: int, timed: TimedIn):
         scheduler.pause_job(job_id=task.job_id)
         scheduler.remove_job(job_id=task.job_id)
 
-    # 添加定时任务
-    job_id = scheduler.add_job(thread_run_task, 'cron', args=[test_dir, case_list, report_name, task_id],
-                               minute=timed.minute,
-                               hour=timed.hour,
-                               day_of_week=timed.day_of_week,
-                               day=timed.day,
-                               month=timed.month,
-                               misfire_grace_time=300,
-                               coalesce=True,
-                               max_instances=1,
-                               replace_existing=True,
-                               )
+    # # 添加定时任务
+    # job_id = scheduler.add_job(thread_run_task, 'cron', args=[test_dir, case_list, report_name, task_id],
+    #                            minute=timed.minute,
+    #                            hour=timed.hour,
+    #                            day_of_week=timed.day_of_week,
+    #                            day=timed.day,
+    #                            month=timed.month,
+    #                            misfire_grace_time=300,
+    #                            coalesce=True,
+    #                            max_instances=1,
+    #                            replace_existing=True,
+    #                            )
 
     try:
         scheduler.start()
     except SchedulerAlreadyRunningError:
         ...
 
-    task.job_id = job_id.id
+    # task.job_id = job_id.id
     task.timed = f"""{timed.minute} {timed.hour} {timed.day_of_week} {timed.day} {timed.month}"""
     task.save()
 

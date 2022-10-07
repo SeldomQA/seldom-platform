@@ -10,8 +10,14 @@ from seldom import ChromeConfig, FirefoxConfig, EdgeConfig
 from app_project.models import Project, Env
 from app_task.models import TestTask, TaskReport, ReportDetails
 from backend.settings import BASE_DIR, REPORT_DIR
+from app_utils import background
 
 
+# Use 10 background threads.
+background.n = 10
+
+
+@background.task
 def seldom_running(test_dir, case_info, report_name, task_id):
     """
     seldom运行用例
@@ -147,19 +153,19 @@ def seldom_running(test_dir, case_info, report_name, task_id):
         log.info("Send a warning message")
 
 
-def thread_run_task(test_dir, case_info, report_name, task_id):
-    """
-    线程运行任务
-    :param test_dir: 测试用例目录
-    :param case_info: 测试用例信息
-    :param report_name: 测试报告
-    :param task_id: 任务ID
-    :return:
-    """
-    threads = []
-    t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, task_id))
-    threads.append(t)
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
+# def thread_run_task(test_dir, case_info, report_name, task_id):
+#     """
+#     线程运行任务
+#     :param test_dir: 测试用例目录
+#     :param case_info: 测试用例信息
+#     :param report_name: 测试报告
+#     :param task_id: 任务ID
+#     :return:
+#     """
+#     threads = []
+#     t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, task_id))
+#     threads.append(t)
+#     for t in threads:
+#         t.start()
+#     for t in threads:
+#         t.join()
