@@ -8,7 +8,7 @@
 <template>
   <div class="main-card">
       <div class="filter-line">
-        <el-button cy-data="create-project" type="primary" @click="showCreate()">创建</el-button>
+        <el-button cy-data="create-project" type="primary" size="small" @click="showCreate()">创建</el-button>
       </div>
       <div class="envlist">
       <el-table :data="envData" border style="width: 100%">
@@ -19,14 +19,10 @@
         <el-table-column prop="browser" label="browser"> </el-table-column>
         <el-table-column prop="env" label="env"> </el-table-column>
         <el-table-column prop="update_time" label="更新时间"> </el-table-column>
-        <el-table-column fixed="right" label="操作" width="100">
+        <el-table-column fixed="right" label="操作" width="200">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="showEdit(scope.row)"
-              >编辑</el-button
-            >
-            <el-button type="text" size="small" @click="deleteEnv(scope.row)"
-              >删除</el-button
-            >
+            <el-button type="primary" size="mini" @click="showEdit(scope.row)">编辑</el-button>
+            <el-button type="danger" size="mini" @click="deleteEnv(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -110,12 +106,11 @@ export default {
 .filter-line {
   height: 50px;
   text-align: left;
-  margin-left: 15px;
 }
 .foot-page {
   margin-top: 20px;
-    float: right;
-    margin-bottom: 20px;
+  float: right;
+  margin-bottom: 20px;
 }
 .project-card {
   margin-left: 15px;

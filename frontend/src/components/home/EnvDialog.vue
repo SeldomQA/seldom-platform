@@ -5,19 +5,19 @@
         <el-form-item label="名称" prop="name">
           <el-input cy-data="enviornment-name" v-model="form.name"></el-input>
         </el-form-item>
-        <el-form-item label="环境" prop="env">
+        <el-form-item label="env" prop="env">
           <el-input cy-data="enviornment-env"  v-model="form.env"></el-input>
         </el-form-item>
-        <el-form-item label="浏览器" prop="browser">
+        <el-form-item label="browser" prop="browser">
           <el-input cy-data="enviornment-browser"  v-model="form.browser"></el-input>
         </el-form-item>
-        <el-form-item label="URL" prop="base_url">
+        <el-form-item label="base_url" prop="base_url">
           <el-input cy-data="enviornment-url"  v-model="form.base_url"></el-input>
         </el-form-item>
         <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
           <div class="dialog-footer">
-            <el-button cy-data="cancel-enviornment" @click="cancelEnv()">取消</el-button>
-            <el-button cy-data="save-enviornment" type="primary" @click="onSubmit('form')">保存</el-button>
+            <el-button cy-data="cancel-enviornment" size="small" @click="cancelEnv()">取消</el-button>
+            <el-button cy-data="save-enviornment" type="primary" size="small" @click="onSubmit('form')">保存</el-button>
           </div>
         </el-form-item>
       </el-form>
