@@ -89,10 +89,6 @@
             label="团队">
           </el-table-column>
           <el-table-column
-            prop="timed"
-            label="定时任务">
-          </el-table-column>
-          <el-table-column
             prop="execute_count"
             label="执行次数">
           </el-table-column>
@@ -116,18 +112,10 @@
           </el-table-column>
           <el-table-column
             fixed="right"
-            label="执行"
-            width="200">
+            label="操作"
+            width="220">
             <template slot-scope="scope">
               <el-button type="success" size="mini" @click="runTask(scope.row)">运行</el-button>
-              <el-button type="primary" size="mini" @click="showTimedTask(scope.row)">定时</el-button>
-            </template>
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            label="操作"
-            width="200">
-            <template slot-scope="scope">
               <el-button type="primary" size="mini" @click="showEditTask(scope.row)">编辑</el-button>
               <el-button type="danger" size="mini" @click="deleteTask(scope.row)">删除</el-button>
             </template>
@@ -137,7 +125,6 @@
 
       <!-- 子组件 -->
       <TaskDialog v-if="taskDailog" :pid=projectId :tid=taskId @cancel="cancelDialog"></TaskDialog>
-      <TimedDialog v-if="timedDailog" :tid=taskId :ttmied=taskTimed @cancel="cancelDialog"></TimedDialog>
     </el-card>
     <el-card class="main-card" v-else>
       <el-page-header @back="goBack" content="任务报告" style="margin-bottom: 50px;">
@@ -152,7 +139,6 @@ import ProjectApi from '../../request/project'
 import TaskApi from '../../request/task'
 import TeamApi from '../../request/team'
 import TaskDialog from './TaskDialog.vue'
-import TimedDialog from './TimedDialog.vue'
 import taskReport from './TaskReport.vue'
 
 export default {
@@ -160,7 +146,6 @@ export default {
   components: {
     // 组件
     TaskDialog,
-    TimedDialog,
     taskReport
   },
   data() {
@@ -171,7 +156,6 @@ export default {
       projectId: '',
       projectName: '',
       taskId: 0,
-      taskTimed: {},
       fileData: [],
       caseData: [],
       projectOptions: [],
@@ -198,17 +182,6 @@ export default {
     showEditTask(row) {
       this.taskId = row.id
       this.taskDailog = true
-    },
-    // 显示定时任务
-    showTimedTask(row) {
-      this.taskId = row.id
-      // 获取定时任务格式
-      for (let i = 0; i < this.tableData.length; i++) {
-        if (this.tableData[i].id === this.taskId) {
-          this.taskTimed = this.tableData[i].timed_dict
-        }
-      }
-      this.timedDailog = true
     },
     // 创建任务子组件的回调
     cancelDialog() {
