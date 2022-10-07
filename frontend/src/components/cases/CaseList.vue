@@ -22,14 +22,19 @@
       <div style="text-align: left;">
         <el-form :inline="true">
           <el-form-item label="项目">
-            <el-select v-model="projectId" placeholder="选择项目" size="small" @change="changeProject()">
-              <el-option
-                v-for="item in projectOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
+            <el-dropdown @command="switchProject">
+              <span class="el-dropdown-link">{{projectName}} <i class="el-icon-sort"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item
+                  v-for="(item, index) in projectOptions"
+                  :key="index"
+                  class="sort-item"
+                  :command="item.id"
+                >{{item.name}}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="showSync" size="small">同步</el-button>
@@ -144,6 +149,7 @@ export default {
       loading: true,
       showSyncDialog: false,
       projectId: '',
+      projectName: '',
       caseId: '',
       caseNumber: 0,
       fullName: '',
@@ -174,20 +180,25 @@ export default {
       this.loading = true
       const resp = await ProjectApi.getProjects()
       if (resp.success === true) {
-        for (let i = 0; i < resp.result.length; i++) {
-          this.projectOptions.push({
-            value: resp.result[i].id,
-            label: resp.result[i].name
-          })
-        }
-        this.projectId = this.projectOptions[0].value
+        this.projectOptions = resp.result
+        this.switchProject(this.projectOptions[0].id)
         this.initProjectFile()
       } else {
         this.$message.error(resp.error.message)
       }
       this.loading = false
     },
-
+    // 选择项目
+    switchProject(command) {
+      for (let i = 0; i < this.projectOptions.length; i++) {
+        if (this.projectOptions[i].id === command) {
+          this.projectName = this.projectOptions[i].name
+          this.projectId = command
+        }
+      }
+      this.initProjectFile()
+      this.initTaskList()
+    },
     // 初始化项目文件列表
     async initProjectFile() {
       const resp = await ProjectApi.getProjectTree(this.projectId)

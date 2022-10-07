@@ -35,6 +35,8 @@
 <script>
 import TeamApi from '../../request/team'
 import TeamDialog from './TeamDialog'
+
+
 export default {
   name: 'Team',
   components: {
