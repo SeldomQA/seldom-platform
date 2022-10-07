@@ -8,7 +8,7 @@
 <template>
   <div class="main-card">
       <div class="filter-line">
-        <el-button cy-data="create-team" type="primary" @click="showCreate()">创建</el-button>
+        <el-button cy-data="create-team" type="primary" size="small" @click="showCreate()">创建</el-button>
       </div>
       <div class="teamlist">
       <el-table :data="teamData" border style="width: 100%">
@@ -16,14 +16,10 @@
         </el-table-column>
         <el-table-column prop="name" label="团队名称"> </el-table-column>
         <el-table-column prop="update_time" label="更新时间"> </el-table-column>
-        <el-table-column fixed="right" label="操作" width="100">
+        <el-table-column fixed="right" label="操作" width="200">
           <template slot-scope="scope">
-            <el-button type="text" size="small" @click="showEdit(scope.row)"
-              >编辑</el-button
-            >
-            <el-button type="text" size="small" @click="deleteTeam(scope.row)"
-              >删除</el-button
-            >
+            <el-button type="primary" size="mini" @click="showEdit(scope.row)">编辑</el-button>
+            <el-button type="danger" size="mini" @click="deleteTeam(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -107,12 +103,11 @@ export default {
 .filter-line {
   height: 50px;
   text-align: left;
-  margin-left: 15px;
 }
 .foot-page {
   margin-top: 20px;
-    float: right;
-    margin-bottom: 20px;
+  float: right;
+  margin-bottom: 20px;
 }
 .team-card {
   margin-left: 15px;

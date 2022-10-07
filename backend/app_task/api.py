@@ -5,23 +5,16 @@ from typing import List
 from seldom.utils import file
 from ninja import Router
 from ninja.pagination import paginate
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers import SchedulerAlreadyRunningError
-from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
 from app_project.models import Project, Env
 from app_case.models import TestCase
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_team.models import Team
-from app_task.api_schma import TaskIn, TimedIn, ReportOut, ReportIn
-from app_task.api_utils import thread_run_task
+from app_task.api_schma import TaskIn, ReportOut, ReportIn
+from app_task.running import seldom_running
 from app_utils.response import response, model_to_dict, Error
 from app_utils.pagination import CustomPagination
-from backend.settings import BASE_DIR
+from app_utils.project_utils import project_dir
 
-
-# 定时任务
-scheduler = BackgroundScheduler()
-# scheduler.add_jobstore(DjangoJobStore(), 'default')
 
 router = Router(tags=["task"])
 
@@ -172,105 +165,22 @@ def running_task(request, task_id: int):
     # 项目目录添加环境变量
     project = Project.objects.get(id=task.project_id)
 
-    project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
-    file.add_to_path(project_dir)
-    test_dir = file.join(project_dir, project.case_dir)
+    # 项目相关目录
+    project_base_dir = project_dir(project.address, temp=True)
+    project_case_dir = file.join(project_base_dir, project.case_dir)
 
-    if os.path.exists(test_dir) is False:
-        return response(error=Error.CASE_DIR_ERROR)
+    # 添加环境变量
+    file.add_to_path(project_base_dir)
 
     # 定义报告
     report_name = f'{task.name}_{str(time.time()).split(".")[0]}.xml'
 
     # 丢给线程执行用例
     threads = []
-    t = threading.Thread(target=thread_run_task, args=(test_dir, case_list, report_name, task_id,))
+    t = threading.Thread(target=seldom_running, args=(project_case_dir, case_list, report_name, task_id,))
     threads.append(t)
     for t in threads:
         t.start()
-
-    return response()
-
-
-@router.post("/{task_id}/timed")
-def add_timed(request, task_id: int, timed: TimedIn):
-    """
-    添加任务的定时
-    year='*', month='*', day=1, week='*', day_of_week='*', hour='*', minute=20, second=0
-    """
-    # 保存定时任务格式
-    task = TestTask.objects.get(id=task_id)
-    relevance = TaskCaseRelevance.objects.filter(task_id=task_id)
-    case_list = []
-    for r in relevance:
-        case = TestCase.objects.get(id=r.case_id)
-        case_list.append({
-            "file": case.file_name,
-            "class": {
-                "name": case.class_name,
-                "doc": case.class_doc
-            },
-            "method": {
-                "name": case.case_name,
-                "doc": case.case_doc
-            }
-        })
-
-    # 测试用例目录
-    project = Project.objects.get(id=task.project_id)
-    project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
-    test_dir = file.join(project_dir, project.case_dir)
-    if os.path.exists(test_dir) is False:
-        return response(error=Error.CASE_DIR_ERROR)
-
-    # 定义报告
-    report_name = f'{task.name}_{str(time.time()).split(".")[0]}.xml'
-    # 如果创建了定时任务先移除
-    timed_job = scheduler.get_job(job_id=task.job_id)
-    if timed_job is not None:
-        scheduler.pause_job(job_id=task.job_id)
-        scheduler.remove_job(job_id=task.job_id)
-
-    # 添加定时任务
-    job_id = scheduler.add_job(thread_run_task, 'cron', args=[test_dir, case_list, report_name, task_id],
-                               minute=timed.minute,
-                               hour=timed.hour,
-                               day_of_week=timed.day_of_week,
-                               day=timed.day,
-                               month=timed.month,
-                               misfire_grace_time=300,
-                               coalesce=True,
-                               max_instances=1,
-                               replace_existing=True,
-                               )
-
-    try:
-        scheduler.start()
-    except SchedulerAlreadyRunningError:
-        ...
-
-    task.job_id = job_id.id
-    task.timed = f"""{timed.minute} {timed.hour} {timed.day_of_week} {timed.day} {timed.month}"""
-    task.save()
-
-    return response(result=[])
-
-
-@router.delete("/{task_id}/timed", )
-def delete_timed(request, task_id: int):
-    """
-    删除任务的定时
-    """
-    task = TestTask.objects.get(id=task_id)
-
-    timed_job = scheduler.get_job(job_id=task.job_id)
-    if timed_job is not None:
-        scheduler.pause_job(job_id=task.job_id)
-        scheduler.remove_job(job_id=task.job_id)
-
-    task.timed = ""
-    task.job_id = ""
-    task.save()
 
     return response()
 
