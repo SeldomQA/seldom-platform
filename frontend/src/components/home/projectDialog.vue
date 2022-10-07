@@ -5,7 +5,7 @@
         <el-form-item label="名称" prop="name">
           <el-input cy-data="project-name" v-model="form.name"></el-input>
         </el-form-item>
-        <el-form-item label="关联项目" prop="address">
+        <el-form-item label="Git地址" prop="address">
           <el-input cy-data="project-address"  v-model="form.address"></el-input>
           <el-alert title="克隆项目：项目的git地址" type="success" :closable="false"></el-alert>
         </el-form-item>

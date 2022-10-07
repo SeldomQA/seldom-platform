@@ -7,8 +7,8 @@
           </el-form-item>
           <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
             <div class="dialog-footer">
-              <el-button cy-data="cancel-team" @click="cancelTeam()">取消</el-button>
-              <el-button cy-data="save-team" type="primary" @click="onSubmit('form')">保存</el-button>
+              <el-button cy-data="cancel-team" size="small" @click="cancelTeam()">取消</el-button>
+              <el-button cy-data="save-team" type="primary" size="small" @click="onSubmit('form')">保存</el-button>
             </div>
           </el-form-item>
         </el-form>
