@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'app_task',
     'app_team',
     'corsheaders',  # 跨域
-    'django_apscheduler',  # 定时任务
 ]
 
 MIDDLEWARE = [
