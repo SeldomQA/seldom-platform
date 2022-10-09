@@ -429,7 +429,7 @@ def get_env(request, env_id: int):
     获取环境
     """
     try:
-        env = Env.objects.get(id=env_id)
+        env = Env.objects.get(id=env_id, is_delete=False)
     except Env.DoesNotExist:
         return response(error=Error.ENV_IS_NULL)
 
@@ -441,7 +441,7 @@ def get_env_list(request):
     """
     获取环境列表
     """
-    envs = Env.objects.all()
+    envs = Env.objects.filter(is_delete=False)
     env_list = []
     for env in envs:
         env_list.append(model_to_dict(env))
@@ -455,7 +455,8 @@ def delete_env(request, env_id: int):
     """
     try:
         env = Env.objects.get(id=env_id)
-        env.delete()
+        env.is_delete = False
+        env.save()
     except Env.DoesNotExist:
         return response(error=Error.ENV_IS_NULL)
 
