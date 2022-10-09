@@ -44,6 +44,11 @@ def model_to_dict(instance: object) -> dict:
     data = {}
     for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
         data[f.name] = f.value_from_object(instance)
+
+    for key, value in data.items():
+        if key in ["update_time", "create_time"]:
+            data[key] = value.strftime('%Y-%m-%d %H:%M:%S')
+
     return data
 
 
