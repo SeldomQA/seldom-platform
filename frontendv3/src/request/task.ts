@@ -1,7 +1,8 @@
 import request from "./HttpCommon.js";
+import { TNomalObject } from "./HttpCommon";
 
 class TaskApi {
-  createTask(data) {
+  createTask(data: TNomalObject) {
     return request.post("/api/task/create", data);
   }
 
@@ -9,11 +10,11 @@ class TaskApi {
     return request.get("/api/task/list");
   }
 
-  getTask(pid) {
+  getTask(pid: string) {
     return request.get("/api/task/" + pid + "/");
   }
-  
-  updateTask(pid, data) {
+
+  updateTask(pid: string, data: TNomalObject) {
     return request.put("/api/task/" + pid + "/", data);
   }
 }
