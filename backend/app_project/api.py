@@ -175,18 +175,21 @@ def sync_project_case(request, project_id: int):
 
     TestCaseTemp.objects.filter(project=project_obj).delete()
 
+    case_hash_list = []
     # 从seldom项目中找到新增的用例
     for seldom in seldom_case:
         case_hash = get_hash(f"""{seldom["file"]}.{seldom["class"]["name"]}.{seldom["method"]["name"]}""")
-        TestCaseTemp.objects.create(
-            project_id=project_id,
-            file_name=seldom["file"],
-            class_name=seldom["class"]["name"],
-            class_doc=seldom["class"]["doc"],
-            case_name=seldom["method"]["name"],
-            case_doc=seldom["method"]["doc"],
-            case_hash=case_hash
-        )
+        if case_hash not in case_hash_list:
+            case_hash_list.append(case_hash)
+            TestCaseTemp.objects.create(
+                project_id=project_id,
+                file_name=seldom["file"],
+                class_name=seldom["class"]["name"],
+                class_doc=seldom["class"]["doc"],
+                case_name=seldom["method"]["name"],
+                case_doc=seldom["method"]["doc"],
+                case_hash=case_hash
+            )
 
     return response()
 

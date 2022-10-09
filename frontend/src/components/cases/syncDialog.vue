@@ -3,9 +3,9 @@
     <el-dialog :title=showTitle :visible.sync="showStatus" @close="cancelSync()" width="800px">
       <div>
         <el-steps :space="200" :active=syncStatus simple>
-          <el-step title="拉取代码" icon="el-icon-download"></el-step>
-          <el-step title="解析用例" icon="el-icon-camera"></el-step>
-          <el-step title="同步结果" icon="el-icon-tickets"></el-step>
+          <el-step title="拉取代码" :icon="stepIcon.one"></el-step>
+          <el-step title="查找用例" :icon="stepIcon.two"></el-step>
+          <el-step title="同步结果" :icon="stepIcon.three"></el-step>
         </el-steps>
       </div>
       <div style="height: 500px; margin-top: 20px;">
@@ -46,6 +46,11 @@ export default {
       syncStatus: 0,
       showStatus: true,
       showTitle: '',
+      stepIcon: {
+        one: 'el-icon-download',
+        two: 'el-icon-search',
+        three: 'el-icon-tickets'
+      },
       req: {
         project_id: 0,
         add_case: [],
@@ -63,15 +68,21 @@ export default {
   methods: {
     // 同步用例
     async syncRunning() {
+      this.stepIcon.one = 'el-icon-loading'
       const resp = await ProjectApi.syncCode(this.pid)
       if (resp.success === true) {
         this.syncStatus = 1
+        this.stepIcon.one = 'el-icon-download'
+        this.stepIcon.two = 'el-icon-loading'
         const resp = await ProjectApi.syncCase(this.pid)
         if (resp.success === true) {
           this.syncStatus = 2
+          this.stepIcon.two = 'el-icon-search'
+          this.stepIcon.three = 'el-icon-loading'
           const resp = await ProjectApi.syncResult(this.pid)
           if (resp.success === true) {
             this.syncStatus = 3
+            this.stepIcon.three = 'el-icon-tickets'
             this.req = resp.result
           } else {
             this.$message.error(resp.error.message)

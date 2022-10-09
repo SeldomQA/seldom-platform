@@ -104,7 +104,7 @@
           支持git
         </h3>
         <p class="text-muted mb-6 mb-md-0">
-          seldom-platform 可以接入任意git管理的自动化项目, 克隆和拉取项目代码。
+          seldom-platform 可以接入任意git管理的自动化项目, 克隆&拉取项目代码。
         </p>
       </div>
       <div style="width: 30%; float: left; margin-left: 3%;">
@@ -132,7 +132,7 @@
             </g>
           </svg>
         </div>
-        <h3>平台化</h3>
+        <h3>平台管理</h3>
         <p class="text-muted mb-6 mb-md-0">
           借助于平台的能力，可以方便的管理用例的执行、创建定时任务、展示统计结果。
         </p>
@@ -240,8 +240,8 @@ export default {
   position: absolute;
   top: 35%;
   left: 50%;
-  width: 800px;
-  height: 300px;
+  width: 45%;
+  height: 400px;
   margin: -150px 0 0 -300px;
 }
 
@@ -249,8 +249,8 @@ export default {
   position: absolute;
   top: 75%;
   left: 40%;
-  width: 1000px;
-  height: 100px;
+  width: 60%;
+  height: 200px;
   margin: -150px 0 0 -300px;
 }
 
