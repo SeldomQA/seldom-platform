@@ -8,6 +8,8 @@ import { ref, onMounted } from "vue";
 const theme = ref<GlobalTheme | null>(null);
 const localStorage = window.localStorage;
 
+const islogin = sessionStorage.token
+
 const changeTheme = () => {
   if (theme.value == null) {
     theme.value = darkTheme;
@@ -28,12 +30,13 @@ onMounted(() => {
     mainhtml[0].classList.add("dark");
   }
   changeTheme();
+  // console.log(islogin);
 });
 </script>
 
 <template>
   <n-config-provider :theme="theme">
-    <n-layout class="dflayout" has-sider position="absolute">
+    <n-layout v-if="islogin != undefined" class="dflayout" has-sider position="absolute">
       <n-layout-sider bordered content-style="padding: 24px;">
         <Sidebar></Sidebar>
       </n-layout-sider>
@@ -50,6 +53,9 @@ onMounted(() => {
           © 2022 Powered by SeldomQA Team
         </n-layout-footer>
       </n-layout>
+    </n-layout>
+    <n-layout v-else>
+      <router-view></router-view>
     </n-layout>
   </n-config-provider>
 </template>

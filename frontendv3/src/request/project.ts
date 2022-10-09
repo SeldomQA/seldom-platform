@@ -1,57 +1,58 @@
-import request from "./HttpCommon.js";
+import request from "./HttpCommon";
+import { TNomalObject } from "./HttpCommon";
 
 class ProjectApi {
-  createProject(data) {
+  createProject(data: TNomalObject) {
     return request.post("/api/project/create", data);
   }
 
-  getProjects(data) {
+  getProjects(data: TNomalObject) {
     return request.get("/api/project/list", data);
   }
 
-  getProject(pid) {
+  getProject(pid: string) {
     return request.get("/api/project/" + pid + "/");
   }
 
-  updateProject(pid, data) {
+  updateProject(pid: string, data: TNomalObject) {
     return request.put("/api/project/" + pid + "/", data);
   }
 
-  deleteProject(pid) {
-    return request.delete("/api/project/" + pid + "/");
+  deleteProject(pid: string) {
+    return request.del("/api/project/" + pid + "/");
   }
 
-  cloneProject(pid) {
+  cloneProject(pid: string) {
     return request.get("/api/project/" + pid + "/clone");
   }
 
   // 后续有具体删除需求备用
-  // removeProjectCover(pid) {
+  // removeProjectCover(pid:string) {
   //   return request.put('/api/project/cover/remove/' + pid + '/')
   // }
 
-  syncProjectCase(pid) {
+  syncProjectCase(pid: string) {
     return request.get("/api/project/" + pid + "/sync");
   }
 
-  getProjectTree(pid) {
+  getProjectTree(pid: string) {
     return request.get("/api/project/" + pid + "/files");
   }
 
-  getProjectCases(pid, file_name) {
+  getProjectCases(pid: string, file_name: TNomalObject) {
     return request.get("/api/project/" + pid + "/cases", { file_name });
   }
 
-  getProjectSubdirectory(pid, file_name) {
+  getProjectSubdirectory(pid: string, file_name: TNomalObject) {
     return request.get("/api/project/" + pid + "/subdirectory", { file_name });
   }
 
   // Env functions
-  createEnv(data) {
+  createEnv(data: TNomalObject) {
     return request.post("/api/project/env", data);
   }
 
-  getEnv(id) {
+  getEnv(id: string) {
     return request.get("/api/project/env/" + id + "/");
   }
 
@@ -59,11 +60,11 @@ class ProjectApi {
     return request.get("/api/project/env/list");
   }
 
-  deleteEnv(id) {
-    return request.delete("/api/project/env/" + id + "/");
+  deleteEnv(id: string) {
+    return request.del("/api/project/env/" + id + "/");
   }
 
-  updateEnv(id, data) {
+  updateEnv(id: string, data: TNomalObject) {
     return request.put("/api/project/env/" + id + "/", data);
   }
 }
