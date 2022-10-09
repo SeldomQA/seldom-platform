@@ -1,17 +1,18 @@
 <template>
   <div class="home">
     <div>
-      <img src="../assets/seldom-platform.gif" class="home-logo" />
+      <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
+        <img src="../assets/seldom-platform.gif"  class="home-logo" />
+      </a>
     </div>
     <div class="background-img">
-        <img src="../assets/home-bg.png" width="100%" height="100%" alt="" />
-      </div>
+      <img src="../assets/home-bg.png" width="100%" height="100%" alt="" />
+    </div>
     <div class="main-window">
       <span style="float: left; width: 300px;">
-        <h1><span style="color: #335eea">Seldom</span> Platform.</h1>
-        <p style="color: #869ab8">基于Seldom框架的测试平台.</p>
       </span>
       <span style="float: right">
+        <h1><span style="color: #335eea">Seldom</span> Platform.</h1>
         <el-tabs v-model="activeName" class="border-card" type="border-card" :stretch="true" style="margin: auto" >
         <el-tab-pane label="登录" name="first">
           <span slot="label"><i class="el-icon-user-solid"></i> 登陆</span>
@@ -248,15 +249,14 @@ export default {
 .main-desc {
   position: absolute;
   top: 75%;
-  left: 40%;
+  left: 20%;
   width: 60%;
   height: 200px;
-  margin: -150px 0 0 -300px;
 }
-
 
 .login-window {
   width: 100%;
   margin: 0 auto;
 }
+
 </style>
