@@ -10,19 +10,19 @@
       <div class="filter-line">
         <el-button cy-data="create-team" type="primary" size="small" @click="showCreate()">创建</el-button>
       </div>
-      <div class="teamlist">
-      <el-table :data="teamData" border style="width: 100%">
-        <el-table-column fixed prop="id" label="ID" width="80">
-        </el-table-column>
-        <el-table-column prop="name" label="团队名称"> </el-table-column>
-        <el-table-column prop="update_time" label="更新时间"> </el-table-column>
-        <el-table-column fixed="right" label="操作" width="200">
-          <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="showEdit(scope.row)">编辑</el-button>
-            <el-button type="danger" size="mini" @click="deleteTeam(scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div>
+        <el-table :data="teamData" border style="width: 100%">
+          <el-table-column fixed prop="id" label="ID" width="80">
+          </el-table-column>
+          <el-table-column prop="name" label="团队名称"> </el-table-column>
+          <el-table-column prop="update_time" label="更新时间"> </el-table-column>
+          <el-table-column fixed="right" label="操作" width="200">
+            <template slot-scope="scope">
+              <el-button type="primary" size="mini" @click="showEdit(scope.row)">编辑</el-button>
+              <el-button type="danger" size="mini" @click="deleteTeam(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </div>
       <TeamDialog v-if="showDailog" @cancel="cancelTeam" :tid=teamid></TeamDialog>
   </div>
