@@ -19,13 +19,21 @@
             <n-tab-pane name="signin" tab="登录">
               <n-form :model="signinRef" :rules="signinRules">
                 <n-form-item-row label="用户名">
-                  <n-input />
+                  <n-input v-model:value="signinRef.username" />
                 </n-form-item-row>
                 <n-form-item-row label="密码">
-                  <n-input type="password" />
+                  <n-input v-model:value="signinRef.password" type="password" />
                 </n-form-item-row>
               </n-form>
-              <n-button type="primary" block secondary strong> 登录 </n-button>
+              <n-button
+                type="primary"
+                block
+                secondary
+                strong
+                @click="submitLogin"
+              >
+                登录
+              </n-button>
             </n-tab-pane>
             <n-tab-pane name="signup" tab="注册">
               <n-form ref="formRef" :model="signupRef" :rules="signupRules">
@@ -45,31 +53,30 @@
                 <n-form-item
                   ref="rPasswordFormItemRef"
                   first
-                  path="reenteredPassword"
+                  path="password2"
                   label="重复密码"
                 >
                   <n-input
-                    v-model:value="signupRef.reenteredPassword"
+                    v-model:value="signupRef.password2"
                     :disabled="!signupRef.password"
                     @keydown.enter.prevent
                   />
                 </n-form-item>
-                <n-row :gutter="[0, 24]">
-                  <n-col :span="24">
-                    <div style="display: flex; justify-content: flex-end">
-                      <n-button
-                        :disabled="signupRef.username === null"
-                        round
-                        type="primary"
-                        @click="handleValidateButtonClick"
-                      >
-                        验证
-                      </n-button>
-                    </div>
-                  </n-col>
-                </n-row>
               </n-form>
-              <n-button type="primary" block secondary strong> 注册 </n-button>
+              <n-button
+                type="primary"
+                block
+                secondary
+                strong
+                @click="submitRegister"
+                :disabled="
+                  signupRef.username === null ||
+                  signupRef.password === null ||
+                  signupRef.password2 === null
+                "
+              >
+                注册
+              </n-button>
             </n-tab-pane>
           </n-tabs>
         </n-card>
@@ -169,7 +176,8 @@
 </template>
 
 <script lang="ts">
-import UserApi from '~/request/user'
+import UserApi from "~/request/user";
+import { useRouter } from "vue-router";
 
 import { defineComponent, ref } from "vue";
 import {
@@ -188,11 +196,12 @@ interface TSignin {
 interface TSignup {
   username: string | null;
   password: string | null;
-  reenteredPassword: string | null;
+  password2: string | null;
 }
 
 export default defineComponent({
   setup() {
+    const router = useRouter();
     const formRef = ref<FormInst | null>(null);
     const rPasswordFormItemRef = ref<FormItemInst | null>(null);
     const message = useMessage();
@@ -204,7 +213,7 @@ export default defineComponent({
     const signupRef = ref<TSignup>({
       username: null,
       password: null,
-      reenteredPassword: null,
+      password2: null,
     });
 
     const signinRules: FormRules = {
@@ -252,7 +261,7 @@ export default defineComponent({
           trigger: ["blur"],
         },
       ],
-      reenteredPassword: [
+      password2: [
         {
           required: true,
           message: "请再次输入密码",
@@ -270,6 +279,45 @@ export default defineComponent({
         },
       ],
     };
+
+    // 用户登录
+    const submitLogin = () => {
+      // formRef.value?.validate((errors) => {
+      //   if (!errors) {
+      UserApi.login(signinRef.value).then((resp) => {
+        if (resp.success === true) {
+          sessionStorage.token = resp.result.token;
+          sessionStorage.user = resp.result.username;
+          router.push({ path: "/main/project" });
+          message.success("登陆成功！");
+        } else {
+          message.error(resp.error.message);
+        }
+      });
+      // } else {
+      //   console.log(errors);
+      //   message.error("请正确填写信息");
+      // }
+      // });
+    };
+    // 用户注册
+    const submitRegister = () => {
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+          UserApi.register(signupRef.value).then((resp) => {
+            if (resp.success === true) {
+              message.success("注册成功！");
+            } else {
+              message.error(resp.error.message);
+            }
+          });
+        } else {
+          console.log(errors);
+          message.error("请正确填写信息");
+        }
+      });
+    };
+
     return {
       formRef,
       rPasswordFormItemRef,
@@ -277,8 +325,10 @@ export default defineComponent({
       signinRules,
       signupRef,
       signupRules,
+      submitLogin,
+      submitRegister,
       handlePasswordInput() {
-        if (signupRef.value.reenteredPassword) {
+        if (signupRef.value.password2) {
           rPasswordFormItemRef.value?.validate({ trigger: "password-input" });
         }
       },
