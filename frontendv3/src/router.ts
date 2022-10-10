@@ -31,5 +31,5 @@ export function createRouter() {
       }
     }
   });
-  return router
+  return router;
 }

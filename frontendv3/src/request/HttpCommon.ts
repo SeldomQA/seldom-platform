@@ -6,10 +6,9 @@
 import axios from "axios";
 import Qs from "qs";
 import baseUrl from "~/config/base-url";
-import { useLoadingBar, useMessage } from "naive-ui";
+import { createDiscreteApi } from "naive-ui";
 
-const loadingBar = useLoadingBar();
-const message = useMessage();
+const { message, loadingBar } = createDiscreteApi(["message", "loadingBar"]);
 
 axios.defaults.baseURL = baseUrl;
 axios.defaults.headers.post["X-Requested-With"] = "XMLHttpRequest";
@@ -26,7 +25,7 @@ interface TRequest {
     responseType?: string,
     isLoading?: boolean,
     additionalHeader?: TNomalObject
-  ): void;
+  ): any;
 }
 
 function tellIfIsLogout(data: TNomalObject) {
@@ -42,11 +41,11 @@ function makeRequest(
 ) {
   const header: TNomalObject = {};
   if (process.env.NODE_ENV === "local") {
-    header["Access-Control-Allow-Origin"] = "*";
-    header["x-account-email"] = "yuchou.zou@klook.com";
-    header["x-account-fullname"] = "yuchou.zou";
+    // header["Access-Control-Allow-Origin"] = "*";
+    // header["x-account-email"] = "yuchou.zou@klook.com";
+    // header["x-account-fullname"] = "yuchou.zou";
   } else {
-    header["Access-Control-Allow-Origin"] = "*";
+    // header["Access-Control-Allow-Origin"] = "*";
   }
 
   Object.keys(additionalHeader).forEach((key) => {
