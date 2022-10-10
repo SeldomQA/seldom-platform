@@ -151,21 +151,3 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     if int(errors) > 0 or int(failures) > 0:
         # 未实现
         log.info("Send a warning message")
-
-
-# def thread_run_task(test_dir, case_info, report_name, task_id):
-#     """
-#     线程运行任务
-#     :param test_dir: 测试用例目录
-#     :param case_info: 测试用例信息
-#     :param report_name: 测试报告
-#     :param task_id: 任务ID
-#     :return:
-#     """
-#     threads = []
-#     t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, task_id))
-#     threads.append(t)
-#     for t in threads:
-#         t.start()
-#     for t in threads:
-#         t.join()
