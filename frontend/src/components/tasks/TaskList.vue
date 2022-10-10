@@ -41,7 +41,7 @@
       <div style="text-align: left;">
         <el-form :inline="true">
           <el-form-item label="团队">
-            <el-select v-model="query.team_id" placeholder="选择团队" size="small">
+            <el-select v-model="query.team_id" clearable placeholder="选择团队" size="small">
               <el-option
                 v-for="item in teamOptions"
                 :key="item.value"
