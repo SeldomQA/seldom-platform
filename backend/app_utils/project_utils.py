@@ -34,7 +34,7 @@ def project_dir(project_address: str, temp=False) -> str:
     else:
         project_address = file.join(github_dir(), project_name)
 
-    if os.path.exists(project_address) is False:
+    if temp is True and os.path.exists(project_address) is False:
         os.mkdir(project_address)
 
     return project_address
