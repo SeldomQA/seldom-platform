@@ -63,6 +63,11 @@ body {
   float: right;
 }
 
+.page-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
 .main-card {
   padding-top: 20px;
   padding-bottom: 20px;

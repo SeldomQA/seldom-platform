@@ -11,31 +11,10 @@
       <span class="span-left">
         <span class="page-title">用例管理</span>
       </span>
-      <span class="span-breadcrumb">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>用例管理</el-breadcrumb-item>
-        </el-breadcrumb>
-      </span>
     </div>
     <el-card class="main-card">
       <div style="text-align: left;">
         <el-form :inline="true">
-          <el-form-item label="项目">
-            <el-dropdown @command="switchProject">
-              <span class="el-dropdown-link">{{projectName}} <i class="el-icon-sort"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  v-for="(item, index) in projectOptions"
-                  :key="index"
-                  class="sort-item"
-                  :command="item.id"
-                >{{item.name}}
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="showSync" size="small">同步</el-button>
           </el-form-item>
@@ -53,9 +32,6 @@
             </el-select>
           </el-form-item>
         </el-form>
-      </div>
-      <div style="height: 40px;">
-        <span> 用例列表</span>
       </div>
       <div style="min-height: 600px;">
         <div class="case-dir-tree">
@@ -165,9 +141,13 @@ export default {
     }
   },
 
+  created() {
+    this.projectId = sessionStorage.projectId
+    this.projectName = sessionStorage.projectName
+  },
   mounted() {
     // 初始化方法
-    this.initProjectList()
+    this.initProjectFile()
     this.initEnv()
     this.resultHeartbeat = setInterval(() => {
       this.initFileCases()
@@ -178,29 +158,6 @@ export default {
     clearInterval(this.resultHeartbeat);
   },
   methods: {
-    // 获取项目列表
-    async initProjectList() {
-      this.loading = true
-      const resp = await ProjectApi.getProjects()
-      if (resp.success === true) {
-        this.projectOptions = resp.result
-        this.switchProject(this.projectOptions[0].id)
-        this.initProjectFile()
-      } else {
-        this.$message.error(resp.error.message)
-      }
-      this.loading = false
-    },
-    // 选择项目
-    switchProject(command) {
-      for (let i = 0; i < this.projectOptions.length; i++) {
-        if (this.projectOptions[i].id === command) {
-          this.projectName = this.projectOptions[i].name
-          this.projectId = command
-        }
-      }
-      this.initProjectFile()
-    },
     // 初始化项目文件列表
     async initProjectFile() {
       const resp = await ProjectApi.getProjectTree(this.projectId)

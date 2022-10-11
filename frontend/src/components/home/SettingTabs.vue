@@ -11,12 +11,6 @@
       <span class="span-left">
         <span class="page-title">配置中心</span>
       </span>
-      <span class="span-breadcrumb">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/main/Setting' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>配置中心</el-breadcrumb-item>
-        </el-breadcrumb>
-      </span>
     </div>
      <el-tabs v-model="tabName" type="border-card" @tab-click="tabClick">
       <el-tab-pane label="项目管理" name="project">
