@@ -20,19 +20,33 @@
 > python manage.py makemigrations
 > python manage.py migrate
 ```
- * 安装redis
+* Redis
+  - Windows: https://github.com/tporadowski/redis
+  - Linux：https://github.com/redis/redis
+
+```shell
+> redis-server  # 启动redis
 ```
-> windows版: https://github.com/tporadowski/redis
-> linux版：https://github.com/redis/redis
-```
-## 启动
+
+## 运行
+
+* 开发运行
 
 ```shell
 > python manage.py runserver
 ```
+
+* 部署运行
+
 ```shell
-> .\redis-server
+> uwsgi --ini uwsgi.ini
 ```
+
+> 部署事项：
+> 1. uwsgi 推荐在Linux上安装
+> 2. 修改`uwsgi.ini` 中项目路径，带 `->` 配置项需要修改
+> 3. 关闭 `backend/setting.py` 文件中设置 `debug=False`
+
 ## 查看接口
 
 * 浏览器访问：http://localhost:8000/api/docs
