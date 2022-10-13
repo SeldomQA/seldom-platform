@@ -90,9 +90,9 @@
             label="操作"
             width="220">
             <template slot-scope="scope">
-              <el-button type="success" size="mini" @click="runTask(scope.row)">运行</el-button>
-              <el-button type="primary" size="mini" @click="showEditTask(scope.row)">编辑</el-button>
-              <el-button type="danger" size="mini" @click="deleteTask(scope.row)">删除</el-button>
+              <el-button type="success" size="mini" plain @click="runTask(scope.row)">运行</el-button>
+              <el-button type="primary" size="mini" plain @click="showEditTask(scope.row)">编辑</el-button>
+              <el-button type="danger" size="mini" plain @click="deleteTask(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>

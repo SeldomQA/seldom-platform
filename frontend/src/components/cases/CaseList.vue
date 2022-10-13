@@ -83,7 +83,7 @@
             </el-table-column>
             <el-table-column label="操作" width="120">
               <template slot-scope="scope">
-              <el-button type="success" size="mini" @click="runCase(scope.row)" @click.stop="drawer = false">执行</el-button>
+              <el-button type="success" size="mini" plain @click="runCase(scope.row)" @click.stop="drawer = false">执行</el-button>
               </template>
             </el-table-column>
           </el-table>

@@ -18,8 +18,8 @@
           <el-table-column prop="update_time" label="更新时间"> </el-table-column>
           <el-table-column fixed="right" label="操作" width="200">
             <template slot-scope="scope">
-              <el-button type="primary" size="mini" @click="showEdit(scope.row)">编辑</el-button>
-              <el-button type="danger" size="mini" @click="deleteTeam(scope.row)">删除</el-button>
+              <el-button type="primary" size="mini" plain @click="showEdit(scope.row)">编辑</el-button>
+              <el-button type="danger" size="mini" plain @click="deleteTeam(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
