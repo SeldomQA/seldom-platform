@@ -4,9 +4,9 @@ import SettingTabs from '../components/home/SettingTabs.vue'
 import CaseList from '../components/cases/CaseList.vue'
 import TaskList from '../components/tasks/TaskList.vue'
 import TeamList from '../components/home/TeamList.vue'
-import Report from '../components/reports/Report.vue'
 import Login from '../views/Login.vue';
 import Navigation from '../views/Navigation.vue';
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -48,11 +48,6 @@ const routes = [
         path: 'teams',
         name: 'Team',
         component: TeamList
-      },
-      {
-        path: 'reports',
-        name: 'Report',
-        component: Report
       }
     ]
   }
