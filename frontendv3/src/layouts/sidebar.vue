@@ -33,7 +33,7 @@ const menuOptions: MenuOption[] = [
           RouterLink,
           {
             to: {
-              name: "index",
+              name: "main-Project",
               params: {
                 lang: "zh-CN",
               },
@@ -49,7 +49,7 @@ const menuOptions: MenuOption[] = [
           RouterLink,
           {
             to: {
-              name: "Env",
+              name: "main-Env",
               params: {
                 lang: "zh-CN",
               },
@@ -72,7 +72,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "Case",
+            name: "main-Case",
             params: {
               lang: "zh-CN",
             },
@@ -89,7 +89,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "Task",
+            name: "main-Task",
             params: {
               lang: "zh-CN",
             },
@@ -106,7 +106,7 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "Report",
+            name: "main-Report",
             params: {
               lang: "zh-CN",
             },

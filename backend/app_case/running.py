@@ -108,16 +108,3 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
         # os.remove(report_path)
 
     log.info("running end!!")
-
-
-# def thread_run_case(test_dir, case_info, report_name, case_id, env):
-#     """
-#     线程运行用例
-#     """
-#     threads = []
-#     t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, case_id, env, ))
-#     threads.append(t)
-#     for t in threads:
-#         t.start()
-#     for t in threads:
-#         t.join()

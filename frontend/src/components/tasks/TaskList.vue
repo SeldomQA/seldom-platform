@@ -11,37 +11,12 @@
       <span class="span-left">
         <span class="page-title">任务管理</span>
       </span>
-      <span class="span-breadcrumb">
-        <el-breadcrumb separator="/">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>任务管理</el-breadcrumb-item>
-        </el-breadcrumb>
-      </span>
     </div>
     <el-card class="main-card" v-if="taskFlag">
       <div style="text-align: left;">
         <el-form :inline="true">
-          <el-form-item label="项目">
-            <el-dropdown @command="switchProject">
-              <span class="el-dropdown-link">{{projectName}} <i class="el-icon-sort"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item
-                  v-for="(item, index) in projectOptions"
-                  :key="index"
-                  class="sort-item"
-                  :command="item.id"
-                >{{item.name}}
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </el-form-item>
-        </el-form>
-      </div>
-      <div style="text-align: left;">
-        <el-form :inline="true">
           <el-form-item label="团队">
-            <el-select v-model="query.team_id" placeholder="选择团队" size="small">
+            <el-select v-model="query.team_id" clearable placeholder="选择团队" size="small">
               <el-option
                 v-for="item in teamOptions"
                 :key="item.value"
@@ -115,9 +90,9 @@
             label="操作"
             width="220">
             <template slot-scope="scope">
-              <el-button type="success" size="mini" @click="runTask(scope.row)">运行</el-button>
-              <el-button type="primary" size="mini" @click="showEditTask(scope.row)">编辑</el-button>
-              <el-button type="danger" size="mini" @click="deleteTask(scope.row)">删除</el-button>
+              <el-button type="success" size="mini" plain @click="runTask(scope.row)">运行</el-button>
+              <el-button type="primary" size="mini" plain @click="showEditTask(scope.row)">编辑</el-button>
+              <el-button type="danger" size="mini" plain @click="deleteTask(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -135,7 +110,6 @@
 </template>
 
 <script>
-import ProjectApi from '../../request/project'
 import TaskApi from '../../request/task'
 import TeamApi from '../../request/team'
 import TaskDialog from './TaskDialog.vue'
@@ -168,10 +142,14 @@ export default {
       }
     }
   },
+  created() {
+    this.projectId = sessionStorage.projectId
+    this.projectName = sessionStorage.projectName
+  },
   mounted() {
     // 初始化方法
-    this.initProjectList()
     this.initTeamList()
+    this.initTaskList()
   },
   methods: {
     // 显示创建任务
@@ -190,16 +168,6 @@ export default {
       this.timedDailog = false
       this.initTaskList()
     },
-    // 获取项目列表
-    async initProjectList() {
-      const resp = await ProjectApi.getProjects()
-      if (resp.success === true) {
-        this.projectOptions = resp.result
-        this.switchProject(this.projectOptions[0].id)
-      } else {
-        this.$message.error(resp.error.message)
-      }
-    },
     // 初始化获取团队列表
     async initTeamList() {
       const resp = await TeamApi.getTeamAll()
@@ -212,15 +180,6 @@ export default {
         }
       } else {
         this.$message.error('查询失败!')
-      }
-    },
-    // 初始化项目文件列表
-    async initProjectFile() {
-      const resp = await ProjectApi.getProjectTree(this.projectId)
-      if (resp.success === true) {
-        this.fileData = resp.result.files
-      } else {
-        this.$message.error(resp.error.message)
       }
     },
     // 初始化任务列表
@@ -268,18 +227,8 @@ export default {
     // 返回任务列表
     goBack() {
       this.taskFlag = true
-    },
-    // 选择项目
-    switchProject(command) {
-      for (let i = 0; i < this.projectOptions.length; i++) {
-        if (this.projectOptions[i].id === command) {
-          this.projectName = this.projectOptions[i].name
-          this.projectId = command
-        }
-      }
-      this.initProjectFile()
-      this.initTaskList()
     }
+
   }
 }
 </script>

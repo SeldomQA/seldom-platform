@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any,Union
 from ninja import Schema
+from datetime import datetime, timedelta, date, time
 
 
 class TaskIn(Schema):
@@ -26,4 +27,4 @@ class ReportOut(Schema):
     skipped: int
     tests: int
     run_time: str
-    create_time: Any
+    create_time: Union[datetime]

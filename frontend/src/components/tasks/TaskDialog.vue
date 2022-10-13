@@ -201,7 +201,7 @@ export default {
               }
               if (isExists === false) {
                 this.caseData.push({
-                  key: resp.result[i].id,
+                  key: resp.result[i].case_hash,
                   label: resp.result[i].id + ' ' + resp.result[i].class_name + '.' + resp.result[i].case_name
                 })
               }

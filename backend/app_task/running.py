@@ -9,8 +9,9 @@ from seldom import Seldom
 from seldom import ChromeConfig, FirefoxConfig, EdgeConfig
 from app_project.models import Project, Env
 from app_task.models import TestTask, TaskReport, ReportDetails
-from backend.settings import BASE_DIR, REPORT_DIR
+from backend.settings import REPORT_DIR
 from app_utils import background
+from app_utils.project_utils import project_dir
 
 
 # Use 10 background threads.
@@ -53,8 +54,8 @@ def seldom_running(test_dir, case_info, report_name, task_id):
 
     # 项目添加环境变量
     project = Project.objects.get(id=task.project_id)
-    project_dir = file.join(BASE_DIR, "github", project.address.split("/")[-1])
-    file.add_to_path(project_dir)
+    project_address_temp = project_dir(project.address, temp=True)
+    file.add_to_path(project_address_temp)
 
     # 1. 直接执行
     main_extend = TestMainExtend(path=test_dir, browser=browser, report=report_name, base_url=base_url)
@@ -151,21 +152,3 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     if int(errors) > 0 or int(failures) > 0:
         # 未实现
         log.info("Send a warning message")
-
-
-# def thread_run_task(test_dir, case_info, report_name, task_id):
-#     """
-#     线程运行任务
-#     :param test_dir: 测试用例目录
-#     :param case_info: 测试用例信息
-#     :param report_name: 测试报告
-#     :param task_id: 任务ID
-#     :return:
-#     """
-#     threads = []
-#     t = threading.Thread(target=seldom_running, args=(test_dir, case_info, report_name, task_id))
-#     threads.append(t)
-#     for t in threads:
-#         t.start()
-#     for t in threads:
-#         t.join()

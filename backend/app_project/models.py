@@ -32,6 +32,7 @@ class Env(models.Model):
     env = models.CharField("环境值", max_length=50, null=True, default="")
     browser = models.CharField("环境值", max_length=20, null=True, default="")
     base_url = models.CharField("URL", max_length=200, null=True, default="")
+    is_delete = models.BooleanField('删除', default=False)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
 

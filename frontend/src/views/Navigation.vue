@@ -8,7 +8,7 @@
 <template>
   <div class="navigation">
     <el-container>
-      <el-container>
+      <el-container v-if="isRouterAlive">
         <el-aside width="160px" style="background-color: #313a46">
           <el-menu text-color="#838f9c" active-text-color="#12263f" :default-active="onRoutes">
             <div class="seldom-logo">
@@ -32,16 +32,26 @@
                 <template #title>任务管理</template>
               </el-menu-item>
             </router-link>
-            <!-- <router-link to="/reports">
-              <el-menu-item index="4" class="menu-option">
-                <i class="el-icon-document-copy"></i>
-                <template #title>报告管理</template>
-              </el-menu-item>
-            </router-link> -->
           </el-menu>
         </el-aside>
         <el-container>
           <el-header style="text-align: right; font-size: 12px">
+            <div style="float: left">
+              <span style="font-size: 15px;">项目 </span>
+              <el-dropdown @command="switchProject" trigger="click" style="margin-top: 10px;">
+                <span class="el-dropdown-link"> {{projectName}} <i class="el-icon-sort"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item
+                    v-for="(item, index) in projectOptions"
+                    :key="index"
+                    class="sort-item"
+                    :command="item.id"
+                  >{{item.name}}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
             <el-dropdown @command="handleCommand" trigger="click" style="margin-top: 10px;">
               <el-avatar size="small" :src="circleUrl"></el-avatar>
               <el-dropdown-menu slot="dropdown" style="width: 120px">
@@ -66,6 +76,7 @@
 
 <script>
 import UserApi from '../request/user'
+import ProjectApi from '../request/project'
 
 export default {
   name: 'navigation',
@@ -82,10 +93,18 @@ export default {
   },
   data() {
     return {
+      isRouterAlive: true,
       // 定义变量
       circleUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
-      token: ''
+      token: '',
+      projectId: '',
+      projectName: '',
+      projectOptions: []
     }
+  },
+  created() {
+    // 初始化项目
+    this.initProjectList()
   },
   mounted() {
     // 初始化方法
@@ -93,6 +112,32 @@ export default {
   },
 
   methods: {
+    // 初始化项目列表
+    async initProjectList() {
+      const resp = await ProjectApi.getProjects()
+      if (resp.success === true) {
+        this.projectOptions = resp.result
+        this.switchProject(this.projectOptions[0].id)
+      } else {
+        this.$message.error(resp.error.message)
+      }
+    },
+    // 选择项目
+    switchProject(command) {
+      for (let i = 0; i < this.projectOptions.length; i++) {
+        if (this.projectOptions[i].id === command) {
+          this.projectName = this.projectOptions[i].name
+          sessionStorage.projectId = this.projectOptions[i].id
+          sessionStorage.projectName = this.projectOptions[i].name
+          this.reload()
+        }
+      }
+    },
+    // 刷新组件
+    reload() {
+      this.isRouterAlive = false
+      this.$nextTick(() => (this.isRouterAlive = true))
+    },
     // 退出登录
     handleCommand(command) {
       switch (command) {

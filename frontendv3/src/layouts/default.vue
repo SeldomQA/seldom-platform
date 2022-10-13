@@ -3,7 +3,7 @@ import Sidebar from "./sidebar.vue";
 import Header from "./header.vue";
 import { darkTheme } from "naive-ui";
 import type { GlobalTheme } from "naive-ui";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 const theme = ref<GlobalTheme | null>(null);
 const localStorage = window.localStorage;
@@ -28,6 +28,7 @@ onMounted(() => {
     mainhtml[0].classList.add("dark");
   }
   changeTheme();
+  // console.log(islogin);
 });
 </script>
 
@@ -46,7 +47,11 @@ onMounted(() => {
             <router-view></router-view>
           </n-layout>
         </n-layout>
-        <n-layout-footer bordered position="absolute" style="text-align:center">
+        <n-layout-footer
+          bordered
+          position="absolute"
+          style="text-align: center"
+        >
           © 2022 Powered by SeldomQA Team
         </n-layout-footer>
       </n-layout>

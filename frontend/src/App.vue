@@ -25,7 +25,7 @@
   text-align: center;
   color: #2c3e50;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 body {
@@ -61,6 +61,11 @@ body {
 
 .span-right {
   float: right;
+}
+
+.page-title {
+  font-size: 16px;
+  font-weight: bold;
 }
 
 .main-card {

@@ -12,6 +12,9 @@
         <el-button cy-data="create-project" type="primary" size="small" @click="showCreate()">创建</el-button>
       </div>
       <el-row>
+        <div v-if="tableData.length === 0">
+          <el-empty description="整个平台功能，从创建项目开始！！"></el-empty>
+        </div>
         <div v-for="(item, index) in tableData" :key="index">
           <el-col :span="7" class="project-card">
             <el-card>

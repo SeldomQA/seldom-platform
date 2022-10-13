@@ -7,8 +7,8 @@ from ninja import Router
 from ninja.pagination import paginate
 from app_project.models import Project, Env
 from app_case.models import TestCase
-from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_team.models import Team
+from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_task.api_schma import TaskIn, ReportOut, ReportIn
 from app_task.running import seldom_running
 from app_utils.response import response, model_to_dict, Error
@@ -31,7 +31,7 @@ def create_task(request, task: TaskIn):
     )
 
     for case in task.cases:
-        TaskCaseRelevance.objects.create(task=task_obj, case_id=case)
+        TaskCaseRelevance.objects.create(task=task_obj, case_hash=case)
 
     task_dict = model_to_dict(task_obj)
     task_dict["cases"] = task.cases
@@ -47,13 +47,13 @@ def get_task(request, task_id: int):
     relevance = TaskCaseRelevance.objects.filter(task=task_obj)
     cases = []
     for r in relevance:
-        cases.append(r.case_id)
+        cases.append(r.case_hash)
 
     case_list = []
     for c in cases:
-        case_obj = TestCase.objects.get(id=c)
+        case_obj = TestCase.objects.get(case_hash=c)
         case_list.append({
-            "key": case_obj.id,
+            "key": case_obj.case_hash,
             "label": str(case_obj.id) + " " + case_obj.class_name + "." + case_obj.case_name
         })
     task_dict = model_to_dict(task_obj)
@@ -120,7 +120,7 @@ def update_task(request, task_id: int, task: TaskIn):
 
     TaskCaseRelevance.objects.filter(task=task_obj).delete()
     for case in task.cases:
-        TaskCaseRelevance.objects.create(task=task_obj, case_id=case)
+        TaskCaseRelevance.objects.create(task=task_obj, case_hash=case)
 
     task_dict = model_to_dict(task_obj)
     task_dict["cases"] = task.cases
@@ -149,7 +149,7 @@ def running_task(request, task_id: int):
     relevance = TaskCaseRelevance.objects.filter(task_id=task_id)
     case_list = []
     for r in relevance:
-        case = TestCase.objects.get(id=r.case_id)
+        case = TestCase.objects.get(case_hash=r.case_hash)
         case_list.append({
             "file": case.file_name,
             "class": {
