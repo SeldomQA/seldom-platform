@@ -45,7 +45,7 @@
                 :props="defaultProps"
                 @node-expand="handleNodeClick"
                 >
-                <span slot-scope="{ node, data }">
+                <span slot-scope="{ data }">
                   <span v-if="data.is_leaf === 1">
                     <i class="el-icon-tickets"></i>
                   </span>
@@ -149,13 +149,13 @@ export default {
     // 初始化方法
     this.initProjectFile()
     this.initEnv()
-    this.resultHeartbeat = setInterval(() => {
-      this.initFileCases()
+    this.casetHeartbeat = setInterval(() => {
+      this.checkCase()
     }, 5000);
   },
   destroyed() {
     // 销毁时候清除定时器
-    clearInterval(this.resultHeartbeat);
+    clearInterval(this.casetHeartbeat);
   },
   methods: {
     // 初始化项目文件列表
@@ -196,6 +196,15 @@ export default {
           this.$message.error(resp.error.message)
         }
       })
+    },
+    // 检查用例状态, 判断有“执行中”的用例，调用接口
+    checkCase() {
+      for (const i in this.caseData) {
+        if (this.caseData[i].status === 1) {
+          this.initFileCases()
+          break
+        }
+      }
     },
     // 点击tree节点
     handleNodeClick(data) {
