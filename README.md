@@ -6,11 +6,11 @@
 
 ## Project
 
-|  项目   | 说明  |  文档  |
-|  ----  | ----  | ----  |
-| backend  | 后端: django + django-ninjia |  [link](./backend/README.md)   |
-| frontend  | 前端：vue2 + element-ui |  [link](./frontend/README.md)  |
-| frontendv3  | 前端：vue3 + naive-ui |  [link](./frontendv3/README.md) |
+| 项目       | 说明                         | 文档                           |
+| ---------- | ---------------------------- | ------------------------------ |
+| backend    | 后端: django + django-ninjia | [link](./backend/README.md)    |
+| frontend   | 前端：vue2 + element-ui      | [link](./frontend/README.md)   |
+| frontendv3 | 前端：vue3 + naive-ui        | [link](./frontendv3/README.md) |
 
 > __注：__
 > `frontend` 和 `frontendv3` 是两套并行开发前端项目，选择哪个取决于你的个人喜好。
@@ -21,34 +21,24 @@
 
 ## ToDo
 
-- [x] 配置管理
-  - [x] 项目管理 ✔️
-  - [x] 环境管理 ✔️
-  - [ ] 团队管理  
-  - [ ] 邮件组
-- [x] 用例管理 ✔️
-- [x] 任务管理 ✔️
-- [ ] 登录注册 ⌛
+功能：
+
+
+| 功能      | frontend | frontendv3 |
+| --------- | -------- | ---------- |
+| 登录&注册 | ✔️        | ✔️          |
+| 项目管理  | ✔️        | ✔️          |
+| 环境管理  | ✔️        | ✔️          |
+| 团队管理  | ✔️        |            |
+| 邮件管理  |          |            |
+| 用例管理  | ✔️        | ✔️          |
+| 任务管理  | ✔️        | ⌛          |
+| 报告列表  | ✔️        |            |
+| 报告详情  | ✔️        |            |
 
 
 ## Function
 
-### 项目管理
+[《seldom-platform平台使用手册》](https://www.yuque.com/chongshi/raflru/ghot2m)
 
-1. 创建&编辑项目
-
-![](./img/v3-project-1.png)
-
-2. 克隆&拉取项目代码
-
-![](./img/v3-project-2.png)
-
-
-### 环境管理
-
-![](./img/v3-env.png)
-
-### 用例管理
-
-![](./img/v3-case.png)
-
+> 注：平台基于 frontend 介绍的，frontendv3的一些功能还不够完善。
