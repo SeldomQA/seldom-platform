@@ -86,6 +86,10 @@
               </template>
           </el-table-column>
           <el-table-column
+            prop="create_time"
+            label="创建">
+          </el-table-column>
+          <el-table-column
             fixed="right"
             label="操作"
             width="220">
@@ -150,6 +154,13 @@ export default {
     // 初始化方法
     this.initTeamList()
     this.initTaskList()
+    this.tasktHeartbeat = setInterval(() => {
+      this.checkTask()
+    }, 5000);
+  },
+  destroyed() {
+    // 销毁时候清除定时器
+    clearInterval(this.tasktHeartbeat);
   },
   methods: {
     // 显示创建任务
@@ -192,6 +203,15 @@ export default {
         this.$message.error('获得任务列表失败！')
       }
     },
+    // 检查用例状态, 判断有“执行中”的用例，调用接口
+    checkTask() {
+      for (const i in this.tableData) {
+        if (this.tableData[i].status === 1) {
+          this.initTaskList()
+          break
+        }
+      }
+    },
     // 删除任务
     deleteTask(row) {
       this.$confirm('检查是否有正在运行的定时任务，确定删除?', '提示', {
@@ -213,8 +233,8 @@ export default {
     async runTask(row) {
       const resp = await TaskApi.runningTask(row.id)
       if (resp.success === true) {
-        this.initTaskList()
         this.$message.success('开始运行！')
+        this.initTaskList()
       } else {
         this.$message.error('运行失败！')
       }
