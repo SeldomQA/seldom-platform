@@ -27,6 +27,7 @@ def create_task(request, task: TaskIn):
     task_obj = TestTask.objects.create(
         name=task.name,
         env_id=task.env_id,
+        team_id=task.team_id,
         project_id=task.project,
     )
 
@@ -91,7 +92,7 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
         try:
             team = Team.objects.get(id=task.team_id)
             task_dict["team"] = team.name
-        except team.DoesNotExist:
+        except Team.DoesNotExist:
             task_dict["team"] = ""
 
         if task_dict["timed"] == "":
