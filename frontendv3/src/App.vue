@@ -19,5 +19,21 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  background-color: #fbf9f6;
+  height: 100%;
+}
+
+body {
+  margin: 0px 0px 0px;
+}
+html{
+  /* background-image: url("./assets/home-bg.png"); */
+  background-attachment: fixed;
+  background-size: 100% 100%;
+  z-index: -1000;
+}
+html,
+body {
+  height: 100%;
 }
 </style>
