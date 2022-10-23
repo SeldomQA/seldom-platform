@@ -78,7 +78,7 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
     if name is not None and name != "":
         query["name__contains"] = name
 
-    tasks = TestTask.objects.filter(**query)
+    tasks = TestTask.objects.filter(**query).order_by("-create_time")
 
     task_list = []
     for task in tasks:
@@ -95,15 +95,6 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
         except Team.DoesNotExist:
             task_dict["team"] = ""
 
-        if task_dict["timed"] == "":
-            task_dict["timed_dict"] = {
-                "minute": "*", "hour": "*", "day_of_week": "*", "day": "*", "month": "*"
-            }
-        else:
-            t = task_dict["timed"].split(" ")
-            task_dict["timed_dict"] = {
-                "minute": t[0], "hour": t[1], "day_of_week": t[2], "day": t[3], "month": t[4]
-            }
         task_list.append(task_dict)
     return response(result=task_list)
 
