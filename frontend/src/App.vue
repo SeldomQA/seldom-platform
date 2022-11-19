@@ -74,6 +74,7 @@ body {
   padding-left: 30px;
   padding-right: 30px;
   margin-bottom: 50px;
+  min-height: 600px;
 }
 
 .el-button--primary {
