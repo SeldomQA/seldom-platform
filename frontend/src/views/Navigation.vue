@@ -9,37 +9,40 @@
   <div class="navigation">
     <el-container>
       <el-container v-if="isRouterAlive">
-        <el-aside width="160px" style="background-color: #313a46">
+        <el-aside width="80px" style="background-color: #313a46">
           <el-menu text-color="#838f9c" active-text-color="#12263f" :default-active="onRoutes">
             <div class="seldom-logo">
-                <img src="../assets/seldom-platform.gif" class="img-logo" />
+                <img src="../assets/seldom-logo-mini.gif" class="img-logo" />
             </div>
             <router-link to="/main/settings">
-              <el-menu-item index="1" class="menu-option">
-                <i class="el-icon-c-scale-to-original"></i>
-                <template #title>配置管理</template>
-              </el-menu-item>
+              <el-tooltip class="item" effect="dark" content="配置管理" placement="right">
+                <el-menu-item index="1" class="menu-option">
+                    <i class="el-icon-c-scale-to-original"></i>
+                </el-menu-item>
+              </el-tooltip>
             </router-link>
             <router-link to="/main/cases">
+              <el-tooltip class="item" effect="dark" content="用例管理" placement="right">
               <el-menu-item index="2" class="menu-option">
                 <i class="el-icon-folder-opened"></i>
-                <template #title>用例管理</template>
               </el-menu-item>
+            </el-tooltip>
             </router-link>
             <router-link to="/main/tasks">
-              <el-menu-item index="3" class="menu-option">
-                <i class="el-icon-date"></i>
-                <template #title>任务管理</template>
-              </el-menu-item>
+              <el-tooltip class="item" effect="dark" content="任务管理" placement="right">
+                <el-menu-item index="3" class="menu-option">
+                  <i class="el-icon-date"></i>
+                </el-menu-item>
+              </el-tooltip>
             </router-link>
           </el-menu>
         </el-aside>
         <el-container>
           <el-header style="text-align: right; font-size: 12px">
             <div style="float: left">
-              <span style="font-size: 15px;">项目 </span>
-              <el-dropdown @command="switchProject" trigger="click" style="margin-top: 10px;">
-                <span class="el-dropdown-link"> {{projectName}} <i class="el-icon-sort"></i>
+              <span style="font-size: 15px;">默认项目: </span>
+              <el-dropdown @command="switchProject" trigger="click">
+                <span class="el-dropdown-link"> {{projectName}} <i class="el-icon-arrow-down"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item
@@ -176,7 +179,7 @@ export default {
   background-color: #313a46;
   line-height: 60px;
   padding-bottom: 0px;
-  width: 160px;
+  width: 80px;
 }
 
 .img-logo {
@@ -196,7 +199,7 @@ export default {
   background-color: #fff;
   color: #333;
   text-align: center;
-  line-height: 160px;
+  line-height: 80px;
 }
 
 .el-main {
@@ -214,7 +217,7 @@ a {
   text-align: left;
   background-color: #313a46;
   color: #fff;
-  width: 160px;
+  width: 80px;
 }
 .el-menu-item-group__title {
   padding: 0 !important;

@@ -8,7 +8,7 @@
 <template>
   <div class="workbench">
     <el-card>
-      <el-tabs v-model="tabName" @tab-click="tabClick">
+      <el-tabs v-model="tabName" tab-position="left" @tab-click="tabClick">
         <el-tab-pane label="项目配置" name="project">
           <project-list v-if="showTab == 1"></project-list>
         </el-tab-pane>
