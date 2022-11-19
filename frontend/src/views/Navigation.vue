@@ -16,8 +16,8 @@
             </div>
             <router-link to="/main/settings">
               <el-menu-item index="1" class="menu-option">
-                <i class="el-icon-setting"></i>
-                <template #title>配置中心</template>
+                <i class="el-icon-c-scale-to-original"></i>
+                <template #title>配置管理</template>
               </el-menu-item>
             </router-link>
             <router-link to="/main/cases">
