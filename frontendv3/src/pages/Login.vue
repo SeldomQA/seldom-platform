@@ -2,7 +2,7 @@
   <div class="main">
     <div class="title">
       <span>
-        <h1><span style="color: #335eea">Seldom</span> Platform.</h1>
+        <h1><span style="color: #20d489">Seldom</span> Platform.</h1>
         <p style="color: #869ab8">基于Seldom框架的测试平台.</p>
       </span>
     </div>
@@ -17,12 +17,12 @@
             pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
           >
             <n-tab-pane name="signin" tab="登录">
-              <n-form :model="signinRef" :rules="signinRules">
-                <n-form-item-row label="用户名">
-                  <n-input v-model:value="signinRef.username" />
+              <n-form :model="signinRef" :rules="signinRules" label-placement="left">
+                <n-form-item-row label="">
+                  <n-input v-model:value="signinRef.username" placeholder="帐号"/>
                 </n-form-item-row>
-                <n-form-item-row label="密码">
-                  <n-input v-model:value="signinRef.password" type="password" />
+                <n-form-item-row label="">
+                  <n-input v-model:value="signinRef.password" type="password" placeholder="密码"/>
                 </n-form-item-row>
               </n-form>
               <n-button
@@ -36,30 +36,33 @@
               </n-button>
             </n-tab-pane>
             <n-tab-pane name="signup" tab="注册">
-              <n-form ref="formRef" :model="signupRef" :rules="signupRules">
-                <n-form-item path="username" label="用户名">
+              <n-form ref="formRef" :model="signupRef" :rules="signupRules" label-placement="left">
+                <n-form-item path="username" label="">
                   <n-input
                     v-model:value="signupRef.username"
                     @keydown.enter.prevent
+                    placeholder="帐号"
                   />
                 </n-form-item>
-                <n-form-item path="password" label="密码">
+                <n-form-item path="password" label="">
                   <n-input
                     v-model:value="signupRef.password"
                     @input="handlePasswordInput"
                     @keydown.enter.prevent
+                    placeholder="密码"
                   />
                 </n-form-item>
                 <n-form-item
                   ref="rPasswordFormItemRef"
                   first
                   path="password2"
-                  label="重复密码"
+                  label=""
                 >
                   <n-input
                     v-model:value="signupRef.password2"
                     :disabled="!signupRef.password"
                     @keydown.enter.prevent
+                    placeholder="确认密码"
                   />
                 </n-form-item>
               </n-form>
@@ -84,25 +87,7 @@
       <div class="features">
         <div style="width: 30%; float: left">
           <div class="icon text-primary mb-3">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g fill="none" fill-rule="evenodd">
-                <path d="M0 0h24v24H0z"></path>
-                <path
-                  d="M7 3h10a4 4 0 110 8H7a4 4 0 110-8zm0 6a2 2 0 100-4 2 2 0 000 4z"
-                  fill="#335EEA"
-                ></path>
-                <path
-                  d="M7 13h10a4 4 0 110 8H7a4 4 0 110-8zm10 6a2 2 0 100-4 2 2 0 000 4z"
-                  fill="#335EEA"
-                  opacity=".3"
-                ></path>
-              </g>
-            </svg>
+            <n-icon size="20" :component="GitBranch" />
           </div>
           <h3>支持git</h3>
           <p class="text-muted mb-6 mb-md-0">
@@ -112,30 +97,7 @@
         </div>
         <div style="width: 30%; float: left; margin-left: 3%">
           <div class="icon text-primary mb-3">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g fill="none" fill-rule="evenodd">
-                <path d="M0 0h24v24H0z"></path>
-                <path
-                  d="M17.272 8.685a1 1 0 111.456-1.37l4 4.25a1 1 0 010 1.37l-4 4.25a1 1 0 01-1.456-1.37l3.355-3.565-3.355-3.565zm-10.544 0L3.373 12.25l3.355 3.565a1 1 0 01-1.456 1.37l-4-4.25a1 1 0 010-1.37l4-4.25a1 1 0 011.456 1.37z"
-                  fill="#335EEA"
-                ></path>
-                <rect
-                  fill="#335EEA"
-                  opacity=".3"
-                  transform="rotate(15 12 12)"
-                  x="11"
-                  y="4"
-                  width="2"
-                  height="16"
-                  rx="1"
-                ></rect>
-              </g>
-            </svg>
+            <n-icon size="20" :component="Search" />
           </div>
           <h3>解析用例</h3>
           <p class="text-muted mb-0">
@@ -145,25 +107,7 @@
         </div>
         <div style="width: 30%; float: right">
           <div class="icon text-primary mb-3">
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <g fill="none" fill-rule="evenodd">
-                <path d="M0 0h24v24H0z"></path>
-                <path
-                  d="M5.5 4h4A1.5 1.5 0 0111 5.5v1A1.5 1.5 0 019.5 8h-4A1.5 1.5 0 014 6.5v-1A1.5 1.5 0 015.5 4zm9 12h4a1.5 1.5 0 011.5 1.5v1a1.5 1.5 0 01-1.5 1.5h-4a1.5 1.5 0 01-1.5-1.5v-1a1.5 1.5 0 011.5-1.5z"
-                  fill="#335EEA"
-                ></path>
-                <path
-                  d="M5.5 10h4a1.5 1.5 0 011.5 1.5v7A1.5 1.5 0 019.5 20h-4A1.5 1.5 0 014 18.5v-7A1.5 1.5 0 015.5 10zm9-6h4A1.5 1.5 0 0120 5.5v7a1.5 1.5 0 01-1.5 1.5h-4a1.5 1.5 0 01-1.5-1.5v-7A1.5 1.5 0 0114.5 4z"
-                  fill="#335EEA"
-                  opacity=".3"
-                ></path>
-              </g>
-            </svg>
+            <n-icon size="20" :component="AppsSharp" />
           </div>
           <h3>平台化</h3>
           <p class="text-muted mb-6 mb-md-0">
@@ -187,6 +131,7 @@ import {
   useMessage,
   FormRules,
 } from "naive-ui";
+import { GitBranch, Search, AppsSharp } from '@vicons/ionicons5'
 
 interface TSignin {
   username: string | null;
@@ -200,6 +145,11 @@ interface TSignup {
 }
 
 export default defineComponent({
+  components: {
+    GitBranch,
+    Search,
+    AppsSharp
+  },
   setup() {
     const router = useRouter();
     const formRef = ref<FormInst | null>(null);
@@ -327,6 +277,9 @@ export default defineComponent({
       signupRules,
       submitLogin,
       submitRegister,
+      GitBranch,
+      Search,
+      AppsSharp,
       handlePasswordInput() {
         if (signupRef.value.password2) {
           rPasswordFormItemRef.value?.validate({ trigger: "password-input" });
@@ -417,7 +370,7 @@ export default defineComponent({
 
 .login-card {
   width: 350px;
-  height: 400px;
+  height: 320px;
 }
 
 .content {
@@ -440,6 +393,6 @@ export default defineComponent({
 
 .features {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 100px;
 }
 </style>
