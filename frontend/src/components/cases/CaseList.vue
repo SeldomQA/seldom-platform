@@ -7,11 +7,6 @@
 -->
 <template>
   <div class="case">
-    <div style="padding-bottom: 20px; height: 30px;">
-      <span class="span-left">
-        <span class="page-title">用例管理</span>
-      </span>
-    </div>
     <el-card class="main-card">
       <div style="text-align: left;">
         <el-form :inline="true">

@@ -7,23 +7,20 @@
 -->
 <template>
   <div class="workbench">
-    <div style="padding-bottom: 20px; height: 30px;">
-      <span class="span-left">
-        <span class="page-title">配置中心</span>
-      </span>
-    </div>
-     <el-tabs v-model="tabName" type="border-card" @tab-click="tabClick">
-      <el-tab-pane label="项目管理" name="project">
-        <project-list v-if="showTab == 1"></project-list>
-      </el-tab-pane>
-      <el-tab-pane label="环境管理" name="env">
-        <EnvList v-if="showTab == 2"></EnvList>
-      </el-tab-pane>
-      <el-tab-pane label="团队管理" name="team">
-        <TeamList v-if="showTab == 3"></TeamList>
-      </el-tab-pane>
-      <el-tab-pane label="邮件组" name="emailGroup">邮件组</el-tab-pane>
-    </el-tabs>
+    <el-card class="main-card">
+      <el-tabs v-model="tabName" tab-position="left" @tab-click="tabClick">
+        <el-tab-pane label="项目配置" name="project">
+          <project-list v-if="showTab == 1"></project-list>
+        </el-tab-pane>
+        <el-tab-pane label="环境配置" name="env">
+          <EnvList v-if="showTab == 2"></EnvList>
+        </el-tab-pane>
+        <el-tab-pane label="团队配置" name="team">
+          <TeamList v-if="showTab == 3"></TeamList>
+        </el-tab-pane>
+        <el-tab-pane label="邮件配置" name="emailGroup">邮件组</el-tab-pane>
+      </el-tabs>
+    </el-card>
   </div>
 </template>
 
