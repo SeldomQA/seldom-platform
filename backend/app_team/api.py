@@ -15,7 +15,8 @@ router = Router(tags=["team"])
 @router.post('/create')
 def create_team(request, team: TeamIn):
     team_obj = Team.objects.create(
-        name=team.name
+        name=team.name,
+        email=team.email
     )
     return response(result=model_to_dict(team_obj))
 
@@ -48,6 +49,7 @@ def update_team(request, team_id: int, team: TeamIn):
     """
     team_obj = get_object_or_404(Team, pk=team_id)
     team_obj.name = team.name
+    team_obj.email = team.email
     team_obj.save()
     return response(result=model_to_dict(team_obj))
 

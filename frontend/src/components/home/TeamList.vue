@@ -15,6 +15,7 @@
           <el-table-column fixed prop="id" label="ID" width="80">
           </el-table-column>
           <el-table-column prop="name" label="团队名称"> </el-table-column>
+          <el-table-column prop="email" label="团队邮箱"> </el-table-column>
           <el-table-column prop="update_time" label="更新时间"> </el-table-column>
           <el-table-column fixed="right" label="操作" width="200">
             <template slot-scope="scope">

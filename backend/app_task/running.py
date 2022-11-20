@@ -1,17 +1,25 @@
-import os
 import time
-import threading
 from xml.dom.minidom import parse
+
+from seldom import (
+    SMTP,
+    Seldom,
+    TestMainExtend,
+    ChromeConfig,
+    FirefoxConfig,
+    EdgeConfig
+)
 from seldom.utils import file
 from seldom.logging import log
-from seldom import TestMainExtend
-from seldom import Seldom
-from seldom import ChromeConfig, FirefoxConfig, EdgeConfig
+
 from app_project.models import Project, Env
+from app_team.models import Team
 from app_task.models import TestTask, TaskReport, ReportDetails
 from backend.settings import REPORT_DIR
+from backend.config import EmailConfig
 from app_utils import background
 from app_utils.project_utils import project_dir
+from app_utils.email_utila import send_email_config
 
 
 # Use 10 background threads.
@@ -148,7 +156,14 @@ def seldom_running(test_dir, case_info, report_name, task_id):
 
     log.info("running end!!")
 
-    # 如果有失败或错误用例发送邮箱
-    if int(errors) > 0 or int(failures) > 0:
-        # 未实现
-        log.info("Send a warning message")
+    # 测试报告发送邮件
+    send_email_config(passed, errors, failures, skipped, tests)
+    team = Team.objects.get(id=task.team_id)
+    if ";" in team.email:
+        to_email = team.email.split(";")
+    else:
+        to_email = team.email
+
+    smtp = SMTP(user=EmailConfig.user, password=EmailConfig.password, host=EmailConfig.host)
+    smtp.sendmail(to=to_email, subject="seldom-platform", delete=False)
+    log.info("Send a warning message")

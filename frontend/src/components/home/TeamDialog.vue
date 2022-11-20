@@ -1,20 +1,24 @@
 <template>
-    <div class="team-dialog">
-      <el-dialog :title=showTitle :visible.sync="showStatus" @close="cancelTeam()" width="600px">
-        <el-form v-if="inResize === true" :rules="rules" ref="form" :model="form" label-width="80px">
-          <el-form-item label="名称" prop="name">
-            <el-input cy-data="team-name" v-model="form.name"></el-input>
-          </el-form-item>
-          <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
-            <div class="dialog-footer">
-              <el-button cy-data="cancel-team" size="small" @click="cancelTeam()">取消</el-button>
-              <el-button cy-data="save-team" type="primary" size="small" @click="onSubmit('form')">保存</el-button>
-            </div>
-          </el-form-item>
-        </el-form>
-      </el-dialog>
-    </div>
-  </template>
+  <div class="team-dialog">
+    <el-dialog :title=showTitle :visible.sync="showStatus" @close="cancelTeam()" width="600px">
+      <el-form v-if="inResize === true" :rules="rules" ref="form" :model="form" label-width="80px">
+        <el-form-item label="名称" prop="name">
+          <el-input cy-data="team-name" v-model="form.name"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input cy-data="email-name" v-model="form.email"></el-input>
+          <el-alert title="多个邮箱用分号“;”分割" type="success"></el-alert>
+        </el-form-item>
+        <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
+          <div class="dialog-footer">
+            <el-button cy-data="cancel-team" size="small" @click="cancelTeam()">取消</el-button>
+            <el-button cy-data="save-team" type="primary" size="small" @click="onSubmit('form')">保存</el-button>
+          </div>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </div>
+</template>
 
 <script>
 import TeamApi from '../../request/team'
@@ -26,7 +30,7 @@ export default {
       showTitle: '',
       form: {
         name: '',
-        create_time: ''
+        email: ''
       },
       rules: {
         name: [
