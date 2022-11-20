@@ -18,7 +18,6 @@
         <el-tab-pane label="团队配置" name="team">
           <TeamList v-if="showTab == 3"></TeamList>
         </el-tab-pane>
-        <el-tab-pane label="邮件配置" name="emailGroup">邮件组</el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
