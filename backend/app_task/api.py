@@ -165,7 +165,7 @@ def running_task(request, task_id: int):
     file.add_to_path(project_base_dir)
 
     # 定义报告
-    report_name = f'{task.name}_{str(time.time()).split(".")[0]}.xml'
+    report_name = f'{task.id}_{str(time.time()).split(".")[0]}.xml'
 
     # 丢给线程执行用例
     threads = []
