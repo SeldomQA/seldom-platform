@@ -162,6 +162,7 @@ def sync_project_case(request, project_id: int):
 
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
+    SeldomTestLoader.collectCaseList = []
     # 把项目目录加到环境变量path
     file.add_to_path(project_address)
 
