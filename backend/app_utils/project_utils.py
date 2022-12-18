@@ -18,6 +18,17 @@ def github_dir() -> str:
     return local_github_dir
 
 
+def reports_dir() -> str:
+    """
+    获得本地report地址
+    """
+    local_reports_dir = file.join(BASE_DIR, "reports")
+    if os.path.exists(local_reports_dir) is False:
+        os.mkdir(local_reports_dir)
+
+    return local_reports_dir
+
+
 def project_dir(project_address: str, temp=False) -> str:
     """
     获得项目本地路径

@@ -38,6 +38,10 @@ class ProjectApi {
     return request.post('/api/project/' + pid + '/sync_merge', data)
   }
 
+  getSyncLog() {
+    return request.get('/api/project/sync_log')
+  }
+
   deleteProject(pid) {
     return request.delete('/api/project/' + pid + '/')
   }

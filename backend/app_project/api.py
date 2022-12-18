@@ -18,7 +18,7 @@ from app_project.models import Project, Env
 from app_project.api_schma import ProjectIn, EnvIn, MergeCase
 from app_case.models import TestCase, TestCaseTemp
 from app_utils.response import response, Error, model_to_dict
-from app_utils.project_utils import github_dir, project_dir, get_hash, copytree
+from app_utils.project_utils import github_dir, reports_dir, project_dir, get_hash, copytree
 from backend.settings import BASE_DIR
 
 # upload image
@@ -172,7 +172,7 @@ def sync_project_case(request, project_id: int):
 
     # 收集测试用例信息
     main_extend = TestMainExtend(path=test_dir)
-    seldom_case = main_extend.collect_cases(json=False)
+    seldom_case = main_extend.collect_cases(json=False, warning=True)
 
     TestCaseTemp.objects.filter(project=project_obj).delete()
 
@@ -272,6 +272,19 @@ def async_project_merge(request, project_id: int, param: MergeCase):
     copytree(project_path, project_path_temp)
 
     return response()
+
+
+@router.get("/sync_log")
+def get_async_log(request):
+    """
+    获得同步日志.
+    注：暂时无法支持不同的项目，只记录最新的同步错误日志。
+    """
+    sync_log_file = os.path.join(reports_dir(), "collect_warning.log")
+    print("sync_log_file", sync_log_file)
+    with open(sync_log_file, "r") as f:
+        log = f.read()
+        return response(result={"log": log})
 
 
 @router.post("/upload", auth=None)

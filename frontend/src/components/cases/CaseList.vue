@@ -11,7 +11,8 @@
       <div style="text-align: left;">
         <el-form :inline="true">
           <el-form-item>
-            <el-button type="primary" @click="showSync" size="small">同步</el-button>
+            <el-button type="primary" @click="showSync()" size="small">同步</el-button>
+            <el-button type="warning" @click="showLog()" size="small">日志</el-button>
           </el-form-item>
           <el-form-item label="用例" style="float: right;">
            <el-tag>{{caseNumber}}</el-tag> 条
@@ -93,7 +94,10 @@
       >
         <ResultDialog v-if="drawer" :cid=caseId @cancel="cancelDialog"></ResultDialog>
       </el-drawer>
+      <!-- 用例同步弹窗 -->
       <syncDialog v-if="showSyncDialog" :pid=projectId @cancel="cancelSync"></syncDialog>
+      <!-- 用例同步日志弹窗 -->
+      <logDialog v-if="showLogDialog" :pid=projectId @cancel="cancelSync"></logDialog>
     </el-card>
   </div>
 </template>
@@ -103,6 +107,7 @@ import ProjectApi from '../../request/project'
 import CaseApi from '../../request/case'
 import ResultDialog from './ResultDialog.vue'
 import syncDialog from './syncDialog.vue'
+import logDialog from './logDialog.vue'
 
 
 export default {
@@ -110,12 +115,14 @@ export default {
   components: {
     // 组件
     ResultDialog,
-    syncDialog
+    syncDialog,
+    logDialog
   },
   data() {
     return {
       loading: true,
       showSyncDialog: false,
+      showLogDialog: false,
       projectId: '',
       projectName: '',
       caseId: '',
@@ -228,9 +235,14 @@ export default {
     async showSync() {
       this.showSyncDialog = true
     },
+    async showLog() {
+      console.log('sss')
+      this.showLogDialog = true
+    },
     // 子组件的回调
     cancelSync() {
       this.showSyncDialog = false
+      this.showLogDialog = false
       this.initProjectFile()
     },
 

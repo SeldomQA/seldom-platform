@@ -89,6 +89,10 @@ body {
   box-shadow: 0 2px 6px 0 rgb(114 124 245 / 50%);
 }
 
+.el-button--warning {
+  box-shadow: 0 2px 6px 0 rgb(250 92 124 / 50%);
+}
+
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
