@@ -336,7 +336,7 @@ def get_project_files(request, project_id: int):
                     "label": case_path[0],
                     "full_name": case_path[0],
                     "is_leaf": 1,
-                    "children": []
+                    "leaf": True
                 }
             else:
                 case_level_one = {
@@ -404,7 +404,7 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
                 "label": case_path[0],
                 "full_name": file_name + "." + case_path[0],
                 "is_leaf": 1,
-                "children": []
+                "leaf": True
             }
         case_name.append(case_level_two)
 

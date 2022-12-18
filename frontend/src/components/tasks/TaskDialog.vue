@@ -52,7 +52,7 @@
                 @node-click="handleNodeClick"
                 >
                 <span class="custom-tree-node" slot-scope="{ node, data }">
-                  <span v-if="data.is_leaf === 1">
+                  <span v-if="data.leaf === true">
                     <i class="el-icon-tickets"></i>
                   </span>
                   <span v-else>
@@ -111,7 +111,8 @@ export default {
       caseData: [],
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'label',
+        isLeaf: 'leaf'
       },
       envOptions: [],
       teamOptions: []
@@ -189,12 +190,11 @@ export default {
         ProjectApi.getProjectCases(this.pid, data.full_name).then(resp => {
           if (resp.success === true) {
             this.$message.success('获取用例成功')
-            // this.caseData = resp.result
             for (let i = 0; i < resp.result.length; i++) {
               // 如果用例不在列表时添加
               let isExists = false
               for (let j = 0; j < this.caseData.length; j++) {
-                if (resp.result[i].id === this.caseData[j].key) {
+                if (resp.result[i].case_hash === this.caseData[j].key) {
                   isExists = true
                   break
                 }

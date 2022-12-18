@@ -156,7 +156,7 @@ export default defineComponent({
         const label = _.label;
         const full_name = _.full_name;
         const children = _.children;
-        const isLeaf = _.is_leaf ? true : false;
+        const isLeaf = _.leaf ? true : false;
         const prefix = () =>
           h(NIcon, null, {
             default: () => h(isLeaf ? LogoPython : FolderOpenOutline),

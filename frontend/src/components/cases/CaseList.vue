@@ -38,10 +38,10 @@
                 ref="tree"
                 lazy
                 :props="defaultProps"
-                @node-expand="handleNodeClick"
+                @node-click="handleNodeClick"
                 >
                 <span slot-scope="{ data }">
-                  <span v-if="data.is_leaf === 1">
+                  <span v-if="data.leaf === true">
                     <i class="el-icon-tickets"></i>
                   </span>
                   <span v-else>
@@ -125,7 +125,8 @@ export default {
       caseData: [],
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'label',
+        isLeaf: 'leaf'
       },
       projectOptions: [],
       drawer: false,
