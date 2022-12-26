@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { reactive, onMounted } from "vue";
 import { useMessage } from "naive-ui";
-import { SettingsOutline, DocumentTextOutline, GitMergeOutline } from "@vicons/ionicons5";
+import {
+  SettingsOutline,
+  DocumentTextOutline,
+  GitMergeOutline,
+} from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
 import ProjectDialog from "@/projectDialog.vue";
 import baseUrl from "~/config/base-url";
@@ -116,16 +120,28 @@ onMounted(() => {
     <n-card class="main-card">
       <div class="filter-line">
         <n-space>
-          <n-button cy-data="create-project" type="primary" @click="showCreate()">创建</n-button>
+          <n-button
+            cy-data="create-project"
+            type="primary"
+            @click="showCreate()"
+            >创建</n-button
+          >
         </n-space>
       </div>
       <div class="card-group">
         <n-space>
           <div v-for="(item, index) in datas.tableData" :key="index">
-            <n-card :title="item.name" style="width:350px" content-style="padding: 24;height:50%"
-              footer-style="padding: 0;height:100%">
+            <n-card
+              :title="item.name"
+              style="width: 350px"
+              content-style="padding: 24;height:50%"
+            >
               <template #header-extra>
-                <n-dropdown trigger="hover" :options="options" @select="(key) => handleSelect(key, item.id)">
+                <n-dropdown
+                  trigger="hover"
+                  :options="options"
+                  @select="(key) => handleSelect(key, item.id)"
+                >
                   <n-icon>
                     <SettingsOutline />
                   </n-icon>
@@ -135,20 +151,23 @@ onMounted(() => {
                 <n-empty description="no cover"> </n-empty>
               </div>
               <div v-else style="height: 100%; width;: 100%">
-                <img :src="baseUrl + '/static/images/' + item.path_name" style="height: 100%; width: 100%" />
+                <img
+                  :src="baseUrl + '/static/images/' + item.path_name"
+                  style="height: 100%; width: 100%"
+                />
               </div>
-              <template #footer>
+              <template #footer style="text-aligin: left">
+                <p>测试目录: {{ item.case_dir }}</p>
+                <p>文件数量: {{ item.test_num }}</p>
                 <p>
-                  <n-icon>
-                    <GitMergeOutline />
-                  </n-icon> {{ item.address }}
+                  状态:
+                  <n-tag type="info" v-if="item.is_clone == 0">未克隆</n-tag>
+                  <n-tag type="success" v-else>已克隆</n-tag>
                 </p>
               </template>
               <template #action>
                 <div>
-                  <n-icon>
-                    <DocumentTextOutline />
-                  </n-icon> {{ item.test_num }}
+                  {{ item.address }}
                 </div>
               </template>
             </n-card>
@@ -157,11 +176,26 @@ onMounted(() => {
       </div>
     </n-card>
     <n-modal v-model:show="datas.showDailog" style="min-width: 600px">
-      <n-card style="width: 600px" v-if="datas.projectId == 0" title="创建项目" :bordered="false" size="huge" role="dialog"
-        aria-modal="true">
+      <n-card
+        style="width: 600px"
+        v-if="datas.projectId == 0"
+        title="创建项目"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
         <ProjectDialog :pid="datas.projectId" @cancel="cancelProject" />
       </n-card>
-      <n-card style="width: 600px" v-else title="编辑项目" :bordered="false" size="huge" role="dialog" aria-modal="true">
+      <n-card
+        style="width: 600px"
+        v-else
+        title="编辑项目"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
         <ProjectDialog :pid="datas.projectId" @cancel="cancelProject" />
       </n-card>
     </n-modal>
@@ -178,7 +212,6 @@ onMounted(() => {
 }
 
 .card-group {
-  text-align: center;
-
+  text-align: left;
 }
 </style>
