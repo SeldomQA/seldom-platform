@@ -469,7 +469,7 @@ def delete_env(request, env_id: int):
     """
     try:
         env = Env.objects.get(id=env_id)
-        env.is_delete = False
+        env.is_delete = True
         env.save()
     except Env.DoesNotExist:
         return response(error=Error.ENV_IS_NULL)
