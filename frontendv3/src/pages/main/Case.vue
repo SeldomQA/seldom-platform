@@ -16,9 +16,12 @@ import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
 import CaseResult from "~/components/caseResult.vue";
 
 type Song = {
-  no: number;
-  title: string;
-  length: string;
+  id: number;
+  class_name: string;
+  class_doc: string;
+  case_name: string;
+  case_doc: string;
+  status: number;
 };
 
 const createColumns = ({
@@ -98,8 +101,6 @@ const createColumns = ({
     },
   ];
 };
-
-const caseData: Song[] = [];
 
 export default defineComponent({
   setup() {
