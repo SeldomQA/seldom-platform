@@ -289,7 +289,6 @@ export default defineComponent({
     return {
       datas,
       model,
-      caseData,
       treeDataFormat,
       columns: createColumns({
         play(row: Song, action: String) {

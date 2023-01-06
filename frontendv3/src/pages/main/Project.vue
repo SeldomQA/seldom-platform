@@ -60,7 +60,7 @@ const deleteProject = async (pid: number) => {
 
 // 克隆拉取项目信息
 const cloneProject = async (pid: number) => {
-  const resp = await ProjectApi.cloneProject(pid);
+  const resp = await ProjectApi.syncCode(pid.toString());
   if (resp.success === true) {
     message.success("克隆&拉取成功！");
     initProjects();

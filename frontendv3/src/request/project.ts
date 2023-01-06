@@ -26,6 +26,10 @@ class ProjectApi {
     return request.get("/api/project/" + pid + "/clone");
   }
 
+  syncCode(pid: string) {
+    return request.get("/api/project/" + pid + "/sync_code");
+  }
+
   // 后续有具体删除需求备用
   // removeProjectCover(pid:string) {
   //   return request.put('/api/project/cover/remove/' + pid + '/')
