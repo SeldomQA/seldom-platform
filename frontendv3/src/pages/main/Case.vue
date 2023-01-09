@@ -14,6 +14,7 @@ import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
 import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
 import CaseResult from "~/components/caseResult.vue";
+import CaseSync from "~/components/taskModal.vue";
 
 type Song = {
   id: number;
@@ -117,6 +118,7 @@ export default defineComponent({
       env: null,
       selectedTreeNode: null,
       selectedCase: null,
+      showCaseSync: false,
     });
     const message = useMessage();
     const model = ref({
@@ -223,6 +225,11 @@ export default defineComponent({
       }
     };
     // 同步项目用例
+    // 显示创建窗口
+    const showCreate = () => {
+      datas.showCaseSync = true;
+    };
+
     const syncProject = async () => {
       if (datas.projectId === "") {
         message.error("请选择项目");
@@ -318,9 +325,10 @@ export default defineComponent({
       },
       defaultExpandedKeys: ref(["40", "41"]),
       showModal,
+      showCreate,
     };
   },
-  components: { CaseResult },
+  components: { CaseResult, CaseSync },
 });
 </script>
 
@@ -349,7 +357,7 @@ export default defineComponent({
               </n-select>
             </n-form-item>
             <n-form-item>
-              <n-button type="primary" @click="syncProject" size="small"
+              <n-button type="primary" @click="showCreate" size="small"
                 >同步</n-button
               >
             </n-form-item>
@@ -415,6 +423,17 @@ export default defineComponent({
         <template #footer> 尾部 </template>
       </n-card>
     </n-modal>
+
+    <n-modal
+      id="syncpage"
+      v-model:show="datas.showCaseSync"
+      preset="card"
+      title="卡片预设"
+      size="huge"
+      :bordered="false"
+    >
+      <CaseSync />
+    </n-modal>
   </div>
 </template>
 lorem
@@ -432,6 +451,11 @@ lorem
 }
 
 #result {
+  height: 720px;
+  width: 1280px;
+}
+
+#syncpage {
   height: 720px;
   width: 1280px;
 }
