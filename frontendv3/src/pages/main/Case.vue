@@ -145,23 +145,7 @@ export default defineComponent({
         };
       });
     };
-    // 获取项目列表
-    const initProjectList = async () => {
-      datas.loading = true;
-      const resp = await ProjectApi.getProjects();
-      if (resp.success === true) {
-        // datas.tableData = resp.result
-        for (let i = 0; i < resp.result.length; i++) {
-          model.value.projectOptions.push({
-            value: resp.result[i].id,
-            label: resp.result[i].name,
-          });
-        }
-      } else {
-        message.error(resp.error.message);
-      }
-      datas.loading = false;
-    };
+
     const initEnvsList = async () => {
       datas.loading = true;
       const resp = await ProjectApi.getEnvs();
@@ -179,7 +163,7 @@ export default defineComponent({
     };
     // 初始化项目文件列表
     const initProjectFile = async () => {
-      const resp = await ProjectApi.getProjectTree(datas.projectId);
+      const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
       if (resp.success === true) {
         datas.fileData = treeDataFormat(resp.result.files);
         datas.caseNumber = resp.result.case_number;
@@ -243,10 +227,7 @@ export default defineComponent({
         message.error(resp.error.message);
       }
     };
-    const changeProject = (value: string, option: SelectOption) => {
-      datas.projectId = value;
-      initProjectFile();
-    };
+
     const changeEnv = (value: string, option: SelectOption) => {
       datas.env = value;
     };
@@ -290,8 +271,9 @@ export default defineComponent({
     };
     const showModal = ref(false);
     onMounted(() => {
-      initProjectList();
       initEnvsList();
+      initProjectFile();
+      datas.projectId = sessionStorage.projectId;
     });
     return {
       datas,
@@ -310,11 +292,9 @@ export default defineComponent({
         },
       }),
       pagination: false as const,
-      changeProject,
       changeEnv,
       syncProject,
       handleNodeClick,
-      initProjectList,
       refresh,
       nodeProps: ({ option }: { option: TreeOption }) => {
         return {
@@ -346,22 +326,9 @@ export default defineComponent({
     <n-card class="main-card">
       <div>
         <n-space justify="space-between">
-          <n-form inline :model="model" label-placement="left">
-            <n-form-item label="项目">
-              <n-select
-                style="width: 200px"
-                :options="model.projectOptions"
-                placeholder="选择项目"
-                @update:value="changeProject"
-              >
-              </n-select>
-            </n-form-item>
-            <n-form-item>
-              <n-button type="primary" @click="showCreate" size="small"
-                >同步</n-button
-              >
-            </n-form-item>
-          </n-form>
+          <n-button type="primary" @click="showCreate" size="small"
+            >同步</n-button
+          >
           <n-form inline label-placement="left">
             <n-form-item label="环境">
               <n-select
