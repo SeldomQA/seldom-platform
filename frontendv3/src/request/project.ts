@@ -18,16 +18,32 @@ class ProjectApi {
     return request.put("/api/project/" + pid + "/", data);
   }
 
+  syncCode(pid: string) {
+    return request.get("/api/project/" + pid + "/sync_code");
+  }
+
+  syncCase(pid: string) {
+    return request.get("/api/project/" + pid + "/sync_case");
+  }
+
+  syncResult(pid: string) {
+    return request.get("/api/project/" + pid + "/sync_result");
+  }
+
+  syncMerge(pid: string, data: TNomalObject) {
+    return request.post("/api/project/" + pid + "/sync_merge", data);
+  }
+
+  getSyncLog() {
+    return request.get("/api/project/sync_log");
+  }
+
   deleteProject(pid: string) {
     return request.del("/api/project/" + pid + "/");
   }
 
   cloneProject(pid: string) {
     return request.get("/api/project/" + pid + "/clone");
-  }
-
-  syncCode(pid: string) {
-    return request.get("/api/project/" + pid + "/sync_code");
   }
 
   // 后续有具体删除需求备用

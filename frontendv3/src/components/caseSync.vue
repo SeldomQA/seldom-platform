@@ -26,28 +26,31 @@
         <n-radio-button value="finish"> Finish </n-radio-button>
       </n-radio-group>
 
-      <div>
-        <n-space justify="space-between">
-          <n-list id="caseSyncList">
-            <n-list-item>
-              <n-thing title="新增用例" description="同步后新增加的用例">
-                Biu<br />
-                Biu<br />
-                Biu<br />
-              </n-thing>
-            </n-list-item>
-          </n-list>
-          <n-list id="caseSyncList">
-            <n-list-item>
-              <n-thing title="删除用例" description="同步后需要删除的用例">
-                Biu<br />
-                Biu<br />
-                Biu<br />
-              </n-thing>
-            </n-list-item>
-          </n-list>
-        </n-space>
-      </div>
+      <n-button v-if="datas.syncCode == 1" n-button type="primary">
+        开始
+      </n-button>
+      <n-button v-else type="warning"> 重试 </n-button>
+
+      <n-space justify="space-between">
+        <n-list id="caseSyncList">
+          <n-list-item>
+            <n-thing title="新增用例" description="同步后新增加的用例">
+              Biu<br />
+              Biu<br />
+              Biu<br />
+            </n-thing>
+          </n-list-item>
+        </n-list>
+        <n-list id="caseSyncList">
+          <n-list-item>
+            <n-thing title="删除用例" description="同步后需要删除的用例">
+              Biu<br />
+              Biu<br />
+              Biu<br />
+            </n-thing>
+          </n-list-item>
+        </n-list>
+      </n-space>
     </n-space>
   </div>
 </template>
@@ -139,17 +142,56 @@ onMounted(() => { });
 </script> -->
 
 <script lang="ts">
-import { defineComponent, ref, h, onMounted } from "vue";
+import ProjectApi from "~/request/project";
+import { defineComponent, ref, h, onMounted, reactive } from "vue";
 import { repeat } from "seemly";
-import { StepsProps } from "naive-ui";
+import { StepsProps, useMessage } from "naive-ui";
 
 export default defineComponent({
   setup() {
+    const datas = reactive({
+      syncStatus: 0,
+      syncCode: 1,
+    });
+
+    const message = useMessage();
+
     const currentRef = ref<number | null>(1);
 
     onMounted(() => {});
 
+    // 同步用例
+    const syncCode = async () => {
+      const resp = await ProjectApi.syncCode(this.pid);
+      if (resp.success === true) {
+        datas.syncStatus = 1;
+      } else {
+        message.error(resp.error.message);
+      }
+    };
+    
+    const syncCase = async () => {
+      const resp = await ProjectApi.syncCase(this.pid);
+      if (resp.success === true) {
+        datas.syncStatus = 1;
+      } else {
+        message.error(resp.error.message);
+      }
+    };
+
+    const syncResult = async () => {
+      const resp = await ProjectApi.syncResult(this.pid);
+      if (resp.success === true) {
+        datas.syncStatus = 1;
+      } else {
+        message.error(resp.error.message);
+      }
+    };
+
+    const syncRunning = async () => {};
+
     return {
+      datas,
       currentStatus: ref<StepsProps["status"]>("process"),
       current: currentRef,
       next() {
