@@ -14,7 +14,7 @@ import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
 import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
 import CaseResult from "~/components/caseResult.vue";
-import CaseSync from "~/components/taskModal.vue";
+import CaseSync from "~/components/caseSync.vue";
 
 type Song = {
   id: number;
@@ -121,10 +121,12 @@ export default defineComponent({
       showCaseSync: false,
     });
     const message = useMessage();
+
     const model = ref({
       projectOptions: [],
       envOptions: [],
     });
+
     // 格式化tree数据
     const treeDataFormat = (datas) => {
       return datas.map((_, index) => {
@@ -161,17 +163,7 @@ export default defineComponent({
       }
       datas.loading = false;
     };
-    // 初始化项目文件列表
-    const initProjectFile = async () => {
-      const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
-      if (resp.success === true) {
-        datas.fileData = treeDataFormat(resp.result.files);
-        datas.caseNumber = resp.result.case_number;
-        // console.log(datas.fileData);
-      } else {
-        message.error(resp.error.message);
-      }
-    };
+
     // 点击项目文件
     const handleNodeClick = (data) => {
       datas.selectedTreeNode = data;
@@ -272,7 +264,6 @@ export default defineComponent({
     const showModal = ref(false);
     onMounted(() => {
       initEnvsList();
-      initProjectFile();
       datas.projectId = sessionStorage.projectId;
     });
     return {
