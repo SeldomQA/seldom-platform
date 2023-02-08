@@ -59,11 +59,11 @@ class ProjectApi {
     return request.get("/api/project/" + pid + "/files");
   }
 
-  getProjectCases(pid: string, file_name: TNomalObject) {
+  getProjectCases(pid: string, file_name: string) {
     return request.get("/api/project/" + pid + "/cases", { file_name });
   }
 
-  getProjectSubdirectory(pid: string, file_name: TNomalObject) {
+  getProjectSubdirectory(pid: string, file_name: string) {
     return request.get("/api/project/" + pid + "/subdirectory", { file_name });
   }
 

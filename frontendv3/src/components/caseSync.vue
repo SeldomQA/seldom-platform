@@ -33,18 +33,23 @@
         <n-list id="caseSyncList">
           <n-list-item>
             <n-thing title="新增用例" description="同步后新增加的用例">
-              {{ datas.addCase }}
+              <div v-for="i in datas.addCase">
+                {{ i.case_name }}
+              </div>
             </n-thing>
           </n-list-item>
         </n-list>
         <n-list id="caseSyncList">
           <n-list-item>
             <n-thing title="删除用例" description="同步后需要删除的用例">
-              {{ datas.delCase }}
+              <div v-for="i in datas.delCase">
+                {{ i.case_name }}
+              </div>
             </n-thing>
           </n-list-item>
         </n-list>
       </n-space>
+
     </n-space>
   </div>
 </template>
@@ -59,6 +64,7 @@ export default defineComponent({
     const datas = reactive({
       addCase: [],
       delCase: [],
+      req: {},
       succCode: 1,
     });
 
@@ -110,7 +116,8 @@ export default defineComponent({
       if (resp.success === true) {
         currentStatus.value = "finish";
         datas.addCase = resp.result.add_case;
-        datas.delCase = resp.result.add_case;
+        datas.delCase = resp.result.del_case;
+        datas.req = resp.result
       } else {
         message.error(resp.error.message);
         currentStatus.value = "error";
@@ -118,7 +125,10 @@ export default defineComponent({
     };
 
     const syncRunning = async () => {
-      if (sessionStorage.projectId === "") {
+      if (
+        sessionStorage.projectId === "" ||
+        sessionStorage.projectId === undefined
+      ) {
         message.error("请选择项目");
         return;
       } else {
@@ -149,6 +159,7 @@ export default defineComponent({
       else currentRef.value--;
     };
 
+    
     return {
       datas,
       loading,

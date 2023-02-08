@@ -127,6 +127,17 @@ export default defineComponent({
       envOptions: [],
     });
 
+    // 初始化项目文件列表
+    const initProjectFile = async () => {
+      const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
+      if (resp.success === true) {
+        datas.fileData = resp.result.files;
+        datas.caseNumber = resp.result.case_number;
+      } else {
+        message.error(resp.error.message);
+      }
+    };
+
     // 格式化tree数据
     const treeDataFormat = (datas) => {
       return datas.map((_, index) => {
@@ -200,21 +211,26 @@ export default defineComponent({
         );
       }
     };
+
     // 同步项目用例
-    // 显示创建窗口
     const showCreate = () => {
       datas.showCaseSync = true;
     };
 
-    const syncProject = async () => {
-      if (datas.projectId === "") {
-        message.error("请选择项目");
-        return;
-      }
-      const resp = await ProjectApi.syncProjectCase(datas.projectId);
+    const caseSync = ref();
+
+    const cancelCallback = () => {
+      message.success("Cancel");
+    };
+
+    // 合并用例
+    const submitCallback = async () => {
+      const resp = await ProjectApi.syncMerge(
+        sessionStorage.projectId,
+        caseSync.value.datas.req
+      );
       if (resp.success === true) {
-        initProjectFile();
-        message.success("同步成功");
+        message.success("合并成功！");
       } else {
         message.error(resp.error.message);
       }
@@ -223,6 +239,7 @@ export default defineComponent({
     const changeEnv = (value: string, option: SelectOption) => {
       datas.env = value;
     };
+
     // 运行用例
     const runCase = async (row) => {
       if (datas.env === null) {
@@ -238,6 +255,7 @@ export default defineComponent({
       }
       // initProjectFile()
     };
+
     // refresh
     const refresh = () => {
       if (datas.selectedTreeNode === null) {
@@ -256,16 +274,21 @@ export default defineComponent({
         });
       }
     };
+
     // 打开报告
     const openReport = (row) => {
       datas.selectedCase = row;
       showModal.value = true;
     };
+
     const showModal = ref(false);
+
     onMounted(() => {
       initEnvsList();
+      initProjectFile();
       datas.projectId = sessionStorage.projectId;
     });
+
     return {
       datas,
       model,
@@ -283,8 +306,8 @@ export default defineComponent({
         },
       }),
       pagination: false as const,
+      initProjectFile,
       changeEnv,
-      syncProject,
       handleNodeClick,
       refresh,
       nodeProps: ({ option }: { option: TreeOption }) => {
@@ -297,6 +320,9 @@ export default defineComponent({
       defaultExpandedKeys: ref(["40", "41"]),
       showModal,
       showCreate,
+      caseSync,
+      submitCallback,
+      cancelCallback,
     };
   },
   components: { CaseResult, CaseSync },
@@ -385,16 +411,19 @@ export default defineComponent({
     <n-modal
       id="syncpage"
       v-model:show="datas.showCaseSync"
-      preset="card"
+      preset="dialog"
       title="卡片预设"
       size="huge"
-      :bordered="false"
+      positive-text="合并"
+      negative-text="取消"
+      @positive-click="submitCallback"
+      @negative-click="cancelCallback"
     >
-      <CaseSync />
+      <CaseSync ref="caseSync" />
     </n-modal>
   </div>
 </template>
-lorem
+
 <style>
 .filter-line {
   padding-bottom: 20px;
@@ -414,7 +443,10 @@ lorem
 }
 
 #syncpage {
-  height: 720px;
-  width: 1280px;
+  height: 600px;
+  width: 1080px;
+}
+.n-dialog__content {
+  height: 85%;
 }
 </style>
