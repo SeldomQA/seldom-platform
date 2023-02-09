@@ -1,5 +1,5 @@
 <script lang="ts">
-import { h, defineComponent, ref, onMounted, reactive, nextTick } from "vue";
+import { h, defineComponent, ref, onMounted, reactive, inject } from "vue";
 import type { Component } from "vue";
 import { NIcon, useMessage, SelectOption } from "naive-ui";
 import {
@@ -64,17 +64,13 @@ export default defineComponent({
       datas.loading = false;
     };
 
+    // 刷新组件
+    const reload = inject("reload");
+
     const changeProject = (value: string, option: SelectOption) => {
       sessionStorage.projectId = value;
       sessionStorage.projectName = option.label;
       reload();
-    };
-
-    // 刷新组件
-    const reload = () => {
-      // this.isRouterAlive = false;
-      // this.$nextTick(() => (this.isRouterAlive = true));
-      nextTick();
     };
 
     const changeTheme = () => {
