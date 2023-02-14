@@ -15,6 +15,7 @@ import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
 import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
+import TeamApi from "~/request/team";
 
 type Song = {
   no: number;
@@ -41,8 +42,12 @@ const createColumns = ({
       key: "env",
     },
     {
-      title: "定时任务(Cron)",
-      key: "status",
+      title: "团队",
+      key: "team",
+    },
+    {
+      title: "执行次数",
+      key: "execute_count",
     },
     {
       title: "状态",
@@ -58,6 +63,10 @@ const createColumns = ({
           return "未知";
         }
       },
+    },
+    {
+      title: "创建",
+      key: "create_time",
     },
     {
       title: "操作",
@@ -78,16 +87,16 @@ const createColumns = ({
                 },
                 { default: () => "运行" }
               ),
-              h(
-                NButton,
-                {
-                  type: "info",
-                  strong: true,
-                  secondary: true,
-                  onClick: () => play(row, "set"),
-                },
-                { default: () => "定时" }
-              ),
+              // h(
+              //   NButton,
+              //   {
+              //     type: "info",
+              //     strong: true,
+              //     secondary: true,
+              //     onClick: () => play(row, "set"),
+              //   },
+              //   { default: () => "定时" }
+              // ),
               h(
                 NButton,
                 {
@@ -133,8 +142,14 @@ export default defineComponent({
       projectId: "",
       fileData: [],
       caseData: [],
-      taskData: [],
       caseNumber: 0,
+      teamOptions: [],
+      tableData: [],
+      query: {
+        project_id: "",
+        team_id: "",
+        name: "",
+      },
     });
 
     const modalDatas: ModalDatas = reactive({
@@ -192,7 +207,7 @@ export default defineComponent({
 
     // 初始化项目文件列表
     const initProjectFile = async () => {
-      const resp = await ProjectApi.getProjectTree(datas.projectId);
+      const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
       if (resp.success === true) {
         datas.fileData = treeDataFormat(resp.result.files);
         datas.caseNumber = resp.result.case_number;
@@ -202,46 +217,63 @@ export default defineComponent({
       }
     };
 
+    // 初始化获取团队列表
+    const initTeamList = async () => {
+      const resp = await TeamApi.getTeamAll();
+      if (resp.success === true) {
+        for (let i = 0; i < resp.result.length; i++) {
+          datas.teamOptions.push({
+            value: resp.result[i].id,
+            label: resp.result[i].name,
+          });
+        }
+      } else {
+        message.error("查询失败!");
+      }
+    };
+
     // 点击项目文件
     const handleNodeClick = (data) => {
       // 如果是文件返回 类&方法
       if (data.label.match(".py")) {
-        ProjectApi.getProjectCases(datas.projectId, data.full_name).then(
-          (resp) => {
-            if (resp.success === true) {
-              message.success("获取用例成功");
-              // console.log(resp.result);
-              datas.caseData = resp.result;
-              modalDatas.sourceDatas = resp.result.map((_, index) => ({
-                label: _.case_name,
-                value: _.id,
-              }));
-            } else {
-              message.error(resp.error.message);
-            }
+        ProjectApi.getProjectCases(
+          sessionStorage.projectId,
+          data.full_name
+        ).then((resp) => {
+          if (resp.success === true) {
+            message.success("获取用例成功");
+            // console.log(resp.result);
+            datas.caseData = resp.result;
+            modalDatas.sourceDatas = resp.result.map((_, index) => ({
+              label: _.case_name,
+              value: _.id,
+            }));
+          } else {
+            message.error(resp.error.message);
           }
-        );
+        });
       } else {
         // 如果目录返回下一级 目录&文件
         if (data.children.length > 0) {
           // 下一级不为空，直接返回
           return;
         }
-        ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name).then(
-          (resp) => {
-            if (resp.success === true) {
-              message.success("获取用例成功");
-              data.children = treeDataFormat(resp.result);
-            } else {
-              message.error(resp.error.message);
-            }
+        ProjectApi.getProjectSubdirectory(
+          sessionStorage.projectId,
+          data.full_name
+        ).then((resp) => {
+          if (resp.success === true) {
+            message.success("获取用例成功");
+            data.children = treeDataFormat(resp.result);
+          } else {
+            message.error(resp.error.message);
           }
-        );
+        });
       }
     };
 
     const changeProject = (value: string, option: SelectOption) => {
-      datas.projectId = value;
+      sessionStorage.projectId = value;
       initProjectFile();
       initTaskList();
     };
@@ -251,14 +283,22 @@ export default defineComponent({
     };
 
     const initTaskList = async () => {
-      datas.loading = true;
-      const resp = await TaskApi.getTasks();
-      if (resp.success === true) {
-        datas.taskData = resp.result;
+      datas.query.project_id = sessionStorage.projectId;
+      if (
+        datas.query.project_id == null ||
+        datas.query.project_id == undefined
+      ) {
+        message.warning("请选择项目");
       } else {
-        message.error(resp.error.message);
+        datas.loading = true;
+        const resp = await TaskApi.getTaskAll(datas.query);
+        if (resp.success === true) {
+          datas.tableData = resp.result;
+        } else {
+          message.error("获得任务列表失败！");
+        }
+        datas.loading = false;
       }
-      datas.loading = false;
     };
 
     const initEnvsList = async () => {
@@ -280,7 +320,7 @@ export default defineComponent({
     // 新增编辑任务modal
     const showModalTask = ref(false);
     const openModalTask = (type: number) => {
-      if (datas.projectId == "") {
+      if (sessionStorage.projectId == "") {
         message.warning("请选择项目");
       } else {
         switch (type) {
@@ -324,7 +364,7 @@ export default defineComponent({
           console.log(modalDatas.targetDatas);
           let payload = {
             taskId: modalDatas.taskId,
-            project: datas.projectId,
+            project: sessionStorage.projectId,
             name: formValue.value.name,
             env: formValue.value.env,
             email: formValue.value.email,
@@ -376,8 +416,11 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      initProjectList();
-      initEnvsList();
+      initTeamList();
+      initTaskList();
+      //   datas.tasktHeartbeat = setInterval(() => {
+      //     checkTask();
+      //   }, 5000);
     });
 
     return {
@@ -477,20 +520,22 @@ export default defineComponent({
       <div>
         <n-space justify="space-between">
           <n-form inline :model="model" label-placement="left">
-            <n-form-item label="项目">
+            <n-form-item label="名称">
               <n-select
                 style="width: 200px"
                 :options="model.projectOptions"
-                placeholder="选择项目"
+                placeholder="选择团队"
                 @update:value="changeProject"
               >
               </n-select>
             </n-form-item>
-            <n-form-item label="用例" label-placement="left">
-              <n-tag type="info" style="margin-right: 12px">{{
-                datas.caseNumber
-              }}</n-tag>
-              条
+            <n-form-item label="团队" label-placement="left">
+              <n-input></n-input>
+            </n-form-item>
+            <n-form-item label-placement="left">
+              <n-button type="primary" @click="openModalTask(1)" size="small"
+                >搜索</n-button
+              >
             </n-form-item>
           </n-form>
           <n-button type="primary" @click="openModalTask(1)" size="small"
@@ -501,7 +546,7 @@ export default defineComponent({
       <h1>任务列表</h1>
       <n-data-table
         :columns="columns"
-        :data="datas.taskData"
+        :data="datas.tableData"
         :pagination="pagination"
         :bordered="false"
       />
