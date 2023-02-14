@@ -122,23 +122,23 @@ const menuOptions: MenuOption[] = [
     key: "go-back-task",
     icon: renderIcon(CalendarOutline),
   },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: "main-Report",
-            params: {
-              lang: "zh-CN",
-            },
-          },
-        },
-        { default: () => "报告管理" }
-      ),
-    key: "go-back-report",
-    icon: renderIcon(DocumentTextOutline),
-  },
+  // {
+  //   label: () =>
+  //     h(
+  //       RouterLink,
+  //       {
+  //         to: {
+  //           name: "main-Report",
+  //           params: {
+  //             lang: "zh-CN",
+  //           },
+  //         },
+  //       },
+  //       { default: () => "报告管理" }
+  //     ),
+  //   key: "go-back-report",
+  //   icon: renderIcon(DocumentTextOutline),
+  // },
 ];
 
 export default defineComponent({
