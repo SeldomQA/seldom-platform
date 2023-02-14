@@ -49,7 +49,6 @@
           </n-list-item>
         </n-list>
       </n-space>
-
     </n-space>
   </div>
 </template>
@@ -91,6 +90,7 @@ export default defineComponent({
       } else {
         message.error(resp.error.message);
         currentStatus.value = "error";
+        datas.succCode = 0;
       }
       loading.value = false;
     };
@@ -106,7 +106,9 @@ export default defineComponent({
       } else {
         message.error(resp.error.message);
         currentStatus.value = "error";
+        datas.succCode = 0;
       }
+      loading.value = false;
     };
 
     const syncResult = async () => {
@@ -117,11 +119,13 @@ export default defineComponent({
         currentStatus.value = "finish";
         datas.addCase = resp.result.add_case;
         datas.delCase = resp.result.del_case;
-        datas.req = resp.result
+        datas.req = resp.result;
       } else {
         message.error(resp.error.message);
         currentStatus.value = "error";
+        datas.succCode = 0;
       }
+      loading.value = false;
     };
 
     const syncRunning = async () => {
@@ -159,7 +163,6 @@ export default defineComponent({
       else currentRef.value--;
     };
 
-    
     return {
       datas,
       loading,
