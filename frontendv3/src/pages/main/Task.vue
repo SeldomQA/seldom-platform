@@ -1,11 +1,10 @@
 <script lang="ts">
-import ProjectApi from "~/request/project";
-import CaseApi from "~/request/case";
 import { reactive, onMounted, h, defineComponent, ref } from "vue";
 import {
   NButton,
   NIcon,
   useMessage,
+  useDialog,
   TreeOption,
   SelectOption,
   FormInst,
@@ -13,18 +12,16 @@ import {
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
-import {
-  FolderOpenOutline,
-  LogoPython,
-  SearchOutline,
-} from "@vicons/ionicons5";
+import { SearchOutline } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
+import TaskModal from "~/components/taskModal.vue";
 
 type Song = {
   no: number;
   title: string;
   length: string;
+  id: number;
 };
 
 const createColumns = ({
@@ -129,31 +126,24 @@ const createColumns = ({
   ];
 };
 
-const caseData: Song[] = [];
-
 type ModalDatas = {
   type?: number | null;
   taskId?: number | null;
   title: string;
-  sourceDatas: { label: string; value: string }[];
-  targetDatas: { value: string }[];
 };
 
 export default defineComponent({
   components: {
     SearchOutline,
-    FolderOpenOutline,
-    LogoPython,
   },
   setup() {
     const datas = reactive({
       loading: true,
       projectId: "",
-      fileData: [],
-      caseData: [],
       caseNumber: 0,
       tableData: [],
       teamIdSelected: "",
+      tid: 0,
       query: {
         project_id: null,
         team_id: null,
@@ -163,50 +153,15 @@ export default defineComponent({
 
     const modalDatas: ModalDatas = reactive({
       title: "",
-      sourceDatas: [],
-      targetDatas: [],
     });
 
     const message = useMessage();
+    const dialog = useDialog();
 
     const model = ref({
       teamOptions: [],
       envOptions: [],
     });
-
-    // 格式化tree数据
-    const treeDataFormat = (datas) => {
-      return datas.map((_, index) => {
-        const label = _.label;
-        const full_name = _.full_name;
-        const children = _.children;
-        const isLeaf = _.leaf ? true : false;
-        const prefix = () =>
-          h(NIcon, null, {
-            default: () => h(isLeaf ? LogoPython : FolderOpenOutline),
-          });
-
-        return {
-          label,
-          full_name,
-          children,
-          isLeaf,
-          prefix,
-        };
-      });
-    };
-
-    // 初始化项目文件列表
-    const initProjectFile = async () => {
-      const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
-      if (resp.success === true) {
-        datas.fileData = treeDataFormat(resp.result.files);
-        datas.caseNumber = resp.result.case_number;
-        // console.log(datas.fileData);
-      } else {
-        message.error(resp.error.message);
-      }
-    };
 
     // 初始化获取团队列表
     const initTeamList = async () => {
@@ -223,52 +178,8 @@ export default defineComponent({
       }
     };
 
-    // 点击项目文件
-    const handleNodeClick = (data) => {
-      // 如果是文件返回 类&方法
-      if (data.label.match(".py")) {
-        ProjectApi.getProjectCases(
-          sessionStorage.projectId,
-          data.full_name
-        ).then((resp) => {
-          if (resp.success === true) {
-            message.success("获取用例成功");
-            // console.log(resp.result);
-            datas.caseData = resp.result;
-            modalDatas.sourceDatas = resp.result.map((_, index) => ({
-              label: _.case_name,
-              value: _.id,
-            }));
-          } else {
-            message.error(resp.error.message);
-          }
-        });
-      } else {
-        // 如果目录返回下一级 目录&文件
-        if (data.children.length > 0) {
-          // 下一级不为空，直接返回
-          return;
-        }
-        ProjectApi.getProjectSubdirectory(
-          sessionStorage.projectId,
-          data.full_name
-        ).then((resp) => {
-          if (resp.success === true) {
-            message.success("获取用例成功");
-            data.children = treeDataFormat(resp.result);
-          } else {
-            message.error(resp.error.message);
-          }
-        });
-      }
-    };
-
     const changeTeam = (value: string, option: SelectOption) => {
       datas.teamIdSelected = value;
-    };
-
-    const changeEnv = (value: string, option: SelectOption) => {
-      formValue.value.env = value;
     };
 
     const initTaskList = async () => {
@@ -290,24 +201,9 @@ export default defineComponent({
       }
     };
 
-    const initEnvsList = async () => {
-      datas.loading = true;
-      const resp = await ProjectApi.getEnvs();
-      if (resp.success === true) {
-        for (let i = 0; i < resp.result.length; i++) {
-          model.value.envOptions.push({
-            value: resp.result[i].id,
-            label: resp.result[i].name,
-          });
-        }
-      } else {
-        message.error(resp.error.message);
-      }
-      datas.loading = false;
-    };
-
     // 新增编辑任务modal
     const showModalTask = ref(false);
+
     const openModalTask = (type: number) => {
       if (sessionStorage.projectId == "") {
         message.warning("请选择项目");
@@ -316,7 +212,7 @@ export default defineComponent({
           case 1:
             modalDatas.title = "新增任务";
             modalDatas.type = 1;
-
+            datas.tid = null;
             break;
           case 2:
             modalDatas.title = "编辑任务";
@@ -334,55 +230,40 @@ export default defineComponent({
 
     const formRef = ref<FormInst | null>(null);
 
-    const formValue = ref<{
-      name: string | null;
-      env: string | null;
-      email: string | null;
-    }>({
-      name: null,
-      env: null,
-      email: null,
-    });
-
     const options = [{}];
 
-    const handleSave = (e: MouseEvent) => {
-      e.preventDefault();
-      formRef.value?.validate((errors) => {
-        if (!errors) {
-          console.log(modalDatas.targetDatas);
-          let payload = {
-            taskId: modalDatas.taskId,
-            project: sessionStorage.projectId,
-            name: formValue.value.name,
-            env: formValue.value.env,
-            email: formValue.value.email,
-            cases: modalDatas.targetDatas,
-          };
-          if (modalDatas.type === 1) {
-            TaskApi.createTask(payload).then((resp) => {
-              if (resp.success === true) {
-                message.success("创建成功！");
-                showModalTask.value = false;
-              } else {
-                message.error("创建失败！");
-              }
-            });
-          } else {
-            TaskApi.updateTask(modalDatas.taskId, payload).then((resp) => {
-              if (resp.success === true) {
-                message.success("更新成功！");
-                showModalTask.value = false;
-              } else {
-                message.error("更新失败！");
-              }
-            });
-          }
-        } else {
-          message.error("必填项校验不通过");
-          console.log(errors);
-        }
+    // 删除任务
+    const deleteTask = (row) => {
+      dialog.warning({
+        title: "警告",
+        content: "检查是否有正在运行的定时任务，确定删除?",
+        positiveText: "确定",
+        negativeText: "不确定",
+        onPositiveClick: () => {
+          TaskApi.deleteTask(row.id).then((resp) => {
+            if (resp.success === true) {
+              initTaskList();
+              message.success("删除任务成功！");
+            } else {
+              message.error("删除任务失败！");
+            }
+          });
+        },
+        onNegativeClick: () => {
+          message.error("不确定");
+        },
       });
+    };
+
+    // 运行任务
+    const runTask = async (row) => {
+      const resp = await TaskApi.runningTask(row.id);
+      if (resp.success === true) {
+        message.success("开始运行！");
+        initTaskList();
+      } else {
+        message.error("运行失败！");
+      }
     };
 
     // 定时设置
@@ -404,9 +285,15 @@ export default defineComponent({
       month: "*",
     });
 
+    const closeModal = () => {
+      showModalTask.value = false;
+      initTaskList();
+    };
+
     onMounted(() => {
       initTeamList();
       initTaskList();
+
       //   datas.tasktHeartbeat = setInterval(() => {
       //     checkTask();
       //   }, 5000);
@@ -415,63 +302,36 @@ export default defineComponent({
     return {
       datas,
       model,
-      caseData,
-      treeDataFormat,
       initTaskList,
       columns: createColumns({
         play(row: Song, action: String) {
           switch (action) {
             case "run":
+              runTask(row);
               break;
             case "set":
               showModalTimer.value = true;
               break;
             case "edit":
+              openModalTask(2);
+              datas.tid = row.id;
               break;
             case "delete":
+              deleteTask(row);
               break;
           }
         },
       }),
       pagination: false as const,
       changeTeam,
-      changeEnv,
-      handleNodeClick,
-      nodeProps: ({ option }: { option: TreeOption }) => {
-        return {
-          onClick() {
-            handleNodeClick(option);
-          },
-        };
-      },
-      defaultExpandedKeys: ref(["40", "41"]),
       // modal
       modalDatas,
       segmented,
       showModalTask,
       openModalTask,
       formRef,
-      formValue,
-      rulesTask: {
-        name: {
-          required: true,
-          message: "请输入任务名称",
-          trigger: ["input"],
-        },
-        env: {
-          type: "number",
-          required: true,
-          trigger: ["blur", "change"],
-          message: "请选择运行环境",
-        },
-        email: {
-          required: true,
-          message: "请输入邮箱地址",
-          trigger: ["input"],
-        },
-      },
-      handleSave,
       showModalTimer,
+      closeModal,
       rulesTimer: {
         name: {
           required: true,
@@ -517,6 +377,7 @@ export default defineComponent({
                 placeholder="选择团队"
                 :options="model.teamOptions"
                 @update:value="changeTeam"
+                clearable
               >
               </n-select>
             </n-form-item>
@@ -561,70 +422,10 @@ export default defineComponent({
       :bordered="false"
       :segmented="segmented"
     >
-      <n-form
-        ref="formRef"
-        :model="formValue"
-        :rules="rulesTask"
-        label-placement="left"
-        inline
-        :label-width="80"
-        size="medium"
-        show-require-mark
-      >
-        <n-form-item label="任务名称" path="name">
-          <n-input
-            v-model:value="formValue.name"
-            placeholder="请输入任务名称"
-          />
-        </n-form-item>
-        <n-form-item label="运行环境" path="env">
-          <n-select
-            v-model:value="formValue.env"
-            style="width: 200px"
-            :options="model.envOptions"
-            placeholder="请选择运行环境"
-          >
-          </n-select>
-        </n-form-item>
-        <n-form-item label="告警邮箱" path="email">
-          <n-input
-            v-model:value="formValue.email"
-            placeholder="请输入邮箱地址"
-          />
-        </n-form-item>
-        <n-form-item>
-          <n-button type="primary" @click="handleSave"> 保存 </n-button>
-        </n-form-item>
-      </n-form>
-      <n-divider title-placement="left"> 选择用例 </n-divider>
-      <div>
-        <n-grid x-gap="16" :cols="6">
-          <n-gi>
-            <n-tree
-              class="filetree"
-              block-line
-              expand-on-click
-              :data="datas.fileData"
-              :default-expanded-keys="defaultExpandedKeys"
-              key-field="label"
-              :node-props="nodeProps"
-            />
-          </n-gi>
-          <n-gi span="5">
-            <n-transfer
-              ref="transfer"
-              virtual-scroll
-              :options="modalDatas.sourceDatas"
-              v-model:value="modalDatas.targetDatas"
-              source-filterable
-              target-filterable
-            />
-          </n-gi>
-        </n-grid>
-      </div>
+      <TaskModal :type="modalDatas.type" :tid="datas.tid" @close="closeModal" />
     </n-modal>
 
-    <n-modal
+    <!-- <n-modal
       v-model:show="showModalTimer"
       class="custom-card"
       preset="card"
@@ -652,16 +453,16 @@ export default defineComponent({
         </n-form-item>
         <n-form-item label="分" path="env">
           <n-select
-            v-model:value="formValue.env"
+            v-model:value="formValue.env_id"
             style="width: 200px"
             :options="model.envOptions"
             placeholder="请选择运行环境"
           >
           </n-select>
         </n-form-item>
-        <n-form-item label="时" path="email">
+        <n-form-item label="时" path="team_id">
           <n-input
-            v-model:value="formValue.email"
+            v-model:value="formValue.team_id"
             placeholder="请输入邮箱地址"
           />
         </n-form-item>
@@ -671,7 +472,7 @@ export default defineComponent({
       </n-form>
       <n-divider title-placement="left"> 选择用例 </n-divider>
       <div></div>
-    </n-modal>
+    </n-modal> -->
   </div>
 </template>
 

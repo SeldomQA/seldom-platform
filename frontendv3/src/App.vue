@@ -6,7 +6,9 @@
 
 <template>
   <n-message-provider>
-    <router-view></router-view>
+    <n-dialog-provider>
+      <router-view></router-view>
+    </n-dialog-provider>
   </n-message-provider>
 </template>
 
@@ -26,7 +28,7 @@
 body {
   margin: 0px 0px 0px;
 }
-html{
+html {
   /* background-image: url("./assets/home-bg.png"); */
   background-attachment: fixed;
   background-size: 100% 100%;
