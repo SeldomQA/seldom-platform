@@ -13,7 +13,11 @@ import {
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import baseUrl from "~/config/base-url";
-import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
+import {
+  FolderOpenOutline,
+  LogoPython,
+  SearchOutline,
+} from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
 
@@ -136,6 +140,11 @@ type ModalDatas = {
 };
 
 export default defineComponent({
+  components: {
+    SearchOutline,
+    FolderOpenOutline,
+    LogoPython,
+  },
   setup() {
     const datas = reactive({
       loading: true,
@@ -143,12 +152,12 @@ export default defineComponent({
       fileData: [],
       caseData: [],
       caseNumber: 0,
-      teamOptions: [],
       tableData: [],
+      teamIdSelected: "",
       query: {
-        project_id: "",
-        team_id: "",
-        name: "",
+        project_id: null,
+        team_id: null,
+        name: null,
       },
     });
 
@@ -161,7 +170,7 @@ export default defineComponent({
     const message = useMessage();
 
     const model = ref({
-      projectOptions: [],
+      teamOptions: [],
       envOptions: [],
     });
 
@@ -187,24 +196,6 @@ export default defineComponent({
       });
     };
 
-    // 获取项目列表
-    const initProjectList = async () => {
-      datas.loading = true;
-      const resp = await ProjectApi.getProjects();
-      if (resp.success === true) {
-        // datas.tableData = resp.result
-        for (let i = 0; i < resp.result.length; i++) {
-          model.value.projectOptions.push({
-            value: resp.result[i].id,
-            label: resp.result[i].name,
-          });
-        }
-      } else {
-        message.error(resp.error.message);
-      }
-      datas.loading = false;
-    };
-
     // 初始化项目文件列表
     const initProjectFile = async () => {
       const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
@@ -222,7 +213,7 @@ export default defineComponent({
       const resp = await TeamApi.getTeamAll();
       if (resp.success === true) {
         for (let i = 0; i < resp.result.length; i++) {
-          datas.teamOptions.push({
+          model.value.teamOptions.push({
             value: resp.result[i].id,
             label: resp.result[i].name,
           });
@@ -272,10 +263,8 @@ export default defineComponent({
       }
     };
 
-    const changeProject = (value: string, option: SelectOption) => {
-      sessionStorage.projectId = value;
-      initProjectFile();
-      initTaskList();
+    const changeTeam = (value: string, option: SelectOption) => {
+      datas.teamIdSelected = value;
     };
 
     const changeEnv = (value: string, option: SelectOption) => {
@@ -428,6 +417,7 @@ export default defineComponent({
       model,
       caseData,
       treeDataFormat,
+      initTaskList,
       columns: createColumns({
         play(row: Song, action: String) {
           switch (action) {
@@ -444,7 +434,7 @@ export default defineComponent({
         },
       }),
       pagination: false as const,
-      changeProject,
+      changeTeam,
       changeEnv,
       handleNodeClick,
       nodeProps: ({ option }: { option: TreeOption }) => {
@@ -523,19 +513,28 @@ export default defineComponent({
             <n-form-item label="名称">
               <n-select
                 style="width: 200px"
-                :options="model.projectOptions"
+                v-model:value="datas.query.team_id"
                 placeholder="选择团队"
-                @update:value="changeProject"
+                :options="model.teamOptions"
+                @update:value="changeTeam"
               >
               </n-select>
             </n-form-item>
             <n-form-item label="团队" label-placement="left">
-              <n-input></n-input>
+              <n-input
+                v-model:value="datas.query.name"
+                placeholder="请输入任务名称"
+              ></n-input>
             </n-form-item>
             <n-form-item label-placement="left">
-              <n-button type="primary" @click="openModalTask(1)" size="small"
-                >搜索</n-button
-              >
+              <n-button type="primary" @click="initTaskList" size="small">
+                <template #icon>
+                  <n-icon>
+                    <SearchOutline />
+                  </n-icon>
+                </template>
+                搜索
+              </n-button>
             </n-form-item>
           </n-form>
           <n-button type="primary" @click="openModalTask(1)" size="small"
