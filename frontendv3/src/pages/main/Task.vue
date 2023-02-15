@@ -370,7 +370,7 @@ export default defineComponent({
       <div>
         <n-space justify="space-between">
           <n-form inline :model="model" label-placement="left">
-            <n-form-item label="名称">
+            <n-form-item label="团队">
               <n-select
                 style="width: 200px"
                 v-model:value="datas.query.team_id"
@@ -381,7 +381,7 @@ export default defineComponent({
               >
               </n-select>
             </n-form-item>
-            <n-form-item label="团队" label-placement="left">
+            <n-form-item label="名称" label-placement="left">
               <n-input
                 v-model:value="datas.query.name"
                 placeholder="请输入任务名称"
