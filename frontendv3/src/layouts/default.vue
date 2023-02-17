@@ -65,7 +65,7 @@ onMounted(() => {
           position="absolute"
           style="text-align: center"
         >
-          © 2022 Powered by SeldomQA Team
+          © 2023 Powered by SeldomQA Team
         </n-layout-footer>
       </n-layout>
     </n-layout>
