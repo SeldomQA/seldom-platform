@@ -18,6 +18,26 @@ class ProjectApi {
     return request.put("/api/project/" + pid + "/", data);
   }
 
+  syncCode(pid: string) {
+    return request.get("/api/project/" + pid + "/sync_code");
+  }
+
+  syncCase(pid: string) {
+    return request.get("/api/project/" + pid + "/sync_case");
+  }
+
+  syncResult(pid: string) {
+    return request.get("/api/project/" + pid + "/sync_result");
+  }
+
+  syncMerge(pid: string, data: TNomalObject) {
+    return request.post("/api/project/" + pid + "/sync_merge", data);
+  }
+
+  getSyncLog() {
+    return request.get("/api/project/sync_log");
+  }
+
   deleteProject(pid: string) {
     return request.del("/api/project/" + pid + "/");
   }
@@ -39,11 +59,11 @@ class ProjectApi {
     return request.get("/api/project/" + pid + "/files");
   }
 
-  getProjectCases(pid: string, file_name: TNomalObject) {
+  getProjectCases(pid: string, file_name: string) {
     return request.get("/api/project/" + pid + "/cases", { file_name });
   }
 
-  getProjectSubdirectory(pid: string, file_name: TNomalObject) {
+  getProjectSubdirectory(pid: string, file_name: string) {
     return request.get("/api/project/" + pid + "/subdirectory", { file_name });
   }
 

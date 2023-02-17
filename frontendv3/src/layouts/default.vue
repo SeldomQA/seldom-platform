@@ -3,7 +3,7 @@ import Sidebar from "./sidebar.vue";
 import Header from "./header.vue";
 import { darkTheme } from "naive-ui";
 import type { GlobalTheme } from "naive-ui";
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, provide, nextTick } from "vue";
 
 const theme = ref<GlobalTheme | null>(null);
 const localStorage = window.localStorage;
@@ -15,6 +15,19 @@ const changeTheme = () => {
     theme.value = null;
   }
 };
+
+// 刷新组件
+const isRouterAlive = ref(true);
+
+const reload = () => {
+  isRouterAlive.value = false;
+
+  nextTick(() => {
+    isRouterAlive.value = true;
+  });
+};
+
+provide("reload", reload);
 
 onMounted(() => {
   const mode = localStorage.getItem("themeMode");
@@ -44,7 +57,7 @@ onMounted(() => {
         </n-layout-header>
         <n-layout position="absolute" style="top: 76px; bottom: 64px">
           <n-layout content-style="padding: 24px;">
-            <router-view></router-view>
+            <div v-if="isRouterAlive"><router-view></router-view></div>
           </n-layout>
         </n-layout>
         <n-layout-footer
@@ -52,7 +65,7 @@ onMounted(() => {
           position="absolute"
           style="text-align: center"
         >
-          © 2022 Powered by SeldomQA Team
+          © 2023 Powered by SeldomQA Team
         </n-layout-footer>
       </n-layout>
     </n-layout>

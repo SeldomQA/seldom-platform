@@ -1,5 +1,5 @@
 <template>
-  <img src="../assets/seldom-platform.gif" style="height: 40px;" />
+  <img src="../assets/seldom-platform.gif" style="height: 40px" />
   <n-menu :options="menuOptions" @update:value="handleUpdateValue" />
 </template>
 
@@ -15,7 +15,8 @@ import {
   CalendarOutline,
   SettingsOutline,
   CloudOutline,
-  PeopleOutline, MailOutline
+  PeopleOutline,
+  MailOutline,
 } from "@vicons/ionicons5";
 
 function renderIcon(icon: Component) {
@@ -24,46 +25,67 @@ function renderIcon(icon: Component) {
 
 const menuOptions: MenuOption[] = [
   {
-    label: '配置管理',
-    key: 'system-setting',
+    label: "配置管理",
+    key: "system-setting",
     icon: renderIcon(SettingsOutline),
-    children: [{
-      label: () =>
-        h(
-          RouterLink,
-          {
-            to: {
-              name: "main-Project",
-              params: {
-                lang: "zh-CN",
+    children: [
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                name: "main-Project",
+                params: {
+                  lang: "zh-CN",
+                },
               },
             },
-          },
-          { default: () => "项目管理" }
-        ),
-      key: "go-back-home",
-      icon: renderIcon(HomeOutline),
-    }, {
-      label: () =>
-        h(
-          RouterLink,
-          {
-            to: {
-              name: "main-Env",
-              params: {
-                lang: "zh-CN",
+            { default: () => "项目管理" }
+          ),
+        key: "go-back-home",
+        icon: renderIcon(HomeOutline),
+      },
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                name: "main-Env",
+                params: {
+                  lang: "zh-CN",
+                },
               },
             },
-          },
-          { default: () => "环境管理" }
-        ),
-      key: "go-back-env",
-      icon: renderIcon(CloudOutline),
-    }, {
-      label: '团队管理', key: 'team', icon: renderIcon(PeopleOutline)
-    }, {
-      label: '邮件组', key: 'mail', icon: renderIcon(MailOutline)
-    }]
+            { default: () => "环境管理" }
+          ),
+        key: "go-back-env",
+        icon: renderIcon(CloudOutline),
+      },
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                name: "main-Team",
+                params: {
+                  lang: "zh-CN",
+                },
+              },
+            },
+            { default: () => "团队管理" }
+          ),
+        key: "go-back-team",
+        icon: renderIcon(PeopleOutline),
+      },
+      {
+        label: "邮件组",
+        key: "mail",
+        icon: renderIcon(MailOutline),
+      },
+    ],
   },
 
   {
@@ -100,24 +122,23 @@ const menuOptions: MenuOption[] = [
     key: "go-back-task",
     icon: renderIcon(CalendarOutline),
   },
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: "main-Report",
-            params: {
-              lang: "zh-CN",
-            },
-          },
-        },
-        { default: () => "报告管理" }
-      ),
-    key: "go-back-report",
-    icon: renderIcon(DocumentTextOutline),
-  },
-
+  // {
+  //   label: () =>
+  //     h(
+  //       RouterLink,
+  //       {
+  //         to: {
+  //           name: "main-Report",
+  //           params: {
+  //             lang: "zh-CN",
+  //           },
+  //         },
+  //       },
+  //       { default: () => "报告管理" }
+  //     ),
+  //   key: "go-back-report",
+  //   icon: renderIcon(DocumentTextOutline),
+  // },
 ];
 
 export default defineComponent({
