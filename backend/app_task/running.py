@@ -1,13 +1,13 @@
 import time
 from xml.dom.minidom import parse
 
+from selenium.webdriver import ChromeOptions
+from selenium.webdriver import EdgeOptions
+from selenium.webdriver import FirefoxOptions
 from seldom import (
     SMTP,
     Seldom,
-    TestMainExtend,
-    ChromeConfig,
-    FirefoxConfig,
-    EdgeConfig
+    TestMainExtend
 )
 from seldom.utils import file
 from seldom.logging import log
@@ -47,9 +47,34 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     else:
         browser = env.browser
         # 设置浏览器headless模式
-        ChromeConfig.headless = True
-        FirefoxConfig.headless = True
-        EdgeConfig.headless = True
+        if browser in ["gc", "chrome"]:
+            chrome_options = ChromeOptions()
+            chrome_options.headless = True
+            browser = {
+                "browser": "chrome",
+                "option": chrome_options
+            }
+        elif browser in ["ff", "firefox"]:
+            firefox_options = FirefoxOptions()
+            firefox_options.add_argument("-headless")
+            browser = {
+                "browser": "firefox",
+                "option": firefox_options
+            }
+        elif browser in ["edge"]:
+            edge_options = EdgeOptions()
+            edge_options.add_argument("headless")
+            browser = {
+                "browser": "edge",
+                "option": edge_options
+            }
+        else:
+            chrome_options = ChromeOptions()
+            chrome_options.headless = True
+            browser = {
+                "browser": "chrome",
+                "option": chrome_options
+            }
 
     if env.env == "":
         Seldom.env = None
