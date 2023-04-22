@@ -1,11 +1,49 @@
 <template>
   <div class="main">
-    <div class="title">
-      <span>
-        <h1><span style="color: #20d489">Seldom</span> Platform.</h1>
-        <p style="color: #869ab8">基于Seldom框架的测试平台.</p>
-      </span>
-    </div>
+    <header>
+      <div class="features">
+        <div>
+          <h1><span style="color: #20d489">Seldom</span> Platform.</h1>
+          <span style="color: #869ab8">基于Seldom框架的测试平台.</span>
+          <a href="https://github.com/SeldomQA/seldom" target="_blank">
+            <n-button type="primary" quaternary>GitHub</n-button>
+          </a>
+          <a href="https://seldomqa.github.io/" target="_blank">
+            <n-button type="info" quaternary>在线文档</n-button>
+          </a>
+        </div>
+        <n-divider>特色</n-divider>
+        <div class="feature-option">
+          <div class="icon text-primary mb-3">
+              <n-icon size="20" :component="GitBranch" />
+            <span class="feature-title">支持git</span>
+          </div>
+          <p class="text-muted mb-6 mb-md-0">
+            seldom-platform 可以接入任意git管理的自动化项目,
+            克隆和拉取项目代码。
+          </p>
+        </div>
+        <div class="feature-option">
+          <div class="icon text-primary mb-3">
+            <n-icon size="20" :component="Search" />
+            <span class="feature-title">解析用例</span>
+          </div>
+          <p class="text-muted mb-0">
+            seldom-platform 可以自动解析seldom自动化项目的“用例”,
+            并且在平台上展示。
+          </p>
+        </div>
+        <div class="feature-option">
+          <div class="icon text-primary mb-3">
+            <n-icon size="20" :component="AppsSharp" />
+            <span class="feature-title">平台化</span>
+          </div>
+          <p class="text-muted mb-6 mb-md-0">
+            借助于平台的能力，可以方便的管理用例的执行、创建定时任务、展示统计结果。
+          </p>
+        </div>
+      </div>
+    </header>
     <div class="content">
       <div class="login">
         <n-card class="login-card">
@@ -13,8 +51,6 @@
             class="card-tabs"
             size="large"
             animated
-            style="margin: 0 -4px"
-            pane-style="padding-left: 4px; padding-right: 4px; box-sizing: border-box;"
           >
             <n-tab-pane name="signin" tab="登录">
               <n-form :model="signinRef" :rules="signinRules" label-placement="left">
@@ -83,37 +119,6 @@
             </n-tab-pane>
           </n-tabs>
         </n-card>
-      </div>
-      <div class="features">
-        <div style="width: 30%; float: left">
-          <div class="icon text-primary mb-3">
-            <n-icon size="20" :component="GitBranch" />
-          </div>
-          <h3>支持git</h3>
-          <p class="text-muted mb-6 mb-md-0">
-            seldom-platform 可以接入任意git管理的自动化项目,
-            克隆和拉取项目代码。
-          </p>
-        </div>
-        <div style="width: 30%; float: left; margin-left: 3%">
-          <div class="icon text-primary mb-3">
-            <n-icon size="20" :component="Search" />
-          </div>
-          <h3>解析用例</h3>
-          <p class="text-muted mb-0">
-            seldom-platform 可以自动解析seldom自动化项目的“用例”,
-            并且在平台上展示。
-          </p>
-        </div>
-        <div style="width: 30%; float: right">
-          <div class="icon text-primary mb-3">
-            <n-icon size="20" :component="AppsSharp" />
-          </div>
-          <h3>平台化</h3>
-          <p class="text-muted mb-6 mb-md-0">
-            借助于平台的能力，可以方便的管理用例的执行、创建定时任务、展示统计结果。
-          </p>
-        </div>
       </div>
     </div>
   </div>
@@ -364,6 +369,20 @@ export default defineComponent({
 </script>
 
 <style>
+
+.main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 0 10rem;
+}
+
+header {
+  line-height: 1.5;
+  max-height: 100vh;
+  place-items: center;
+  padding-right: calc(var(--section-gap) / 2);
+}
+
 .title {
   text-align: center;
 }
@@ -375,10 +394,6 @@ export default defineComponent({
 
 .content {
   margin: auto;
-  height: 500px;
-  /* width: 1680px; */
-  max-width: 1280px;
-  min-width: 1280px;
 }
 
 .login {
@@ -395,4 +410,15 @@ export default defineComponent({
   text-align: center;
   margin-top: 100px;
 }
+
+.feature-option {
+  height: 120px;
+}
+
+.feature-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-left: 15px;
+}
+
 </style>

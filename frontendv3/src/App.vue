@@ -21,7 +21,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  background-color: #fbf9f6;
   height: 100%;
 }
 
@@ -33,6 +32,7 @@ html {
   background-attachment: fixed;
   background-size: 100% 100%;
   z-index: -1000;
+  background-color: #fbf9f6;
 }
 html,
 body {
