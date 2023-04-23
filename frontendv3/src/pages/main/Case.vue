@@ -356,16 +356,14 @@ export default defineComponent({
               </n-select>
             </n-form-item>
             <n-form-item label="用例">
-              <n-tag type="info" style="margin-right: 12px">{{
-                datas.caseNumber
-              }}</n-tag>
+              <n-tag type="info" style="margin-right: 12px">{{ datas.caseNumber }}</n-tag>
               条
             </n-form-item>
           </n-form>
         </n-space>
       </div>
       <n-space justify="space-between" align="center">
-        <h1>用例列表</h1>
+        <h3>用例列表</h3>
         <n-button type="primary" @click="refresh">刷新</n-button>
       </n-space>
       <div>

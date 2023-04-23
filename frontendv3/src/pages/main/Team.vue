@@ -58,6 +58,7 @@ const createColumns = ({
                 {
                   type: "info",
                   secondary: true,
+                  size: "small",
                   onClick: () => play(row, "edit"),
                 },
                 { default: () => "编辑" }
@@ -67,6 +68,7 @@ const createColumns = ({
                 {
                   type: "error",
                   secondary: true,
+                  size: "small",
                   onClick: () => play(row, "delete"),
                 },
                 { default: () => "删除" }
@@ -211,9 +213,8 @@ export default defineComponent({
 
     <n-card class="main-card">
       <div class="filter-line">
-        <n-button type="primary" @click="showCreate"> 创建 </n-button>
+        <n-button type="primary" @click="showCreate">创建</n-button>
       </div>
-
       <n-data-table
         :columns="columns"
         :data="datas.teamData"
@@ -236,3 +237,9 @@ export default defineComponent({
     </n-modal>
   </div>
 </template>
+
+<style scoped>
+.filter-line {
+    padding-bottom: 20px;
+}
+</style>

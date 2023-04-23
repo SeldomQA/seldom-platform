@@ -84,6 +84,7 @@ const createColumns = ({
                   type: "primary",
                   strong: true,
                   secondary: true,
+                  size: "small",
                   onClick: () => play(row, "run"),
                 },
                 { default: () => "运行" }
@@ -104,6 +105,7 @@ const createColumns = ({
                   type: "warning",
                   strong: true,
                   secondary: true,
+                  size: "small",
                   onClick: () => play(row, "edit"),
                 },
                 { default: () => "编辑" }
@@ -114,6 +116,7 @@ const createColumns = ({
                   type: "error",
                   strong: true,
                   secondary: true,
+                  size: "small",
                   onClick: () => play(row, "delete"),
                 },
                 { default: () => "删除" }
@@ -388,7 +391,7 @@ export default defineComponent({
               ></n-input>
             </n-form-item>
             <n-form-item label-placement="left">
-              <n-button type="primary" @click="initTaskList" size="small">
+              <n-button type="primary" @click="initTaskList">
                 <template #icon>
                   <n-icon>
                     <SearchOutline />
@@ -398,12 +401,9 @@ export default defineComponent({
               </n-button>
             </n-form-item>
           </n-form>
-          <n-button type="primary" @click="openModalTask(1)" size="small"
-            >创建</n-button
-          >
+          <n-button type="primary" @click="openModalTask(1)">创建</n-button>
         </n-space>
       </div>
-      <h1>任务列表</h1>
       <n-data-table
         :columns="columns"
         :data="datas.tableData"
