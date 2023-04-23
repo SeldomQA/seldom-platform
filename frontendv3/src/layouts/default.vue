@@ -55,7 +55,12 @@ onMounted(() => {
         <n-layout-header bordered>
           <Header @changeThemeSignal="changeTheme"></Header>
         </n-layout-header>
-        <n-layout position="absolute" style="top: 76px; bottom: 64px">
+        <n-layout v-if="theme === null" position="absolute" style="top: 76px; bottom: 64px; background-color: #fbf9f6">
+          <n-layout content-style="padding: 24px; background-color: #fbf9f6">
+            <div v-if="isRouterAlive"><router-view></router-view></div>
+          </n-layout>
+        </n-layout>
+        <n-layout v-else="theme === null" position="absolute" style="top: 76px; bottom: 64px;">
           <n-layout content-style="padding: 24px;">
             <div v-if="isRouterAlive"><router-view></router-view></div>
           </n-layout>
