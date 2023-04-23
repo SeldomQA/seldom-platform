@@ -1,5 +1,9 @@
 <template>
-  <n-form ref="formRef" :model="model" :style="{ maxWidth: '640px' }">
+  <n-form
+    ref="formRef"
+    :model="model"
+    label-placement="left"
+    label-width="80px">
     <n-form-item
       label="环境名称"
       path="name"
@@ -8,17 +12,18 @@
         message: 'please input name',
         trigger: ['input', 'blur'],
       }"
+      :style="{ maxWidth: '640px', marginTop: '30px' }"
     >
-      <n-input v-model:value="model.name" clearable />
+      <n-input v-model:value="model.name" placeholder="环境名称" clearable />
     </n-form-item>
     <n-form-item label="base-url" path="base-url">
-      <n-input v-model:value="model.base_url" clearable />
+      <n-input v-model:value="model.base_url" placeholder="基础URL" clearable />
     </n-form-item>
     <n-form-item label="browser" path="browser">
-      <n-input v-model:value="model.browser" clearable />
+      <n-input v-model:value="model.browser" placeholder="浏览器名称" clearable />
     </n-form-item>
     <n-form-item label="env" path="env">
-      <n-input v-model:value="model.env" clearable />
+      <n-input v-model:value="model.env" placeholder="环境变量名" clearable />
     </n-form-item>
   </n-form>
 </template>

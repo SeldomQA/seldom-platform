@@ -1,18 +1,18 @@
 <template>
   <div class="case-sync-modal">
-    <n-space vertical>
+    <n-space vertical style="margin-top: 30px">
       <n-steps :current="(current as number)" :status="currentStatus">
         <n-step
           title="拉取代码"
-          description="All through the day, I me mine I me mine, I me mine"
+          description=""
         />
         <n-step
           title="同步用例"
-          description="When I find myself in times of trouble Mother Mary comes to me"
+          description=""
         />
         <n-step
           title="查找结果"
-          description="Here come old flat top He come grooving up slowly"
+          description=""
         />
       </n-steps>
 
@@ -20,12 +20,17 @@
         v-if="datas.succCode == 1"
         n-button
         type="primary"
+        size="small"
         :loading="loading"
         @click="syncRunning"
-      >
-        开始
+      >开始
       </n-button>
-      <n-button v-else type="warning" :loading="loading" @click="syncRunning">
+      <n-button
+        v-else
+        type="warning"
+        size="small"
+        :loading="loading"
+        @click="syncRunning">
         重试
       </n-button>
 

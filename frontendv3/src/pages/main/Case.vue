@@ -399,9 +399,7 @@ export default defineComponent({
         role="dialog"
         aria-modal="true"
       >
-        <template #header-extra> 噢?！??? </template>
         <CaseResult :caseid="datas.selectedCase.id" />
-        <template #footer> 尾部 </template>
       </n-card>
     </n-modal>
 
@@ -409,7 +407,7 @@ export default defineComponent({
       id="syncpage"
       v-model:show="datas.showCaseSync"
       preset="dialog"
-      title="卡片预设"
+      title="同步用例"
       size="huge"
       positive-text="合并"
       negative-text="取消"
@@ -440,9 +438,9 @@ export default defineComponent({
 }
 
 #syncpage {
-  height: 600px;
   width: 1080px;
 }
+
 .n-dialog__content {
   height: 85%;
 }

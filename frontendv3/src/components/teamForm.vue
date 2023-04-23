@@ -5,17 +5,17 @@
       :model="model"
       :rules="rules"
       label-placement="left"
-      label-width="auto"
-      require-mark-placement="right-hanging"
+      label-width="80px"
       :style="{
         maxWidth: '640px',
+        marginTop: '30px'
       }"
     >
       <n-form-item label="名称" path="name">
-        <n-input v-model:value="model.name" placeholder="请输入团队名称" />
+        <n-input v-model:value="model.name" placeholder="团队名称" clearable/>
       </n-form-item>
       <n-form-item label="邮箱" path="email">
-        <n-input v-model:value="model.email" placeholder="请输入团队邮箱" />
+        <n-input v-model:value="model.email" placeholder="团队邮箱" clearable/>
       </n-form-item>
     </n-form>
   </div>

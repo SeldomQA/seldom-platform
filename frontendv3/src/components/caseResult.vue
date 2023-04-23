@@ -49,23 +49,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-result status="success" title="Pass" description="great ! nice !">
-    <template #footer>
-      <n-descriptions label-placement="left">
-        <n-descriptions-item label="报告名称"
-          >{{ result.name }}
-        </n-descriptions-item>
-        <n-descriptions-item label="创建时间">
-          {{ result.create_time }}
-        </n-descriptions-item>
-        <n-descriptions-item label="运行时长">
-          {{ result.run_time }}
-        </n-descriptions-item>
-      </n-descriptions>
-      <h3 style="text-align: left">运行日志</h3>
-      <textarea style="width: 96%; border-color: gray" rows="20">
-        {{ result.system_out }}
-      </textarea>
-    </template>
-  </n-result>
+  <div>
+    <n-descriptions label-placement="left">
+      <n-descriptions-item label="报告名称"
+        >{{ result.name }}
+      </n-descriptions-item>
+      <n-descriptions-item label="创建时间">
+        {{ result.create_time }}
+      </n-descriptions-item>
+      <n-descriptions-item label="运行时长">
+        {{ result.run_time }}
+      </n-descriptions-item>
+    </n-descriptions>
+    <n-divider title-placement="left">运行日志</n-divider>
+    <textarea style="width: 100%; border-color: gray" rows="34">
+      {{ result.system_out }}
+    </textarea>
+  </div>
 </template>
