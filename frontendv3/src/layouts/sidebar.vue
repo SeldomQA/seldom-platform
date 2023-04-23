@@ -79,12 +79,7 @@ const menuOptions: MenuOption[] = [
           ),
         key: "go-back-team",
         icon: renderIcon(PeopleOutline),
-      },
-      {
-        label: "邮件组",
-        key: "mail",
-        icon: renderIcon(MailOutline),
-      },
+      }
     ],
   },
 
