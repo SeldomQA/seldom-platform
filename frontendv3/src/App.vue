@@ -38,4 +38,15 @@ html,
 body {
   height: 100%;
 }
+
+.n-input__input-el {
+  height: auto !important;
+}
+
+.breadcrumb-navigation {
+  height: 40px;
+  font-size: 1.17em;
+  font-weight: bold;
+}
+
 </style>

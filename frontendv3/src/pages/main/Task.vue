@@ -358,7 +358,7 @@ export default defineComponent({
 <template>
   <div class="body">
     <div class="pageheader">
-      <n-space justify="space-between">
+      <n-space justify="space-between" class="breadcrumb-navigation">
         <span>任务管理</span>
         <n-breadcrumb separator=">">
           <n-breadcrumb-item href="/">首页</n-breadcrumb-item>

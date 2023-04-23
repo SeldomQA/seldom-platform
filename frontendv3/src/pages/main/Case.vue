@@ -332,7 +332,7 @@ export default defineComponent({
 <template>
   <div class="body">
     <div class="pageheader">
-      <n-space justify="space-between">
+      <n-space justify="space-between" class="breadcrumb-navigation">
         <span>用例管理</span>
         <n-breadcrumb separator=">">
           <n-breadcrumb-item href="/">首页</n-breadcrumb-item>
@@ -343,8 +343,7 @@ export default defineComponent({
     <n-card class="main-card">
       <div>
         <n-space justify="space-between">
-          <n-button type="primary" @click="showCreate" size="small"
-            >同步</n-button
+          <n-button type="primary" @click="showCreate">同步</n-button
           >
           <n-form inline label-placement="left">
             <n-form-item label="环境">
@@ -402,7 +401,7 @@ export default defineComponent({
         role="dialog"
         aria-modal="true"
       >
-        <template #header-extra> 噢?！ </template>
+        <template #header-extra> 噢?！??? </template>
         <CaseResult :caseid="datas.selectedCase.id" />
         <template #footer> 尾部 </template>
       </n-card>
