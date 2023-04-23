@@ -361,7 +361,7 @@ export default defineComponent({
       <n-space justify="space-between" class="breadcrumb-navigation">
         <span>任务管理</span>
         <n-breadcrumb separator=">">
-          <n-breadcrumb-item href="/">首页</n-breadcrumb-item>
+          <n-breadcrumb-item>首页</n-breadcrumb-item>
           <n-breadcrumb-item>任务管理</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
