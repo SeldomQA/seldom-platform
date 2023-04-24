@@ -156,15 +156,27 @@ onMounted(() => {
                   style="height: 100%; width: 100%"
                 />
               </div>
-              <template #footer style="text-aligin: left">
-                <p>测试目录: {{ item.case_dir }}</p>
-                <p>文件数量: {{ item.test_num }}</p>
-                <p>
-                  状态:
-                  <n-tag type="info" v-if="item.is_clone == 0">未克隆</n-tag>
-                  <n-tag type="success" v-else>已克隆</n-tag>
-                </p>
-              </template>
+              <n-descriptions label-placement="left" column="1">
+                <n-descriptions-item>
+                  <template #label>
+                    测试目录
+                  </template>
+                  {{ item.case_dir }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    文件数量
+                  </template>
+                  {{ item.test_num }}
+                </n-descriptions-item>
+                <n-descriptions-item>
+                  <template #label>
+                    状态
+                  </template>
+                  <n-tag type="info" size="small" v-if="item.is_clone == 0">未克隆</n-tag>
+                  <n-tag type="success" size="small" v-else>已克隆</n-tag>
+                </n-descriptions-item>
+              </n-descriptions>
               <template #action>
                 <div>
                   {{ item.address }}
