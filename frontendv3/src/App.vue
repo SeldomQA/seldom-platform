@@ -49,4 +49,7 @@ body {
   font-weight: bold;
 }
 
+.dialog-footer {
+  float: right;
+}
 </style>
