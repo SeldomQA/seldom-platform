@@ -158,22 +158,18 @@ onMounted(() => {
               </div>
               <n-descriptions label-placement="left" column="1">
                 <n-descriptions-item>
-                  <template #label>
-                    测试目录
-                  </template>
+                  <template #label> 测试目录 </template>
                   {{ item.case_dir }}
                 </n-descriptions-item>
                 <n-descriptions-item>
-                  <template #label>
-                    文件数量
-                  </template>
+                  <template #label> 文件数量 </template>
                   {{ item.test_num }}
                 </n-descriptions-item>
                 <n-descriptions-item>
-                  <template #label>
-                    状态
-                  </template>
-                  <n-tag type="info" size="small" v-if="item.is_clone == 0">未克隆</n-tag>
+                  <template #label> 状态 </template>
+                  <n-tag type="info" size="small" v-if="item.is_clone == 0"
+                    >未克隆</n-tag
+                  >
                   <n-tag type="success" size="small" v-else>已克隆</n-tag>
                 </n-descriptions-item>
               </n-descriptions>
@@ -187,7 +183,7 @@ onMounted(() => {
         </n-space>
       </div>
     </n-card>
-    <n-modal v-model:show="datas.showDailog" style="min-width: 600px">
+    <n-modal v-model:show="datas.showDailog" style="width: 600px">
       <n-card
         style="width: 600px"
         v-if="datas.projectId == 0"

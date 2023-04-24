@@ -7,18 +7,15 @@
       label-placement="left"
       label-width="auto"
       require-mark-placement="right-hanging"
-      :style="{
-        maxWidth: '640px',
-      }"
     >
       <n-form-item label="名称" path="name">
-        <n-input v-model:value="form.name" placeholder="请输入名称" />
+        <n-input v-model:value="form.name" placeholder="项目名称" />
       </n-form-item>
       <n-form-item label="git项目" path="address">
-        <n-input v-model:value="form.address" placeholder="请输入关联项目" />
+        <n-input v-model:value="form.address" placeholder="git地址" />
       </n-form-item>
       <n-form-item label="用例目录" path="case_dir">
-        <n-input v-model:value="form.case_dir" placeholder="请输入用例目录" />
+        <n-input v-model:value="form.case_dir" placeholder="用例目录" />
       </n-form-item>
       <n-form-item>
         <n-alert
@@ -37,7 +34,7 @@
           :max="1"
           @finish="handleFinish"
           @remove="handleRemove"
-          :show-retry-button= false
+          :show-retry-button="false"
         >
           <n-upload-dragger>
             <div style="margin-bottom: 12px">
@@ -60,7 +57,7 @@
           <n-button cy-data="cancel-project" @click="cancelProject()"
             >取消</n-button
           >
-          <n-button cy-data="save-project" type="primary" @click="onSubmit"
+          <n-button cy-data="save-project" type="primary" @click="onSubmit()"
             >保存</n-button
           >
         </n-space>
@@ -101,12 +98,12 @@ const rules = {
   name: {
     required: true,
     trigger: ["blur", "input"],
-    message: "请输入名称",
+    message: "请输入项目名称",
   },
   address: {
     required: true,
     trigger: ["blur", "input"],
-    message: "请输入关联项目",
+    message: "请输入git地址",
   },
   case_dir: {
     required: true,
