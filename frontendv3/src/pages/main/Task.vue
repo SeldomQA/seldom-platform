@@ -11,6 +11,18 @@ import {
   NSpace,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
+import { Bar, Doughnut } from "vue-chartjs";
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+
 import baseUrl from "~/config/base-url";
 import { SearchOutline } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
@@ -18,10 +30,13 @@ import TeamApi from "~/request/team";
 import TaskModal from "~/components/taskModal.vue";
 
 type Song = {
-  no: number;
-  title: string;
-  length: string;
   id: number;
+  name: string;
+  env: string;
+  team: string;
+  execute_count: number;
+  status: number;
+  create_time: string;
 };
 
 const createColumns = ({
@@ -37,6 +52,17 @@ const createColumns = ({
     {
       title: "任务名称",
       key: "name",
+      render(row) {
+        return h(
+          NButton,
+          {
+            type: "info",
+            quaternary: true,
+            onClick: () => play(row, "clickTaskName"),
+          },
+          { default: () => row.name }
+        );
+      },
     },
     {
       title: "环境",
@@ -129,6 +155,43 @@ const createColumns = ({
   ];
 };
 
+type Song2 = {
+  id: number;
+  name: string;
+  env: string;
+  team: string;
+  execute_count: number;
+  status: number;
+  create_time: string;
+};
+
+const clickReportName = (row: Song2) => {
+  console.log(row);
+};
+
+const createColumnsReport = ({
+  clickReportName,
+}: {
+  clickReportName: (row: Song2) => void;
+}): DataTableColumns<Song2> => {
+  return [
+    {
+      title: "Name",
+      key: "name",
+      render(row) {
+        return h(
+          NButton,
+          {
+            size: "small",
+            onClick: () => clickReportName(row),
+          },
+          { default: () => row.name }
+        );
+      },
+    },
+  ];
+};
+
 type ModalDatas = {
   type?: number | null;
   taskId?: number | null;
@@ -138,6 +201,8 @@ type ModalDatas = {
 export default defineComponent({
   components: {
     SearchOutline,
+    Bar,
+    Doughnut,
   },
   setup() {
     const datas = reactive({
@@ -152,6 +217,7 @@ export default defineComponent({
         team_id: null,
         name: null,
       },
+      taskFlag: true,
     });
 
     const modalDatas: ModalDatas = reactive({
@@ -236,14 +302,14 @@ export default defineComponent({
     const options = [{}];
 
     // 删除任务
-    const deleteTask = (row) => {
+    const deleteTask = (row: Song) => {
       dialog.warning({
         title: "警告",
         content: "检查是否有正在运行的定时任务，确定删除?",
         positiveText: "确定",
         negativeText: "不确定",
         onPositiveClick: () => {
-          TaskApi.deleteTask(row.id).then((resp) => {
+          TaskApi.deleteTask(row.id.toString()).then((resp) => {
             if (resp.success === true) {
               initTaskList();
               message.success("删除任务成功！");
@@ -259,14 +325,25 @@ export default defineComponent({
     };
 
     // 运行任务
-    const runTask = async (row) => {
-      const resp = await TaskApi.runningTask(row.id);
-      if (resp.success === true) {
-        message.success("开始运行！");
-        initTaskList();
-      } else {
-        message.error("运行失败！");
-      }
+    const runTask = async (row: Song) => {
+      console.log(row);
+      // const resp = await TaskApi.runningTask(row.id.toString());
+      // if (resp.success === true) {
+      //   message.success("开始运行！");
+      //   initTaskList();
+      // } else {
+      //   message.error("运行失败！");
+      // }
+    };
+
+    // 显示任务报告列表
+    const clickTaskName = (row: Song) => {
+      datas.tid = row.id;
+      datas.taskFlag = false;
+    };
+    // 返回任务列表
+    const goBack = () => {
+      datas.taskFlag = true;
     };
 
     // 定时设置
@@ -292,6 +369,73 @@ export default defineComponent({
       showModalTask.value = false;
       initTaskList();
     };
+
+    //报告页面
+
+    ChartJS.register(
+      Title,
+      Tooltip,
+      Legend,
+      BarElement,
+      ArcElement,
+      CategoryScale,
+      LinearScale
+    );
+
+    const barChartData = {
+      labels: ["错误", "总数", "失败", "通过", "跳过"],
+      datasets: [
+        {
+          label: "432",
+          data: [65, 59, 80, 81, 56],
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.5)",
+            "rgba(54, 162, 235, 0.5)",
+            "rgba(255, 206, 86, 0.5)",
+            "rgba(75, 192, 192, 0.5)",
+            "rgba(153, 102, 255, 0.5)",
+          ],
+          borderColor: [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(153, 102, 255, 1)",
+          ],
+          borderWidth: 1,
+          borderRadius: 10,
+        },
+      ],
+    };
+
+    const barChartOptions = { responsive: true };
+
+    const doughnutChartData = {
+      labels: ["错误", "总数", "失败", "通过", "跳过"],
+      datasets: [
+        {
+          label: "数量",
+          data: [65, 59, 80, 81, 56],
+          backgroundColor: [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(153, 102, 255, 1)",
+          ],
+          borderColor: [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+            "rgba(75, 192, 192, 1)",
+            "rgba(153, 102, 255, 1)",
+          ],
+          hoverOffset: 10,
+        },
+      ],
+    };
+
+    const doughnutChartOptions = { responsive: true };
 
     onMounted(() => {
       initTeamList();
@@ -321,6 +465,9 @@ export default defineComponent({
               break;
             case "delete":
               deleteTask(row);
+              break;
+            case "clickTaskName":
+              clickTaskName(row);
               break;
           }
         },
@@ -353,6 +500,12 @@ export default defineComponent({
           trigger: ["input"],
         },
       },
+      goBack,
+      columnsReport: createColumnsReport({ clickReportName }),
+      barChartData,
+      barChartOptions,
+      doughnutChartData,
+      doughnutChartOptions,
     };
   },
 });
@@ -360,72 +513,77 @@ export default defineComponent({
 
 <template>
   <div class="body">
-    <div class="pageheader">
-      <n-space justify="space-between" class="breadcrumb-navigation">
-        <span>任务管理</span>
-        <n-breadcrumb separator=">">
-          <n-breadcrumb-item>首页</n-breadcrumb-item>
-          <n-breadcrumb-item>任务管理</n-breadcrumb-item>
-        </n-breadcrumb>
-      </n-space>
-    </div>
-    <n-card class="main-card">
-      <div>
-        <n-space justify="space-between">
-          <n-form inline :model="model" label-placement="left">
-            <n-form-item label="团队">
-              <n-select
-                style="width: 200px"
-                v-model:value="datas.query.team_id"
-                placeholder="选择团队"
-                :options="model.teamOptions"
-                @update:value="changeTeam"
-                clearable
-              >
-              </n-select>
-            </n-form-item>
-            <n-form-item label="名称" label-placement="left">
-              <n-input
-                v-model:value="datas.query.name"
-                placeholder="请输入任务名称"
-              ></n-input>
-            </n-form-item>
-            <n-form-item label-placement="left">
-              <n-button type="primary" @click="initTaskList">
-                <template #icon>
-                  <n-icon>
-                    <SearchOutline />
-                  </n-icon>
-                </template>
-                搜索
-              </n-button>
-            </n-form-item>
-          </n-form>
-          <n-button type="primary" @click="openModalTask(1)">创建</n-button>
+    <div class="task-list" v-if="datas.taskFlag">
+      <div class="pageheader">
+        <n-space justify="space-between" class="breadcrumb-navigation">
+          <span>任务管理</span>
+          <n-breadcrumb separator=">">
+            <n-breadcrumb-item>首页</n-breadcrumb-item>
+            <n-breadcrumb-item>任务管理</n-breadcrumb-item>
+          </n-breadcrumb>
         </n-space>
       </div>
-      <n-data-table
-        :columns="columns"
-        :data="datas.tableData"
-        :pagination="pagination"
+      <n-card class="main-card">
+        <div>
+          <n-space justify="space-between">
+            <n-form inline :model="model" label-placement="left">
+              <n-form-item label="团队">
+                <n-select
+                  style="width: 200px"
+                  v-model:value="datas.query.team_id"
+                  placeholder="选择团队"
+                  :options="model.teamOptions"
+                  @update:value="changeTeam"
+                  clearable
+                >
+                </n-select>
+              </n-form-item>
+              <n-form-item label="名称" label-placement="left">
+                <n-input
+                  v-model:value="datas.query.name"
+                  placeholder="请输入任务名称"
+                ></n-input>
+              </n-form-item>
+              <n-form-item label-placement="left">
+                <n-button type="primary" @click="initTaskList">
+                  <template #icon>
+                    <n-icon>
+                      <SearchOutline />
+                    </n-icon>
+                  </template>
+                  搜索
+                </n-button>
+              </n-form-item>
+            </n-form>
+            <n-button type="primary" @click="openModalTask(1)">创建</n-button>
+          </n-space>
+        </div>
+        <n-data-table
+          :columns="columns"
+          :data="datas.tableData"
+          :pagination="pagination"
+          :bordered="false"
+        />
+      </n-card>
+
+      <n-modal
+        v-model:show="showModalTask"
+        class="custom-card"
+        preset="card"
+        style="width: 80%"
+        :title="modalDatas.title"
+        size="huge"
         :bordered="false"
-      />
-    </n-card>
+        :segmented="segmented"
+      >
+        <TaskModal
+          :type="modalDatas.type"
+          :tid="datas.tid"
+          @close="closeModal"
+        />
+      </n-modal>
 
-    <n-modal
-      v-model:show="showModalTask"
-      class="custom-card"
-      preset="card"
-      style="width: 80%"
-      :title="modalDatas.title"
-      size="huge"
-      :bordered="false"
-      :segmented="segmented"
-    >
-      <TaskModal :type="modalDatas.type" :tid="datas.tid" @close="closeModal" />
-    </n-modal>
-
-    <!-- <n-modal
+      <!-- <n-modal
       v-model:show="showModalTimer"
       class="custom-card"
       preset="card"
@@ -473,6 +631,47 @@ export default defineComponent({
       <n-divider title-placement="left"> 选择用例 </n-divider>
       <div></div>
     </n-modal> -->
+    </div>
+    <div class="task-report" v-else>
+      <div class="pageheader">
+        <n-space justify="space-between" class="breadcrumb-navigation">
+          <div>
+            <n-button quaternary @click="goBack">返回</n-button>
+            <span>任务管理</span>
+          </div>
+
+          <n-breadcrumb separator=">">
+            <n-breadcrumb-item>首页</n-breadcrumb-item>
+            <n-breadcrumb-item>任务管理</n-breadcrumb-item>
+            <n-breadcrumb-item>任务报告</n-breadcrumb-item>
+          </n-breadcrumb>
+        </n-space>
+      </div>
+      <n-grid cols="8" item-responsive responsive="screen">
+        <n-grid-item span="0 m:1 l:3">
+          <n-data-table
+            :columns="columnsReport"
+            :data="datas.tableData"
+            :pagination="pagination"
+            :bordered="false"
+          />
+        </n-grid-item>
+        <n-grid-item span="0 m:1 l:3">
+          <Bar
+            id="my-chart-id"
+            :options="barChartOptions"
+            :data="barChartData"
+          />
+        </n-grid-item>
+        <n-grid-item span="0 m:1 l:2">
+          <Doughnut
+            id="my-chart-id"
+            :options="doughnutChartOptions"
+            :data="doughnutChartData"
+          />
+        </n-grid-item>
+      </n-grid>
+    </div>
   </div>
 </template>
 

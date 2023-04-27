@@ -10,9 +10,11 @@
   "dependencies": {
     "awesome-cron": "^0.0.14",
     "axios": "^0.27.2",
+    "chart.js": "^4.2.1",
     "naive-ui": "^2.32.2",
     "qs": "^6.10.5",
     "vue": "^3.2.25",
+    "vue-chartjs": "^5.2.0",
     "vue-router": "4"
   },
   "devDependencies": {
