@@ -155,42 +155,9 @@ const createColumns = ({
   ];
 };
 
-type Song2 = {
-  id: number;
-  name: string;
-  env: string;
-  team: string;
-  execute_count: number;
-  status: number;
-  create_time: string;
-};
 
-const clickReportName = (row: Song2) => {
-  console.log(row);
-};
 
-const createColumnsReport = ({
-  clickReportName,
-}: {
-  clickReportName: (row: Song2) => void;
-}): DataTableColumns<Song2> => {
-  return [
-    {
-      title: "Name",
-      key: "name",
-      render(row) {
-        return h(
-          NButton,
-          {
-            size: "small",
-            onClick: () => clickReportName(row),
-          },
-          { default: () => row.name }
-        );
-      },
-    },
-  ];
-};
+
 
 type ModalDatas = {
   type?: number | null;
@@ -326,14 +293,13 @@ export default defineComponent({
 
     // 运行任务
     const runTask = async (row: Song) => {
-      console.log(row);
-      // const resp = await TaskApi.runningTask(row.id.toString());
-      // if (resp.success === true) {
-      //   message.success("开始运行！");
-      //   initTaskList();
-      // } else {
-      //   message.error("运行失败！");
-      // }
+      const resp = await TaskApi.runningTask(row.id.toString());
+      if (resp.success === true) {
+        message.success("开始运行！");
+        initTaskList();
+      } else {
+        message.error("运行失败！");
+      }
     };
 
     // 显示任务报告列表
@@ -501,7 +467,6 @@ export default defineComponent({
         },
       },
       goBack,
-      columnsReport: createColumnsReport({ clickReportName }),
       barChartData,
       barChartOptions,
       doughnutChartData,
@@ -647,30 +612,7 @@ export default defineComponent({
           </n-breadcrumb>
         </n-space>
       </div>
-      <n-grid cols="8" item-responsive responsive="screen">
-        <n-grid-item span="0 m:1 l:3">
-          <n-data-table
-            :columns="columnsReport"
-            :data="datas.tableData"
-            :pagination="pagination"
-            :bordered="false"
-          />
-        </n-grid-item>
-        <n-grid-item span="0 m:1 l:3">
-          <Bar
-            id="my-chart-id"
-            :options="barChartOptions"
-            :data="barChartData"
-          />
-        </n-grid-item>
-        <n-grid-item span="0 m:1 l:2">
-          <Doughnut
-            id="my-chart-id"
-            :options="doughnutChartOptions"
-            :data="doughnutChartData"
-          />
-        </n-grid-item>
-      </n-grid>
+
     </div>
   </div>
 </template>
