@@ -1,10 +1,5 @@
 <template>
   <div class="home">
-    <div>
-      <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
-        <img src="../assets/seldom-platform.gif"  class="home-logo" />
-      </a>
-    </div>
     <div class="background-img">
       <img src="../assets/home-bg.png" width="100%" height="100%" alt="" />
     </div>
