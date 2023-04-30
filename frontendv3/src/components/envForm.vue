@@ -6,22 +6,37 @@
     label-width="auto"
     :rules="rules"
   >
-    <n-form-item label="环境名称" path="name">
+    <n-form-item label="名称" path="name">
       <n-input v-model:value="form.name" placeholder="环境名称" clearable />
     </n-form-item>
-    <n-form-item label="base_url" path="base-url">
-      <n-input v-model:value="form.base_url" placeholder="基础URL" clearable />
-    </n-form-item>
-    <n-form-item label="browser" path="browser">
-      <n-input
-        v-model:value="form.browser"
-        placeholder="浏览器名称"
-        clearable
+    <n-form-item label="类型" path="test_type">
+      <n-select
+        v-model:value="form.test_type"
+        placeholder="测试类型"
+        :options="typeOptions"
       />
     </n-form-item>
     <n-form-item label="env" path="env">
       <n-input v-model:value="form.env" placeholder="环境变量名" clearable />
     </n-form-item>
+    <n-form-item
+      v-if="form.test_type === 'http'"
+      label="base_url"
+      path="base-url"
+    >
+      <n-input v-model:value="form.base_url" placeholder="基础URL" clearable />
+    </n-form-item>
+    <n-form-item
+      v-if="form.test_type === 'web'"
+      label="browser"
+      path="browser">
+      <n-select
+        v-model:value="form.browser"
+        placeholder="浏览器名称"
+        :options="browserOptions"
+      />
+    </n-form-item>
+
     <div class="dialog-footer">
       <n-space>
         <n-button @click="cancelDialog()">取消</n-button>
@@ -40,15 +55,55 @@ const props = defineProps({
   envid: Number,
 });
 
+const typeOptions = [
+  {
+    label: "http",
+    value: "http",
+  },
+  {
+    label: "web",
+    value: "web",
+  },
+  // app 暂时不支持
+  // {
+  //   label: "app",
+  //   value: "app",
+  // },
+];
+
+const browserOptions = [
+  {
+    label: "chrome",
+    value: "chrome",
+  },
+  {
+    label: "edge",
+    value: "edge",
+  },
+  {
+    label: "firefox",
+    value: "firefox",
+  },
+];
 const formRef = ref<FormInst | null>(null);
 
 type teamForm = {
   id: number;
   name: string;
+  test_type: string;
   base_url: string | null;
   browser: string | null;
   env: string | null;
 };
+
+const form = ref<teamForm>({
+  id: 0,
+  name: "",
+  test_type: "http",
+  base_url: null,
+  browser: null,
+  env: null,
+});
 
 const rules = {
   name: {
@@ -56,19 +111,21 @@ const rules = {
     trigger: ["input", "blur"],
     message: "请输入环境名称",
   },
+  test_type: {
+    required: true,
+    trigger: ["input", "blur"],
+    message: "请选择测试类型",
+  },
+  browser: {
+    required: true,
+    trigger: ["input", "blur"],
+    message: "请选择浏览器名称",
+  },
 };
 
 const emit = defineEmits(["cancel"]);
 
 const message = useMessage();
-
-const form = ref<teamForm>({
-  id: 0,
-  name: "",
-  base_url: null,
-  browser: null,
-  env: null,
-});
 
 const getEnv = async () => {
   ProjectApi.getEnv(props.envid).then((resp) => {

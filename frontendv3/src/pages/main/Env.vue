@@ -109,6 +109,11 @@ onMounted(() => {
           </template>
           <template #description> {{ item.desc }} </template>
           <n-descriptions id="thing-desc" label-placement="left" :column="1">
+            <n-descriptions-item v-if="item.test_type" label="类型">
+              <n-tag type="success" size="small">
+                {{ item.test_type }}
+              </n-tag>
+            </n-descriptions-item>
             <n-descriptions-item v-if="item.base_url" label="base_url">
               {{ item.base_url }}
             </n-descriptions-item>
