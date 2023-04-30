@@ -14,9 +14,12 @@ class ProjectIn(Schema):
 class EnvIn(Schema):
     """环境入参"""
     name: str
+    test_type: str
     env: Optional[str] = None
     browser: Optional[str] = None
     base_url: Optional[str] = None
+    app_server: Optional[str] = None
+    app_info: Optional[str] = "{}"
 
 
 class MergeCase(Schema):

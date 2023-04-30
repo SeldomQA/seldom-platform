@@ -431,9 +431,13 @@ def create_env(request, env: EnvIn):
     """
     project_obj = Env.objects.create(
         name=env.name,
+        test_type=env.test_type,
         env=env.env,
         browser=env.browser,
-        base_url=env.base_url)
+        base_url=env.base_url,
+        app_server=env.app_server,
+        app_info=env.app_info
+    )
     return response(result=model_to_dict(project_obj))
 
 
@@ -485,9 +489,12 @@ def update_env(request, env_id: int, env: EnvIn):
     try:
         env_obj = Env.objects.get(id=env_id)
         env_obj.name = env.name
+        env_obj.test_type = env.test_type
         env_obj.env = env.env
         env_obj.browser = env.browser
         env_obj.base_url = env.base_url
+        env_obj.app_server = env.app_server
+        env_obj.app_info = env.app_info
         env_obj.save()
     except Env.DoesNotExist:
         return response(error=Error.ENV_IS_NULL)

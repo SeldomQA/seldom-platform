@@ -24,14 +24,18 @@ class Env(models.Model):
     """
     环境管理
     说明：
+    * test_type = http/web/app # seldom框架支持三种类型测试
     * env = Seldom.env  # 指定当前运行环境 env=production/develop/test
     * browser = seldom.main(browser="xxx")  # web测试，指定当前运行的浏览器 xxx=chrome/firefox/edge
     * base_url = seldom.main(base_url="xxx")  # http接口测试：指定当前运行的URL xxx=http://www.httpbin.org
     """
     name = models.CharField("名称", max_length=50, null=False)
+    test_type = models.CharField("环境值", max_length=20, null=True, default="http")
     env = models.CharField("环境值", max_length=50, null=True, default="")
     browser = models.CharField("环境值", max_length=20, null=True, default="")
     base_url = models.CharField("URL", max_length=200, null=True, default="")
+    app_server = models.CharField("APP服务", max_length=100, null=True, default="")
+    app_info = models.CharField("APP信息", max_length=1000, null=True, default="{}")
     is_delete = models.BooleanField('删除', default=False)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
