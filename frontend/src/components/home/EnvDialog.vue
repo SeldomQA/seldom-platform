@@ -5,13 +5,30 @@
         <el-form-item label="名称" prop="name">
           <el-input cy-data="enviornment-name" v-model="form.name"></el-input>
         </el-form-item>
+        <el-form-item label="类型" prop="test_type">
+          <el-select v-model="form.test_type" style="width: 100%;" @change="testTypeChange()">
+            <el-option
+              v-for="item in typeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="env" prop="env">
           <el-input cy-data="enviornment-env"  v-model="form.env"></el-input>
         </el-form-item>
-        <el-form-item label="browser" prop="browser">
-          <el-input cy-data="enviornment-browser"  v-model="form.browser"></el-input>
+        <el-form-item v-if="form.test_type=='web'" label="browser" prop="browser">
+          <el-select v-model="form.browser" cy-data="enviornment-browser" style="width: 100%;">
+            <el-option
+              v-for="item in browserOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="base_url" prop="base_url">
+        <el-form-item v-if="form.test_type=='http'" label="base_url" prop="base_url">
           <el-input cy-data="enviornment-url"  v-model="form.base_url"></el-input>
         </el-form-item>
         <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
@@ -36,6 +53,7 @@ export default {
       showTitle: '',
       form: {
         name: '',
+        test_type: 'http',
         env: '',
         browser: '',
         base_url: ''
@@ -43,8 +61,41 @@ export default {
       rules: {
         name: [
           { required: true, message: '请输入项目名称', trigger: 'blur' }
+        ],
+        test_type: [
+          { required: true, message: '请选择测试类型', trigger: 'blur' }
+        ],
+        browser: [
+          { required: true, message: '请选择浏览器', trigger: 'blur' }
         ]
       },
+      typeOptions: [
+        {
+          value: 'http',
+          label: 'http'
+        }, {
+          value: 'web',
+          label: 'web'
+        }
+      // 暂未APP支持
+      // {
+      //   value: 'app',
+      //   label: 'App UI'
+      // }
+      ],
+      browserOptions: [
+        {
+          value: 'chrome',
+          label: 'chrome'
+        }, {
+          value: 'edge',
+          label: 'edge'
+        }, {
+          value: 'firefox',
+          label: 'firefox'
+        }
+      ],
+      testType: 'http',
       inResize: true
     }
   },

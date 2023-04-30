@@ -15,6 +15,11 @@
           <el-table-column fixed prop="id" label="ID" width="80">
           </el-table-column>
           <el-table-column prop="name" label="名称"> </el-table-column>
+          <el-table-column label="类型">
+            <template slot-scope="scope">
+              <el-tag>{{ scope.row.test_type }}</el-tag>
+            </template>
+            </el-table-column>
           <el-table-column prop="base_url" label="base_url"> </el-table-column>
           <el-table-column prop="browser" label="browser"> </el-table-column>
           <el-table-column prop="env" label="env"> </el-table-column>
