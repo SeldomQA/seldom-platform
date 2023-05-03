@@ -11,22 +11,11 @@ import {
   NSpace,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
-import { Bar, Doughnut } from "vue-chartjs";
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  ArcElement,
-  CategoryScale,
-  LinearScale,
-} from "chart.js";
-
 import baseUrl from "~/config/base-url";
 import { SearchOutline } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
+import TaskReport from "~/components/TaskReport.vue";
 import TaskModal from "~/components/taskModal.vue";
 
 type Song = {
@@ -155,10 +144,6 @@ const createColumns = ({
   ];
 };
 
-
-
-
-
 type ModalDatas = {
   type?: number | null;
   taskId?: number | null;
@@ -168,8 +153,6 @@ type ModalDatas = {
 export default defineComponent({
   components: {
     SearchOutline,
-    Bar,
-    Doughnut,
   },
   setup() {
     const datas = reactive({
@@ -336,73 +319,6 @@ export default defineComponent({
       initTaskList();
     };
 
-    //报告页面
-
-    ChartJS.register(
-      Title,
-      Tooltip,
-      Legend,
-      BarElement,
-      ArcElement,
-      CategoryScale,
-      LinearScale
-    );
-
-    const barChartData = {
-      labels: ["错误", "总数", "失败", "通过", "跳过"],
-      datasets: [
-        {
-          label: "432",
-          data: [65, 59, 80, 81, 56],
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.5)",
-            "rgba(54, 162, 235, 0.5)",
-            "rgba(255, 206, 86, 0.5)",
-            "rgba(75, 192, 192, 0.5)",
-            "rgba(153, 102, 255, 0.5)",
-          ],
-          borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-          ],
-          borderWidth: 1,
-          borderRadius: 10,
-        },
-      ],
-    };
-
-    const barChartOptions = { responsive: true };
-
-    const doughnutChartData = {
-      labels: ["错误", "总数", "失败", "通过", "跳过"],
-      datasets: [
-        {
-          label: "数量",
-          data: [65, 59, 80, 81, 56],
-          backgroundColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-          ],
-          borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-            "rgba(75, 192, 192, 1)",
-            "rgba(153, 102, 255, 1)",
-          ],
-          hoverOffset: 10,
-        },
-      ],
-    };
-
-    const doughnutChartOptions = { responsive: true };
-
     onMounted(() => {
       initTeamList();
       initTaskList();
@@ -467,10 +383,6 @@ export default defineComponent({
         },
       },
       goBack,
-      barChartData,
-      barChartOptions,
-      doughnutChartData,
-      doughnutChartOptions,
     };
   },
 });
@@ -612,7 +524,7 @@ export default defineComponent({
           </n-breadcrumb>
         </n-space>
       </div>
-
+      <TaskReport :tid="datas.tid"/>
     </div>
   </div>
 </template>

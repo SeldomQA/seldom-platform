@@ -105,26 +105,26 @@
       </el-table-column>
     </el-table> -->
 
-    <n-grid cols="8" item-responsive responsive="screen">
-      <n-grid-item span="0 m:3 l:3">
-        <n-data-table
-          :columns="columnsReport"
-          :data="datas.tableData"
-          :pagination="pagination"
-          :bordered="false"
-        />
-      </n-grid-item>
-      <n-grid-item span="0 m:3 l:3">
-        <Bar id="my-chart-id" :options="barChartOptions" :data="barChartData" />
-      </n-grid-item>
-      <n-grid-item span="0 m:2 l:2">
-        <Doughnut
-          id="my-chart-id"
-          :options="doughnutChartOptions"
-          :data="doughnutChartData"
-        />
-      </n-grid-item>
-    </n-grid>
+    <n-space justify="space-between">
+      <Doughnut
+        id="my-chart-id"
+        :options="doughnutChartOptions"
+        :data="doughnutChartData"
+      />
+      <Bar id="my-chart-id" :options="barChartOptions" :data="barChartData" />
+    </n-space>
+
+    <n-data-table
+      class="table"
+      :columns="columnsReport"
+      :data="datas.tableData"
+      :pagination="pagination"
+      :bordered="false"
+      :row-key="rowKey"
+      :row-props="rowProps"
+      v-model:checked-row-keys="checkedRowKeysRef"
+    />
+
     <!-- 分页 -->
     <!-- <div class="foot-page">
       <el-pagination
@@ -146,9 +146,9 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted, effect, watch,h } from "vue";
+import { reactive, ref, onMounted, effect, watch, h } from "vue";
 import { useMessage, NButton } from "naive-ui";
-import type { DataTableColumns } from "naive-ui";
+import type { DataTableColumns, DataTableRowKey } from "naive-ui";
 import TaskApi from "~/request/task";
 // import TaskReportDialog from "./TaskReportDialog.vue";
 
@@ -183,12 +183,9 @@ const form = ref({
 
 const message = useMessage();
 
-// created() {
-//   datas.req.task_id = props.tid;
-// }
-
 // 初始化任务列表
 const initReportList = async () => {
+  datas.req.task_id = props.tid;
   const resp = await TaskApi.getReportAll(datas.req);
   if (resp.success === true) {
     datas.tableData = resp.result;
@@ -213,7 +210,7 @@ const handleCurrentChange = (val) => {
   initReportList();
 };
 
-type Song2 = {
+type Song = {
   id: number;
   name: string;
   env: string;
@@ -223,19 +220,81 @@ type Song2 = {
   create_time: string;
 };
 
-const clickReportName = (row: Song2) => {
+const rowKey = (row: Song) => row.id;
+
+const checkedRowKeysRef = ref<[number]>([0]);
+
+const rowProps = (row: Song) => {
+  return {
+    style: "cursor: pointer;",
+    onClick: () => {
+      message.info(row.name);
+      checkedRowKeysRef.value = [row.id];
+      // console.log(checkedRowKeysRef.value);
+    },
+  };
+};
+
+const clickReportName = (row: Song) => {
   console.log(row);
 };
 
 const createColumnsReport = ({
   clickReportName,
 }: {
-  clickReportName: (row: Song2) => void;
-}): DataTableColumns<Song2> => {
+  clickReportName: (row: Song) => void;
+}): DataTableColumns<Song> => {
   return [
     {
-      title: "Name",
+      type: "selection",
+      multiple: false,
+    },
+    {
+      title: "名称",
       key: "name",
+      render(row) {
+        return h(
+          NButton,
+          {
+            size: "small",
+            bordered: false,
+            onClick: () => clickReportName(row),
+          },
+          { default: () => row.name }
+        );
+      },
+    },
+    {
+      title: "总数",
+      key: "tests",
+    },
+    {
+      title: "通过",
+      key: "passed",
+    },
+    {
+      title: "错误",
+      key: "error",
+    },
+    {
+      title: "失败",
+      key: "failure",
+    },
+    {
+      title: "跳过",
+      key: "skipped",
+    },
+    {
+      title: "运行",
+      key: "run_time",
+    },
+    {
+      title: "创建时间",
+      key: "create_time",
+    },
+    {
+      title: "操作",
+      key: "actions",
       render(row) {
         return h(
           NButton,
@@ -243,7 +302,7 @@ const createColumnsReport = ({
             size: "small",
             onClick: () => clickReportName(row),
           },
-          { default: () => row.name }
+          { default: () => "查看" }
         );
       },
     },
@@ -252,7 +311,99 @@ const createColumnsReport = ({
 
 const columnsReport = createColumnsReport({ clickReportName });
 
-const pagination = false as const
+const pagination = false as const;
+
+import { Bar, Doughnut } from "vue-chartjs";
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+} from "chart.js";
+
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  BarElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale
+);
+
+const barChartData = {
+  labels: ["错误", "总数", "失败", "通过", "跳过"],
+  datasets: [
+    {
+      label: "432",
+      data: [65, 59, 80, 81, 56],
+      backgroundColor: [
+        "rgba(255, 99, 132, 0.8)",
+        "rgba(54, 162, 235, 0.8)",
+        "rgba(255, 206, 86, 0.8)",
+        "rgba(75, 192, 192, 0.8)",
+        "rgba(153, 102, 255, 0.8)",
+      ],
+      borderColor: [
+        "rgba(255, 99, 132, 1)",
+        "rgba(54, 162, 235, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(153, 102, 255, 1)",
+      ],
+      borderWidth: 1,
+      //柱体弧度
+      borderRadius: 10,
+      //柱体宽度
+      barThickness: 20,
+    },
+  ],
+};
+
+const barChartOptions = {
+  responsive: true,
+
+  maintainAspectRatio: false,
+  height: 800,
+};
+
+const doughnutChartData = {
+  labels: ["错误", "总数", "失败", "通过", "跳过"],
+  datasets: [
+    {
+      label: "数量",
+      data: [65, 59, 80, 81, 56],
+      backgroundColor: [
+        "rgba(255, 99, 132, 0.9)",
+        "rgba(54, 162, 235, 0.9)",
+        "rgba(255, 206, 86, 0.9)",
+        "rgba(75, 192, 192, 0.9)",
+        "rgba(153, 102, 255, 0.9)",
+      ],
+      borderColor: [
+        "rgba(255, 99, 132, 1)",
+        "rgba(54, 162, 235, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(153, 102, 255, 1)",
+      ],
+      cutoutPercentage: 10,
+      hoverOffset: 50,
+    },
+  ],
+};
+
+const doughnutChartOptions = {
+  responsive: true,
+  //柱体  比例
+  cutout: 70,
+  //大小
+  radius: 80,
+};
 
 onMounted(() => {
   // 初始化方法
@@ -273,5 +424,8 @@ onMounted(() => {
 .foot-page {
   margin-top: 20px;
   text-align: right;
+}
+.table {
+  height: 100%;
 }
 </style>
