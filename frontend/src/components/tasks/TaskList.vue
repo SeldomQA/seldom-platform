@@ -87,10 +87,18 @@
           </el-table-column>
           <el-table-column
             fixed="right"
-            label="操作"
-            width="220">
+            label="运行&报告"
+            width="180">
             <template slot-scope="scope">
               <el-button type="success" size="mini" plain @click="runTask(scope.row)">运行</el-button>
+              <el-button type="primary" size="mini" plain @click="clickTaskName(scope.row)">报告</el-button>
+            </template>
+          </el-table-column>
+          <el-table-column
+            fixed="right"
+            label="操作"
+            width="180">
+            <template slot-scope="scope">
               <el-button type="primary" size="mini" plain @click="showEditTask(scope.row)">编辑</el-button>
               <el-button type="danger" size="mini" plain @click="deleteTask(scope.row)">删除</el-button>
             </template>
@@ -102,7 +110,7 @@
       <TaskDialog v-if="taskDailog" :pid=projectId :tid=taskId @cancel="cancelDialog"></TaskDialog>
     </el-card>
     <el-card class="main-card" v-else>
-      <el-page-header @back="goBack" content="任务报告" style="margin-bottom: 50px;">
+      <el-page-header @back="goBack" :content="taskTitle" style="margin-bottom: 50px;">
       </el-page-header>
       <taskReport :tid=taskId></taskReport>
     </el-card>
@@ -125,6 +133,7 @@ export default {
   data() {
     return {
       taskFlag: true,
+      taskTitle: '',
       taskDailog: false,
       timedDailog: false,
       projectId: '',
@@ -237,6 +246,7 @@ export default {
     },
     // 显示任务报告列表
     clickTaskName(row) {
+      this.taskTitle = row.name + ' - 报告列表'
       this.taskId = row.id
       this.taskFlag = false
     },
