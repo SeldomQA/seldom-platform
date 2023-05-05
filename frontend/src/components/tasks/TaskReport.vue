@@ -125,6 +125,14 @@
         prop="create_time"
         label="创建时间">
       </el-table-column>
+      <el-table-column
+        fixed="right"
+        label="操作"
+        width="180">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" plain @click="showReport(scope.row)">报告详情</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <!-- 分页 -->
     <div class="foot-page">
