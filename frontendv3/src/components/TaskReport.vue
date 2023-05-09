@@ -213,10 +213,12 @@ const handleCurrentChange = (val) => {
 type Song = {
   id: number;
   name: string;
-  env: string;
-  team: string;
-  execute_count: number;
-  status: number;
+  tests: number;
+  passed: number;
+  error: number;
+  failure: number;
+  skipped: number;
+  run_time: string;
   create_time: string;
 };
 
@@ -228,9 +230,10 @@ const rowProps = (row: Song) => {
   return {
     style: "cursor: pointer;",
     onClick: () => {
-      message.info(row.name);
       checkedRowKeysRef.value = [row.id];
-      // console.log(checkedRowKeysRef.value);
+      let data = [row.tests, row.passed, row.error, row.failure, row.skipped];
+      barChartData.value = renderBarChartData(data);
+      doughnutChartData.value = renderDoughnutChartData(data);
     },
   };
 };
@@ -313,6 +316,7 @@ const columnsReport = createColumnsReport({ clickReportName });
 
 const pagination = false as const;
 
+//chart.js
 import { Bar, Doughnut } from "vue-chartjs";
 import {
   Chart as ChartJS,
@@ -323,6 +327,7 @@ import {
   ArcElement,
   CategoryScale,
   LinearScale,
+  ChartData,
 } from "chart.js";
 
 ChartJS.register(
@@ -335,24 +340,24 @@ ChartJS.register(
   LinearScale
 );
 
-const barChartData = {
-  labels: ["错误", "总数", "失败", "通过", "跳过"],
+const barChartData = ref({
+  labels: ["总数", "通过", "错误", "失败", "跳过"],
   datasets: [
     {
       label: "432",
-      data: [65, 59, 80, 81, 56],
+      data: [40, 50, 60, 30, 10],
       backgroundColor: [
-        "rgba(255, 99, 132, 0.8)",
         "rgba(54, 162, 235, 0.8)",
-        "rgba(255, 206, 86, 0.8)",
         "rgba(75, 192, 192, 0.8)",
+        "rgba(255, 99, 132, 0.8)",
+        "rgba(255, 206, 86, 0.8)",
         "rgba(153, 102, 255, 0.8)",
       ],
       borderColor: [
-        "rgba(255, 99, 132, 1)",
         "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
         "rgba(75, 192, 192, 1)",
+        "rgba(255, 99, 132, 1)",
+        "rgba(255, 206, 86, 1)",
         "rgba(153, 102, 255, 1)",
       ],
       borderWidth: 1,
@@ -362,7 +367,7 @@ const barChartData = {
       barThickness: 20,
     },
   ],
-};
+});
 
 const barChartOptions = {
   responsive: true,
@@ -371,31 +376,31 @@ const barChartOptions = {
   height: 800,
 };
 
-const doughnutChartData = {
-  labels: ["错误", "总数", "失败", "通过", "跳过"],
+const doughnutChartData = ref({
+  labels: ["总数", "通过", "错误", "失败", "跳过"],
   datasets: [
     {
       label: "数量",
       data: [65, 59, 80, 81, 56],
       backgroundColor: [
-        "rgba(255, 99, 132, 0.9)",
         "rgba(54, 162, 235, 0.9)",
-        "rgba(255, 206, 86, 0.9)",
         "rgba(75, 192, 192, 0.9)",
+        "rgba(255, 99, 132, 0.9)",
+        "rgba(255, 206, 86, 0.9)",
         "rgba(153, 102, 255, 0.9)",
       ],
       borderColor: [
-        "rgba(255, 99, 132, 1)",
         "rgba(54, 162, 235, 1)",
-        "rgba(255, 206, 86, 1)",
         "rgba(75, 192, 192, 1)",
+        "rgba(255, 99, 132, 1)",
+        "rgba(255, 206, 86, 1)",
         "rgba(153, 102, 255, 1)",
       ],
       cutoutPercentage: 10,
       hoverOffset: 50,
     },
   ],
-};
+});
 
 const doughnutChartOptions = {
   responsive: true,
@@ -404,6 +409,61 @@ const doughnutChartOptions = {
   //大小
   radius: 80,
 };
+
+const renderBarChartData = (data: any) => ({
+  labels: ["总数", "通过", "错误", "失败", "跳过"],
+  datasets: [
+    {
+      label: "432",
+      data: data,
+      backgroundColor: [
+        "rgba(54, 162, 235, 0.8)",
+        "rgba(75, 192, 192, 0.8)",
+        "rgba(255, 99, 132, 0.8)",
+        "rgba(255, 206, 86, 0.8)",
+        "rgba(153, 102, 255, 0.8)",
+      ],
+      borderColor: [
+        "rgba(54, 162, 235, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(255, 99, 132, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(153, 102, 255, 1)",
+      ],
+      borderWidth: 1,
+      //柱体弧度
+      borderRadius: 10,
+      //柱体宽度
+      barThickness: 20,
+    },
+  ],
+});
+
+const renderDoughnutChartData = (data: any) => ({
+  labels: ["总数", "通过", "错误", "失败", "跳过"],
+  datasets: [
+    {
+      label: "数量",
+      data: data,
+      backgroundColor: [
+        "rgba(54, 162, 235, 0.9)",
+        "rgba(75, 192, 192, 0.9)",
+        "rgba(255, 99, 132, 0.9)",
+        "rgba(255, 206, 86, 0.9)",
+        "rgba(153, 102, 255, 0.9)",
+      ],
+      borderColor: [
+        "rgba(54, 162, 235, 1)",
+        "rgba(75, 192, 192, 1)",
+        "rgba(255, 99, 132, 1)",
+        "rgba(255, 206, 86, 1)",
+        "rgba(153, 102, 255, 1)",
+      ],
+      cutoutPercentage: 10,
+      hoverOffset: 50,
+    },
+  ],
+});
 
 onMounted(() => {
   // 初始化方法
