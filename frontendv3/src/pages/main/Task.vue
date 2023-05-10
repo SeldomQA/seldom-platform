@@ -15,7 +15,7 @@ import baseUrl from "~/config/base-url";
 import { SearchOutline } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
-import TaskReport from "~/components/TaskReport.vue";
+import TaskReport from "~/components/taskReport.vue";
 import TaskModal from "~/components/taskModal.vue";
 
 type Song = {

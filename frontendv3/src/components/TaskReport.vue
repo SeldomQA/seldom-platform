@@ -136,12 +136,16 @@
       </el-pagination>
     </div> -->
     <!-- 引用组件 -->
-    <!-- <TaskReportDialog
-      v-if="reportDialog"
-      :rid="reportId"
-      :type="resultType"
-      @cancel="cancelDialog"
-    ></TaskReportDialog> -->
+    <n-modal
+      v-model:show="datas.reportDialog"
+      class="custom-card"
+      preset="card"
+      title="报告详情"
+      size="huge"
+      :bordered="false"
+    >
+      <TaskReportDialog :rid="datas.reportId" :type="datas.resultType" />
+    </n-modal>
   </div>
 </template>
 
@@ -149,17 +153,20 @@
 import { reactive, ref, onMounted, effect, watch, h } from "vue";
 import { useMessage, NButton } from "naive-ui";
 import type { DataTableColumns, DataTableRowKey } from "naive-ui";
+import TaskReportDialog from "~/components/taskReportModal.vue";
 import TaskApi from "~/request/task";
-// import TaskReportDialog from "./TaskReportDialog.vue";
+
 
 const props = defineProps({
   tid: Number,
 });
 
+const message = useMessage();
+
 const datas = reactive({
   loading: true,
   reportDialog: false,
-  reportId: false,
+  reportId: 0,
   resultType: "",
   tableData: [],
   total: 0,
@@ -181,8 +188,6 @@ const form = ref({
   user: "",
 });
 
-const message = useMessage();
-
 // 初始化任务列表
 const initReportList = async () => {
   datas.req.task_id = props.tid;
@@ -195,9 +200,10 @@ const initReportList = async () => {
   }
 };
 // 显示报告详情
-const showReport = async (row, type) => {
+const showReport = async (row: Song, type) => {
   datas.reportDialog = true;
   datas.reportId = row.id;
+  console.log( datas.reportId);
   datas.resultType = type;
 };
 // 创建任务子组件的回调
@@ -238,10 +244,6 @@ const rowProps = (row: Song) => {
   };
 };
 
-const clickReportName = (row: Song) => {
-  console.log(row);
-};
-
 const createColumnsReport = ({
   clickReportName,
 }: {
@@ -255,17 +257,17 @@ const createColumnsReport = ({
     {
       title: "名称",
       key: "name",
-      render(row) {
-        return h(
-          NButton,
-          {
-            size: "small",
-            bordered: false,
-            onClick: () => clickReportName(row),
-          },
-          { default: () => row.name }
-        );
-      },
+      // render(row) {
+      //   return h(
+      //     NButton,
+      //     {
+      //       size: "small",
+      //       bordered: false,
+      //       onClick: () => clickReportName(row),
+      //     },
+      //     { default: () => row.name }
+      //   );
+      // },
     },
     {
       title: "总数",
@@ -303,13 +305,17 @@ const createColumnsReport = ({
           NButton,
           {
             size: "small",
-            onClick: () => clickReportName(row),
+            onClick: () => showReport(row, "tests"),
           },
           { default: () => "查看" }
         );
       },
     },
   ];
+};
+
+const clickReportName = (row: Song) => {
+  console.log(row);
 };
 
 const columnsReport = createColumnsReport({ clickReportName });
