@@ -40,61 +40,61 @@
           >
           </n-input>
         </div>
-        <!-- <div v-if="caseDetails.system_err !== ''">
+        <div v-if="datas.caseDetails.system_err !== ''">
           <p>system err</p>
           <n-input
             id="system-err"
             type="textarea"
             :rows="10"
             placeholder="null"
-            v-model="caseDetails.system_err"
+            v-model:value="datas.caseDetails.system_err"
           >
           </n-input>
         </div>
-        <div v-if="caseDetails.system_out !== ''">
+        <div v-if="datas.caseDetails.system_out !== ''">
           <p>system out</p>
           <n-input
             id="system-out"
             type="textarea"
             :rows="10"
             placeholder="null"
-            v-model="caseDetails.system_out"
+            v-model:value="datas.caseDetails.system_out"
           >
           </n-input>
         </div>
-        <div v-if="caseDetails.failure_out !== ''">
+        <div v-if="datas.caseDetails.failure_out !== ''">
           <p>failure</p>
           <n-input
             id="failure"
             type="textarea"
             :rows="10"
             placeholder="null"
-            v-model="caseDetails.failure_out"
+            v-model:value="datas.caseDetails.failure_out"
           >
           </n-input>
         </div>
-        <div v-if="caseDetails.error_out !== ''">
+        <div v-if="datas.caseDetails.error_out !== ''">
           <p>error</p>
           <n-input
             id="error"
             type="textarea"
             :rows="10"
             placeholder="null"
-            v-model="caseDetails.error_out"
+            v-model:value="datas.caseDetails.error_out"
           >
           </n-input>
         </div>
-        <div v-if="caseDetails.skipped_message !== ''">
+        <div v-if="datas.caseDetails.skipped_message !== ''">
           <p>skipped message</p>
           <n-input
             id="skipped-message"
             type="textarea"
             :rows="2"
             placeholder="null"
-            v-model="caseDetails.skipped_message"
+            v-model:value="datas.caseDetails.skipped_message"
           >
           </n-input>
-        </div> -->
+        </div>
       </span>
     </div>
   </div>
@@ -138,8 +138,6 @@ const initTaskDetails = async () => {
   }
 };
 
-
-
 // 点击用例详情
 const caseRowClick = (row) => {
   return {
@@ -150,15 +148,14 @@ const caseRowClick = (row) => {
   };
 };
 
-
 onMounted(() => {
   // 初始化方法
   initTaskDetails();
 });
 </script>
 
-<style>
-.n-transfer-panel {
+<style scoped>
+/* .n-transfer-panel {
   height: 500px !important;
 }
 .n-transfer-panel__list {
@@ -181,17 +178,20 @@ onMounted(() => {
 #error {
   color: #fa5c7c;
 }
+
 #failure {
   color: #fd7e14;
 }
+
 #skipped-message {
   color: #8a969c;
 }
+
 #system-err {
   color: #fa5c7c;
 }
 
 #system-out {
   color: #6b5eae;
-}
+} */
 </style>
