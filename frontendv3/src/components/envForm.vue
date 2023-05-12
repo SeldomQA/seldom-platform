@@ -1,49 +1,51 @@
 <template>
-  <n-form
-    ref="formRef"
-    :model="form"
-    label-placement="left"
-    label-width="auto"
-    :rules="rules"
-  >
-    <n-form-item label="名称" path="name">
-      <n-input v-model:value="form.name" placeholder="环境名称" clearable />
-    </n-form-item>
-    <n-form-item label="类型" path="test_type">
-      <n-select
-        v-model:value="form.test_type"
-        placeholder="测试类型"
-        :options="typeOptions"
-      />
-    </n-form-item>
-    <n-form-item label="env" path="env">
-      <n-input v-model:value="form.env" placeholder="环境变量名" clearable />
-    </n-form-item>
-    <n-form-item
-      v-if="form.test_type === 'http'"
-      label="base_url"
-      path="base-url"
+  <div class="env-form">
+    <n-form
+      ref="formRef"
+      :model="form"
+      :rules="rules"
+      label-placement="left"
+      label-width="auto"
     >
-      <n-input v-model:value="form.base_url" placeholder="基础URL" clearable />
-    </n-form-item>
-    <n-form-item
-      v-if="form.test_type === 'web'"
-      label="browser"
-      path="browser">
-      <n-select
-        v-model:value="form.browser"
-        placeholder="浏览器名称"
-        :options="browserOptions"
-      />
-    </n-form-item>
+      <n-form-item label="名称" path="name">
+        <n-input v-model:value="form.name" placeholder="环境名称" clearable />
+      </n-form-item>
+      <n-form-item label="类型" path="test_type">
+        <n-select
+          v-model:value="form.test_type"
+          placeholder="测试类型"
+          :options="typeOptions"
+        />
+      </n-form-item>
+      <n-form-item label="env" path="env">
+        <n-input v-model:value="form.env" placeholder="环境变量名" clearable />
+      </n-form-item>
+      <n-form-item
+        v-if="form.test_type === 'http'"
+        label="base_url"
+        path="base-url"
+      >
+        <n-input v-model:value="form.base_url" placeholder="基础URL" clearable />
+      </n-form-item>
+      <n-form-item
+        v-if="form.test_type === 'web'"
+        label="browser"
+        path="browser">
+        <n-select
+          v-model:value="form.browser"
+          placeholder="浏览器名称"
+          :options="browserOptions"
+        />
+      </n-form-item>
 
-    <div class="dialog-footer">
-      <n-space>
-        <n-button @click="cancelDialog()">取消</n-button>
-        <n-button type="primary" @click="saveTeam()">保存</n-button>
-      </n-space>
-    </div>
-  </n-form>
+      <div class="dialog-footer">
+        <n-space>
+          <n-button @click="cancelDialog()">取消</n-button>
+          <n-button type="primary" @click="saveEnv()">保存</n-button>
+        </n-space>
+      </div>
+    </n-form>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -52,7 +54,7 @@ import { defineComponent, reactive, ref, onMounted } from "vue";
 import ProjectApi from "~/request/project";
 
 const props = defineProps({
-  envid: Number,
+  envId: Number,
 });
 
 const typeOptions = [
@@ -87,7 +89,7 @@ const browserOptions = [
 ];
 const formRef = ref<FormInst | null>(null);
 
-type teamForm = {
+type envForm = {
   id: number;
   name: string;
   test_type: string;
@@ -96,7 +98,7 @@ type teamForm = {
   env: string | null;
 };
 
-const form = ref<teamForm>({
+const form = ref<envForm>({
   id: 0,
   name: "",
   test_type: "http",
@@ -123,12 +125,11 @@ const rules = {
   },
 };
 
-const emit = defineEmits(["cancel"]);
 
 const message = useMessage();
 
 const getEnv = async () => {
-  ProjectApi.getEnv(props.envid).then((resp) => {
+  ProjectApi.getEnv(props.envId).then((resp: any) => {
     if (resp.success === true) {
       form.value = resp.result;
     } else {
@@ -138,18 +139,18 @@ const getEnv = async () => {
 };
 
 onMounted(() => {
-  if (props.envid === 0) {
+  if (props.envId === 0) {
   } else {
     getEnv();
   }
 });
 
-// 保存按钮
-const saveTeam = () => {
+// 保存环境
+const saveEnv = () => {
   formRef.value?.validate((errors) => {
     if (!errors) {
-      if (props.envid === 0) {
-        ProjectApi.createEnv(form.value).then((resp) => {
+      if (props.envId === 0) {
+        ProjectApi.createEnv(form.value).then((resp: any) => {
           if (resp.success === true) {
             message.success("创建成功！");
             cancelDialog();
@@ -158,7 +159,7 @@ const saveTeam = () => {
           }
         });
       } else {
-        ProjectApi.updateEnv(props.envid, form.value).then((resp) => {
+        ProjectApi.updateEnv(props.envId, form.value).then((resp: any) => {
           if (resp.success === true) {
             message.success("更新成功！");
             cancelDialog();
@@ -174,6 +175,7 @@ const saveTeam = () => {
 };
 
 // 关闭dialog
+const emit = defineEmits(["cancel"]);
 const cancelDialog = () => {
   emit("cancel", {});
 };

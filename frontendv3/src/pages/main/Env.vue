@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import ProjectApi from "~/request/project";
-import CaseApi from "~/request/case";
-import { reactive, onMounted, h, defineComponent, ref } from "vue";
-import { NIcon, useMessage, TreeOption, SelectOption } from "naive-ui";
-import type { DataTableColumns } from "naive-ui";
-import baseUrl from "~/config/base-url";
-import {
-  MenuOutline,
-  CloudOutline,
-  TrashOutline,
-  PencilOutline,
-} from "@vicons/ionicons5";
+import { reactive, onMounted, ref } from "vue";
+import { NIcon, useMessage} from "naive-ui";
+
 import envForm from "@/envForm.vue";
 
 const message = useMessage();
@@ -58,7 +50,7 @@ const deleteEnv = async (id: number) => {
   }
 };
 
-// 关闭表单
+// 关闭弹窗回调
 const cancelDialog = () => {
   datas.showDailog = false;
   getEnvList();
@@ -158,7 +150,7 @@ onMounted(() => {
         role="dialog"
         aria-modal="true"
       >
-        <envForm ref="form" :envid="datas.envId" @cancel="cancelDialog" />
+        <envForm ref="form" :envId="datas.envId" @cancel="cancelDialog" />
       </n-card>
     </n-modal>
   </div>
