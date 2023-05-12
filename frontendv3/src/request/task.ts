@@ -39,7 +39,7 @@ class TaskApi {
   }
 
   getReportResult(rid: string, data: TNomalObject) {
-    return request.post("/api//task/report/" + rid + "/results", data);
+    return request.post("/api/task/report/" + rid + "/results", data);
   }
 }
 

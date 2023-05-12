@@ -15,13 +15,17 @@ import baseUrl from "~/config/base-url";
 import { SearchOutline } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
+import TaskReport from "~/components/taskReport.vue";
 import TaskModal from "~/components/taskModal.vue";
 
 type Song = {
-  no: number;
-  title: string;
-  length: string;
   id: number;
+  name: string;
+  env: string;
+  team: string;
+  execute_count: number;
+  status: number;
+  create_time: string;
 };
 
 const createColumns = ({
@@ -37,6 +41,17 @@ const createColumns = ({
     {
       title: "任务名称",
       key: "name",
+      render(row) {
+        return h(
+          NButton,
+          {
+            type: "info",
+            quaternary: true,
+            onClick: () => play(row, "clickTaskName"),
+          },
+          { default: () => row.name }
+        );
+      },
     },
     {
       title: "环境",
@@ -152,6 +167,7 @@ export default defineComponent({
         team_id: null,
         name: null,
       },
+      taskFlag: true,
     });
 
     const modalDatas: ModalDatas = reactive({
@@ -236,14 +252,14 @@ export default defineComponent({
     const options = [{}];
 
     // 删除任务
-    const deleteTask = (row) => {
+    const deleteTask = (row: Song) => {
       dialog.warning({
         title: "警告",
         content: "检查是否有正在运行的定时任务，确定删除?",
         positiveText: "确定",
         negativeText: "不确定",
         onPositiveClick: () => {
-          TaskApi.deleteTask(row.id).then((resp) => {
+          TaskApi.deleteTask(row.id.toString()).then((resp) => {
             if (resp.success === true) {
               initTaskList();
               message.success("删除任务成功！");
@@ -259,14 +275,24 @@ export default defineComponent({
     };
 
     // 运行任务
-    const runTask = async (row) => {
-      const resp = await TaskApi.runningTask(row.id);
+    const runTask = async (row: Song) => {
+      const resp = await TaskApi.runningTask(row.id.toString());
       if (resp.success === true) {
         message.success("开始运行！");
         initTaskList();
       } else {
         message.error("运行失败！");
       }
+    };
+
+    // 显示任务报告列表
+    const clickTaskName = (row: Song) => {
+      datas.tid = row.id;
+      datas.taskFlag = false;
+    };
+    // 返回任务列表
+    const goBack = () => {
+      datas.taskFlag = true;
     };
 
     // 定时设置
@@ -322,6 +348,9 @@ export default defineComponent({
             case "delete":
               deleteTask(row);
               break;
+            case "clickTaskName":
+              clickTaskName(row);
+              break;
           }
         },
       }),
@@ -353,6 +382,7 @@ export default defineComponent({
           trigger: ["input"],
         },
       },
+      goBack,
     };
   },
 });
@@ -360,72 +390,77 @@ export default defineComponent({
 
 <template>
   <div class="body">
-    <div class="pageheader">
-      <n-space justify="space-between" class="breadcrumb-navigation">
-        <span>任务管理</span>
-        <n-breadcrumb separator=">">
-          <n-breadcrumb-item>首页</n-breadcrumb-item>
-          <n-breadcrumb-item>任务管理</n-breadcrumb-item>
-        </n-breadcrumb>
-      </n-space>
-    </div>
-    <n-card class="main-card">
-      <div>
-        <n-space justify="space-between">
-          <n-form inline :model="model" label-placement="left">
-            <n-form-item label="团队">
-              <n-select
-                style="width: 200px"
-                v-model:value="datas.query.team_id"
-                placeholder="选择团队"
-                :options="model.teamOptions"
-                @update:value="changeTeam"
-                clearable
-              >
-              </n-select>
-            </n-form-item>
-            <n-form-item label="名称" label-placement="left">
-              <n-input
-                v-model:value="datas.query.name"
-                placeholder="请输入任务名称"
-              ></n-input>
-            </n-form-item>
-            <n-form-item label-placement="left">
-              <n-button type="primary" @click="initTaskList">
-                <template #icon>
-                  <n-icon>
-                    <SearchOutline />
-                  </n-icon>
-                </template>
-                搜索
-              </n-button>
-            </n-form-item>
-          </n-form>
-          <n-button type="primary" @click="openModalTask(1)">创建</n-button>
+    <div class="task-list" v-if="datas.taskFlag">
+      <div class="pageheader">
+        <n-space justify="space-between" class="breadcrumb-navigation">
+          <span>任务管理</span>
+          <n-breadcrumb separator=">">
+            <n-breadcrumb-item>首页</n-breadcrumb-item>
+            <n-breadcrumb-item>任务管理</n-breadcrumb-item>
+          </n-breadcrumb>
         </n-space>
       </div>
-      <n-data-table
-        :columns="columns"
-        :data="datas.tableData"
-        :pagination="pagination"
+      <n-card class="main-card">
+        <div>
+          <n-space justify="space-between">
+            <n-form inline :model="model" label-placement="left">
+              <n-form-item label="团队">
+                <n-select
+                  style="width: 200px"
+                  v-model:value="datas.query.team_id"
+                  placeholder="选择团队"
+                  :options="model.teamOptions"
+                  @update:value="changeTeam"
+                  clearable
+                >
+                </n-select>
+              </n-form-item>
+              <n-form-item label="名称" label-placement="left">
+                <n-input
+                  v-model:value="datas.query.name"
+                  placeholder="请输入任务名称"
+                ></n-input>
+              </n-form-item>
+              <n-form-item label-placement="left">
+                <n-button type="primary" @click="initTaskList">
+                  <template #icon>
+                    <n-icon>
+                      <SearchOutline />
+                    </n-icon>
+                  </template>
+                  搜索
+                </n-button>
+              </n-form-item>
+            </n-form>
+            <n-button type="primary" @click="openModalTask(1)">创建</n-button>
+          </n-space>
+        </div>
+        <n-data-table
+          :columns="columns"
+          :data="datas.tableData"
+          :pagination="pagination"
+          :bordered="false"
+        />
+      </n-card>
+
+      <n-modal
+        v-model:show="showModalTask"
+        class="custom-card"
+        preset="card"
+        style="width: 80%"
+        :title="modalDatas.title"
+        size="huge"
         :bordered="false"
-      />
-    </n-card>
+        :segmented="segmented"
+      >
+        <TaskModal
+          :type="modalDatas.type"
+          :tid="datas.tid"
+          @close="closeModal"
+        />
+      </n-modal>
 
-    <n-modal
-      v-model:show="showModalTask"
-      class="custom-card"
-      preset="card"
-      style="width: 80%"
-      :title="modalDatas.title"
-      size="huge"
-      :bordered="false"
-      :segmented="segmented"
-    >
-      <TaskModal :type="modalDatas.type" :tid="datas.tid" @close="closeModal" />
-    </n-modal>
-
-    <!-- <n-modal
+      <!-- <n-modal
       v-model:show="showModalTimer"
       class="custom-card"
       preset="card"
@@ -473,6 +508,24 @@ export default defineComponent({
       <n-divider title-placement="left"> 选择用例 </n-divider>
       <div></div>
     </n-modal> -->
+    </div>
+    <div class="task-report" v-else>
+      <div class="pageheader">
+        <n-space justify="space-between" class="breadcrumb-navigation">
+          <div>
+            <n-button quaternary @click="goBack">返回</n-button>
+            <span>任务管理</span>
+          </div>
+
+          <n-breadcrumb separator=">">
+            <n-breadcrumb-item>首页</n-breadcrumb-item>
+            <n-breadcrumb-item>任务管理</n-breadcrumb-item>
+            <n-breadcrumb-item>任务报告</n-breadcrumb-item>
+          </n-breadcrumb>
+        </n-space>
+      </div>
+      <TaskReport :tid="datas.tid"/>
+    </div>
   </div>
 </template>
 
