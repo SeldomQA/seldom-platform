@@ -1,21 +1,16 @@
-<script lang="ts">
-import TeamApi from "~/request/Team";
-import { reactive, onMounted, h, defineComponent, ref } from "vue";
+<script setup lang="ts">
+import TeamApi from "~/request/team";
+import { reactive, onMounted, h} from "vue";
 import {
   NButton,
-  NIcon,
   useMessage,
-  TreeOption,
-  SelectOption,
-  FormInst,
   NSpace,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
-import baseUrl from "~/config/base-url";
-import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
 import teamForm from "@/teamForm.vue";
 
-type Song = {
+
+type RowData  = {
   id: number;
   name: string;
   email: string;
@@ -23,10 +18,10 @@ type Song = {
 };
 
 const createColumns = ({
-  play,
+  teamList
 }: {
-  play: (row: Song, action: string) => void;
-}): DataTableColumns<Song> => {
+  teamList: (row: RowData , action: string) => void;
+}): DataTableColumns<RowData> => {
   return [
     {
       title: "ID",
@@ -59,7 +54,7 @@ const createColumns = ({
                   type: "info",
                   secondary: true,
                   size: "small",
-                  onClick: () => play(row, "edit"),
+                  onClick: () => teamList(row, "edit"),
                 },
                 { default: () => "编辑" }
               ),
@@ -69,7 +64,7 @@ const createColumns = ({
                   type: "error",
                   secondary: true,
                   size: "small",
-                  onClick: () => play(row, "delete"),
+                  onClick: () => teamList(row, "delete"),
                 },
                 { default: () => "删除" }
               ),
@@ -81,120 +76,81 @@ const createColumns = ({
   ];
 };
 
-export default defineComponent({
-  setup() {
-    const message = useMessage();
-
-    const datas = reactive({
-      loading: true,
-      teamData: [],
-      modalType: 1,
-      showDailog: false,
-      teamId: 0,
-    });
-
-    const initTeamList = async () => {
-      datas.loading = true;
-      const resp = await TeamApi.getTeamAll();
-      if (resp.success === true) {
-        message.success("获取团队信息成功");
-        datas.teamData = resp.result;
-      } else {
-        message.error(resp.error.message);
-      }
-      datas.loading = false;
-    };
-
-    // 对话框
-    const form = ref();
-
-    // 显示创建窗口
-    const showCreate = () => {
-      datas.modalType = 1;
-      datas.teamId = 0;
-      datas.showDailog = true;
-    };
-
-    // 显示编辑窗口
-    const showUpdate = (id: number) => {
-      datas.modalType = 0;
-      datas.teamId = id;
-      datas.showDailog = true;
-    };
-
-    const deleteTeam = async (id: number) => {
-      const resp = await TeamApi.deleteTeam(id.toString());
-      if (resp.success === true) {
-        message.success("删除成功！");
-        initTeamList();
-      } else {
-        message.error("删除失败");
-      }
-    };
-
-    const onNegativeClick = () => {
-      message.success("Cancel");
-      datas.showDailog = false;
-    };
-
-    const onPositiveClick = () => {
-      // console.log(form.value.model);
-      if (datas.modalType == 1) {
-        TeamApi.createTeam(form.value.model).then((resp) => {
-          if (resp.success === true) {
-            message.success("创建成功！");
-            initTeamList();
-          } else {
-            message.error("创建失败！");
-          }
-        });
-      } else {
-        TeamApi.updateTeam(datas.teamId.toString(), form.value.model).then(
-          (resp) => {
-            if (resp.success === true) {
-              message.success("更新成功！");
-              initTeamList();
-            } else {
-              message.error("更新失败！");
-            }
-          }
-        );
-      }
-      datas.showDailog = false;
-    };
-
-    onMounted(() => {
-      initTeamList();
-    });
-
-    return {
-      datas,
-      form,
-      showUpdate,
-      deleteTeam,
-      showCreate,
-      onNegativeClick,
-      onPositiveClick,
-      columns: createColumns({
-        play(row: Song, action: string) {
-          message.info(`Play ${row.name} action ${action}`);
-          datas.teamId = row.id;
-          switch (action) {
-            case "edit":
-              datas.modalType = 2;
-              showUpdate(row.id);
-              break;
-            case "delete":
-              deleteTeam(row.id);
-              break;
-            default:
-              break;
-          }
-        },
-      }),
-      pagination: false as const,
-    };
+const columns = createColumns({
+  teamList(row: RowData, action: string) {
+    datas.teamId = row.id;
+    switch (action) {
+      case "edit":
+        datas.modalType = 0;
+        showUpdate(row.id);
+        break;
+      case "delete":
+        deleteTeam(row.id);
+        break;
+      default:
+        break;
+    }
   },
+});
+
+const pagination = false as const
+
+const message = useMessage();
+
+const datas = reactive({
+  loading: true,
+  teamData: [],
+  modalType: 1,
+  showDailog: false,
+  teamId: 0,
+});
+
+const initTeamList = async () => {
+  datas.loading = true;
+  const resp = await TeamApi.getTeamAll();
+  if (resp.success === true) {
+    datas.teamData = resp.result;
+  } else {
+    message.error(resp.error.message);
+  }
+  datas.loading = false;
+};
+
+
+// 显示创建窗口
+const showCreate = () => {
+  datas.modalType = 1;
+  datas.teamId = 0;
+  datas.showDailog = true;
+};
+
+// 显示编辑窗口
+const showUpdate = (id: number) => {
+  datas.modalType = 0;
+  datas.teamId = id;
+  datas.showDailog = true;
+};
+
+// 删除团队
+const deleteTeam = async (id: number) => {
+  const resp = await TeamApi.deleteTeam(id.toString());
+  if (resp.success === true) {
+    message.success("删除成功！");
+    initTeamList();
+  } else {
+    message.error("删除失败");
+  }
+};
+
+
+// 关闭弹窗回调
+const cancelDialog = () => {
+  datas.showDailog = false;
+  initTeamList();
+};
+
+onMounted(() => {
+  initTeamList();
 });
 </script>
 
@@ -223,23 +179,21 @@ export default defineComponent({
       />
     </n-card>
 
-    <n-modal
-      v-model:show="datas.showDailog"
-      style="min-width: 600px"
-      preset="dialog"
-      positive-text="确认"
-      negative-text="取消"
-      @positive-click="onPositiveClick"
-      @negative-click="onNegativeClick"
-      :title="datas.modalType ? '新建团队' : '编辑团队'"
-    >
-      <teamForm ref="form" :teamId="datas.teamId" />
+    <!-- 创建&编辑弹窗 -->
+    <n-modal v-model:show="datas.showDailog">
+      <n-card
+        :title="datas.modalType ? '新建团队' : '编辑团队'"
+        style="width: 600px"
+        role="dialog"
+      >
+        <teamForm ref="form" :teamId="datas.teamId" @cancel="cancelDialog"/>
+      </n-card>
     </n-modal>
   </div>
 </template>
 
 <style scoped>
 .filter-line {
-    padding-bottom: 20px;
+  padding-bottom: 20px;
 }
 </style>
