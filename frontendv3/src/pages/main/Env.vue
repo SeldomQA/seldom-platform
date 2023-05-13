@@ -2,6 +2,12 @@
 import ProjectApi from "~/request/project";
 import { reactive, onMounted, ref } from "vue";
 import { NIcon, useMessage} from "naive-ui";
+import {
+  MenuOutline,
+  CloudOutline,
+  TrashOutline,
+  PencilOutline
+} from "@vicons/ionicons5";
 
 import envForm from "@/envForm.vue";
 
