@@ -1,30 +1,22 @@
 <template>
-  <div class="project-dialog">
+  <div class="project-form">
     <n-form
       ref="formRef"
       :model="form"
       :rules="rules"
       label-placement="left"
       label-width="auto"
-      require-mark-placement="right-hanging"
     >
       <n-form-item label="名称" path="name">
         <n-input v-model:value="form.name" placeholder="项目名称" />
       </n-form-item>
-      <n-form-item label="git项目" path="address">
-        <n-input v-model:value="form.address" placeholder="git地址" />
+      <n-form-item label="Git地址" path="address">
+        <n-input v-model:value="form.address" placeholder="项目的github/gitee/gitlab...地址" />
       </n-form-item>
       <n-form-item label="用例目录" path="case_dir">
         <n-input v-model:value="form.case_dir" placeholder="用例目录" />
       </n-form-item>
-      <n-form-item>
-        <n-alert
-          style="width: 100%"
-          title="克隆项目：项目的git地址"
-          type="success"
-        ></n-alert>
-      </n-form-item>
-      <n-form-item label="封面">
+      <n-form-item label="项目Logo">
         <n-upload
           ref="uploadRef"
           v-model:file-list="fileListRef"
@@ -33,7 +25,6 @@
           :action="baseUrl + '/api/project/upload'"
           :max="1"
           @finish="handleFinish"
-          @remove="handleRemove"
           :show-retry-button="false"
         >
           <n-upload-dragger>
@@ -43,11 +34,10 @@
               </n-icon>
             </div>
             <n-text style="font-size: 16px">
-              点击或者拖动文件到该区域来上传
+              点击或者拖动文件到该区域
             </n-text>
             <n-p depth="3" style="margin: 8px 0 0 0">
-              请上传.png
-              .jpg格式的图片，不要上传敏感数据或无意义的数据，破服务器请求手下留情
+              请上传PNG、JPG格式的图片, 只支持上传1个图片。
             </n-p>
           </n-upload-dragger>
         </n-upload>
@@ -67,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { FormInst, useMessage, UploadFileInfo, UploadInst } from "naive-ui";
 import ProjectApi from "~/request/project";
 import { ArchiveOutline } from "@vicons/ionicons5";
@@ -82,6 +72,7 @@ const emit = defineEmits(["cancel"]);
 const message = useMessage();
 
 const formRef = ref<FormInst | null>(null);
+
 const uploadRef = ref<UploadInst | null>(null);
 
 const form = ref({
@@ -135,24 +126,11 @@ const handleFinish = ({
   }
   return file;
 };
-const handleRemove = async () => {
-  // 后续有具体删除需求备用
-  // const resp = await ProjectApi.removeProjectCover(props.pid);
-  // if (resp.success === true) {
-  //   form.value.path_name = "";
-  //   form.value.cover_name = "";
-  //   message.success("封面删除成功");
-  // } else {
-  //   message.error(resp.error.message);
-  // }
-  form.value.path_name = "";
-  form.value.cover_name = "";
-  message.success("封面删除成功");
-};
 
 // 获取一条项目信息
 const getProject = async () => {
-  const resp = await ProjectApi.getProject(props.pid);
+  const pId = props.pid + ''
+  const resp = await ProjectApi.getProject(pId);
   if (resp.success === true) {
     // console.log(resp.result);
     form.value = resp.result;
@@ -175,11 +153,10 @@ const cancelProject = () => {
 
 // 新增&编辑保存按钮
 const onSubmit = () => {
-  // console.log("pid", props.pid);
   formRef.value?.validate((errors) => {
     if (!errors) {
       if (props.pid === 0) {
-        ProjectApi.createProject(form.value).then((resp) => {
+        ProjectApi.createProject(form.value).then((resp: any) => {
           if (resp.success === true) {
             message.success("创建成功！");
             cancelProject();
@@ -188,7 +165,8 @@ const onSubmit = () => {
           }
         });
       } else {
-        ProjectApi.updateProject(props.pid, form.value).then((resp) => {
+        const pId = props.pid + ''
+        ProjectApi.updateProject(pId, form.value).then((resp: any) => {
           if (resp.success === true) {
             message.success("更新成功！");
             cancelProject();

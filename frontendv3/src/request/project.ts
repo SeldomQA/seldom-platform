@@ -6,8 +6,8 @@ class ProjectApi {
     return request.post("/api/project/create", data);
   }
 
-  getProjects(data: TNomalObject) {
-    return request.get("/api/project/list", data);
+  getProjects() {
+    return request.get("/api/project/list");
   }
 
   getProject(pid: string) {
