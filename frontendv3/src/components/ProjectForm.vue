@@ -1,5 +1,5 @@
 <template>
-  <div class="project-dialog">
+  <div class="project-form">
     <n-form
       ref="formRef"
       :model="form"
@@ -25,7 +25,6 @@
           :action="baseUrl + '/api/project/upload'"
           :max="1"
           @finish="handleFinish"
-          @remove="handleRemove"
           :show-retry-button="false"
         >
           <n-upload-dragger>
@@ -38,7 +37,7 @@
               点击或者拖动文件到该区域
             </n-text>
             <n-p depth="3" style="margin: 8px 0 0 0">
-              请上传PNG、JPG格式的图片
+              请上传PNG、JPG格式的图片, 只支持上传1个图片。
             </n-p>
           </n-upload-dragger>
         </n-upload>
@@ -58,7 +57,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { FormInst, useMessage, UploadFileInfo, UploadInst } from "naive-ui";
 import ProjectApi from "~/request/project";
 import { ArchiveOutline } from "@vicons/ionicons5";
@@ -128,21 +127,6 @@ const handleFinish = ({
   return file;
 };
 
-const handleRemove = async () => {
-  // 后续有具体删除需求备用
-  // const resp = await ProjectApi.removeProjectCover(props.pid);
-  // if (resp.success === true) {
-  //   form.value.path_name = "";
-  //   form.value.cover_name = "";
-  //   message.success("封面删除成功");
-  // } else {
-  //   message.error(resp.error.message);
-  // }
-  form.value.path_name = "";
-  form.value.cover_name = "";
-  message.success("封面删除成功");
-};
-
 // 获取一条项目信息
 const getProject = async () => {
   const pId = props.pid + ''
@@ -169,7 +153,6 @@ const cancelProject = () => {
 
 // 新增&编辑保存按钮
 const onSubmit = () => {
-  // console.log("pid", props.pid);
   formRef.value?.validate((errors) => {
     if (!errors) {
       if (props.pid === 0) {

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { reactive, onMounted } from "vue";
-import { useMessage } from "naive-ui";
+import { useMessage, useDialog } from "naive-ui";
 import { SettingsOutline } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
-import ProjectDialog from "@/projectDialog.vue";
+import ProjectForm from "@/ProjectForm.vue";
 import baseUrl from "~/config/base-url";
 
 const message = useMessage();
+const dialog = useDialog()
 
 const datas = reactive({
   loading: false,
@@ -48,14 +49,26 @@ const cancelProject = () => {
 };
 
 // 删除一条项目信息
-const deleteProject = async (pid: number) => {
-  const resp = await ProjectApi.deleteProject(pid.toString());
-  if (resp.success === true) {
-    message.success("删除成功！");
-    initProjects();
-  } else {
-    message.error("删除失败");
-  }
+const deleteProject = (pid: number) => {
+  dialog.warning({
+    title: '警告',
+    content: '你确定删除项目吗？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      ProjectApi.deleteProject(pid.toString()).then((resp: any) => {
+        if (resp.success === true) {
+          message.success("删除成功！");
+          initProjects();
+        } else {
+          message.error("删除失败！");
+        }
+      })
+    },
+    onNegativeClick: () => {
+      console.log('取消删除');
+    }
+  })
 };
 
 // 克隆拉取项目信息
@@ -190,7 +203,7 @@ onMounted(() => {
         role="dialog"
         aria-modal="true"
       >
-        <ProjectDialog :pid="datas.projectId" @cancel="cancelProject" />
+        <ProjectForm :pid="datas.projectId" @cancel="cancelProject" />
       </n-card>
     </n-modal>
   </div>
