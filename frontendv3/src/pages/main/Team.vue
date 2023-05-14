@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import TeamApi from "~/request/team";
 import { reactive, onMounted, h} from "vue";
 import {
   NButton,
@@ -7,7 +6,9 @@ import {
   NSpace,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
-import teamForm from "@/teamForm.vue";
+import { useDialog} from "naive-ui";
+import TeamApi from "~/request/team";
+import TeamForm from "@/TeamForm.vue";
 
 
 type RowData  = {
@@ -40,7 +41,7 @@ const createColumns = ({
       key: "update_time",
     },
     {
-      title: "Action",
+      title: "操作",
       key: "actions",
       render(row) {
         return h(
@@ -96,6 +97,7 @@ const columns = createColumns({
 const pagination = false as const
 
 const message = useMessage();
+const dialog = useDialog();
 
 const datas = reactive({
   loading: true,
@@ -131,17 +133,29 @@ const showUpdate = (id: number) => {
   datas.showDailog = true;
 };
 
-// 删除团队
-const deleteTeam = async (id: number) => {
-  const resp = await TeamApi.deleteTeam(id.toString());
-  if (resp.success === true) {
-    message.success("删除成功！");
-    initTeamList();
-  } else {
-    message.error("删除失败");
-  }
-};
 
+// 删除环境
+const deleteTeam = (id: number) => {
+  dialog.warning({
+    title: '警告',
+    content: '你确定删除团队吗？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      TeamApi.deleteTeam(id.toString()).then((resp: any) => {
+        if (resp.success === true) {
+          message.success("删除成功！");
+          initTeamList();
+        } else {
+          message.error("删除失败");
+        }
+      })
+    },
+    onNegativeClick: () => {
+      console.log('取消删除');
+    }
+  })
+};
 
 // 关闭弹窗回调
 const cancelDialog = () => {
@@ -186,7 +200,7 @@ onMounted(() => {
         style="width: 600px"
         role="dialog"
       >
-        <teamForm ref="form" :teamId="datas.teamId" @cancel="cancelDialog"/>
+        <TeamForm ref="form" :teamId="datas.teamId" @cancel="cancelDialog"/>
       </n-card>
     </n-modal>
   </div>

@@ -1,25 +1,24 @@
 <script setup lang="ts">
-import ProjectApi from "~/request/project";
 import { reactive, onMounted, ref } from "vue";
-import { NIcon, useMessage} from "naive-ui";
+import { useMessage, useDialog} from "naive-ui";
 import {
   MenuOutline,
   CloudOutline,
   TrashOutline,
   PencilOutline
 } from "@vicons/ionicons5";
-
-import envForm from "@/envForm.vue";
+import ProjectApi from "~/request/project";
+import EnvForm from "@/EnvForm.vue";
 
 const message = useMessage();
-
+const dialog = useDialog();
 const form = ref();
 
 const datas = reactive({
   loading: false,
   showDailog: false,
   modalType: 0,
-  envDatas: [],
+  envData: [],
   envId: 0,
 });
 
@@ -37,23 +36,37 @@ const showUpdate = (id: number) => {
   datas.showDailog = true;
 };
 
+// 初始化环境列表
 const getEnvList = async () => {
   const resp = await ProjectApi.getEnvs();
   if (resp.success === true) {
-    datas.envDatas = resp.result;
+    datas.envData = resp.result;
   } else {
     message.error(resp.error.message);
   }
 };
 
-const deleteEnv = async (id: number) => {
-  const resp = await ProjectApi.deleteEnv(id);
-  if (resp.success === true) {
-    message.success("删除成功！");
-    getEnvList();
-  } else {
-    message.error("删除失败");
-  }
+// 删除环境
+const deleteEnv = (id: number) => {
+  dialog.warning({
+    title: '警告',
+    content: '你确定删除环境吗？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      ProjectApi.deleteEnv(id.toString()).then((resp: any) => {
+        if (resp.success === true) {
+          message.success("删除成功！");
+          getEnvList();
+        } else {
+          message.error("删除失败");
+        }
+      })
+    },
+    onNegativeClick: () => {
+      console.log('取消删除');
+    }
+  })
 };
 
 // 关闭弹窗回调
@@ -85,65 +98,49 @@ onMounted(() => {
       </div>
 
       <n-space>
-        <n-thing
-          v-for="(item, index) in datas.envDatas"
-          :key="index"
-          class="envthing"
-        >
-          <template #avatar>
-            <n-avatar>
-              <n-icon>
-                <CloudOutline />
-              </n-icon>
-            </n-avatar>
-          </template>
-          <template #header> {{ item.name }} </template>
-          <template #header-extra>
-            <n-button circle size="small">
-              <template #icon>
-                <MenuOutline />
-              </template>
-            </n-button>
-          </template>
-          <template #description> {{ item.desc }} </template>
-          <n-descriptions id="thing-desc" label-placement="left" :column="1">
-            <n-descriptions-item v-if="item.test_type" label="类型">
-              <n-tag type="success" size="small">
-                {{ item.test_type }}
-              </n-tag>
-            </n-descriptions-item>
-            <n-descriptions-item v-if="item.base_url" label="base_url">
-              {{ item.base_url }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="item.browser" label="browser">
-              {{ item.browser }}
-            </n-descriptions-item>
-            <n-descriptions-item v-if="item.env" label="env">
-              {{ item.env }}
-            </n-descriptions-item>
-          </n-descriptions>
-          <!-- <template #footer>  </template> -->
-          <template #action>
-            <n-space>
-              <n-button size="small" @click="showUpdate(item.id)">
+        <div v-for="(item, index) in datas.envData" :key="index">
+          <n-card
+              :title="item['name']"
+              class="card-style"
+              content-style="padding: 24px; height:50%;"
+              hoverable
+            >
+            <template #header> {{ item['name'] }} </template>
+            <template #header-extra>
+              <n-button circle size="small">
                 <template #icon>
-                  <n-icon>
-                    <PencilOutline />
-                  </n-icon>
+                  <CloudOutline />
                 </template>
-                编辑
               </n-button>
-              <n-button size="small" @click="deleteEnv(item.id)">
-                <template #icon>
-                  <n-icon>
-                    <TrashOutline />
-                  </n-icon>
-                </template>
-                删除
-              </n-button>
-            </n-space>
-          </template>
-        </n-thing>
+            </template>
+            <n-descriptions id="thing-desc" label-placement="left" :column="1">
+              <n-descriptions-item v-if="item['test_type']" label="类型">
+                <n-tag type="success" size="small">
+                  {{ item['test_type'] }}
+                </n-tag>
+              </n-descriptions-item>
+              <n-descriptions-item v-if="item['base_url']" label="base_url">
+                {{ item['base_url'] }}
+              </n-descriptions-item>
+              <n-descriptions-item v-if="item['browser']" label="browser">
+                {{ item['browser'] }}
+              </n-descriptions-item>
+              <n-descriptions-item v-if="item['env']" label="env">
+                {{ item['env'] }}
+              </n-descriptions-item>
+            </n-descriptions>
+            <template #action>
+              <n-space>
+                <n-button type="info" size="small" secondary @click="showUpdate(item['id'])">
+                  编辑
+                </n-button>
+                <n-button type="error" size="small" secondary @click="deleteEnv(item['id'])">
+                  删除
+                </n-button>
+              </n-space>
+            </template>
+          </n-card>
+        </div>
       </n-space>
     </n-card>
 
@@ -156,7 +153,7 @@ onMounted(() => {
         role="dialog"
         aria-modal="true"
       >
-        <envForm ref="form" :envId="datas.envId" @cancel="cancelDialog" />
+        <EnvForm ref="form" :envId="datas.envId" @cancel="cancelDialog" />
       </n-card>
     </n-modal>
   </div>
@@ -167,15 +164,9 @@ onMounted(() => {
   padding-bottom: 20px;
 }
 
-.envthing {
-  max-width: 400px;
-  min-width: 300px;
-  padding: 18px;
-  border: solid;
-  border-color: rgb(239, 239, 245);
+.card-style {
+  width: 300px;
+  margin-right: 20px;
 }
 
-#thing-desc .n-descriptions-table-content {
-  padding: 4px;
-}
 </style>

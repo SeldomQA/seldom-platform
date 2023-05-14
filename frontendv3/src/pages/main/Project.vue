@@ -7,13 +7,13 @@ import ProjectForm from "@/ProjectForm.vue";
 import baseUrl from "~/config/base-url";
 
 const message = useMessage();
-const dialog = useDialog()
+const dialog = useDialog();
 
 const datas = reactive({
   loading: false,
   showDailog: false,
   projectId: 0,
-  tableData: [],
+  projectData: [],
   url: "https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg",
 });
 
@@ -22,7 +22,7 @@ const initProjects = async () => {
   datas.loading = true;
   const resp = await ProjectApi.getProjects();
   if (resp.success === true) {
-    datas.tableData = resp.result;
+    datas.projectData = resp.result;
   } else {
     message.error(resp.error.message);
   }
@@ -143,11 +143,12 @@ onMounted(() => {
       </div>
       <div class="card-group">
         <n-space>
-          <div v-for="(item, index) in datas.tableData" :key="index">
+          <div v-for="(item, index) in datas.projectData" :key="index">
             <n-card
               :title="item['name']"
-              style="width: 300px; margin-right: 20px;"
+              class="card-style"
               content-style="padding: 24px; height:50%;"
+              hoverable
             >
               <template #header-extra>
                 <n-dropdown
@@ -217,4 +218,10 @@ onMounted(() => {
 .card-group {
   text-align: left;
 }
+
+.card-style {
+  width: 300px;
+  margin-right: 20px;
+}
+
 </style>
