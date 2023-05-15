@@ -1,30 +1,5 @@
-<template>
-  <div class="team-form">
-    <n-form
-      ref="formRef"
-      :model="form"
-      :rules="rules"
-      label-placement="left"
-      label-width="auto"
-    >
-      <n-form-item label="名称" path="name">
-        <n-input v-model:value="form.name" placeholder="团队名称" clearable/>
-      </n-form-item>
-      <n-form-item label="邮箱" path="email">
-        <n-input v-model:value="form.email" placeholder="团队邮箱" clearable/>
-      </n-form-item>
-      <div class="dialog-footer">
-        <n-space>
-          <n-button @click="cancelDialog()">取消</n-button>
-          <n-button type="primary" @click="saveTeam()">保存</n-button>
-        </n-space>
-      </div>
-    </n-form>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { reactive, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { FormInst, useMessage } from "naive-ui";
 import TeamApi from "~/request/team";
 
@@ -51,7 +26,7 @@ const form = ref<teamForm>({
 const rules = {
   name: {
     required: true,
-    trigger: ["blur", "input"],
+    trigger: ["input"],
     message: "请输入团队名称",
   },
   email: {
@@ -91,11 +66,12 @@ const saveTeam = () => {
           }
         });
       } else {
-        TeamApi.updateTeam(props.teamId, form.value).then((resp: any) => {
+        const teamId = props.teamId + ''
+        TeamApi.updateTeam(teamId, form.value).then((resp: any) => {
           if (resp.success === true) {
             message.success("更新成功！");
             cancelDialog();
-          } else {
+          } else { 
             message.error("更新失败！");
           }
         });
@@ -112,6 +88,31 @@ const cancelDialog = () => {
   emit("cancel", {});
 };
 </script>
+
+<template>
+  <div class="team-form">
+    <n-form
+      ref="formRef"
+      :model="form"
+      :rules="rules"
+      label-placement="left"
+      label-width="auto"
+    >
+      <n-form-item label="名称" path="name">
+        <n-input v-model:value="form.name" placeholder="团队名称" clearable/>
+      </n-form-item>
+      <n-form-item label="邮箱" path="email">
+        <n-input v-model:value="form.email" placeholder="团队邮箱" clearable/>
+      </n-form-item>
+      <div class="dialog-footer">
+        <n-space>
+          <n-button @click="cancelDialog()">取消</n-button>
+          <n-button type="primary" @click="saveTeam()">保存</n-button>
+        </n-space>
+      </div>
+    </n-form>
+  </div>
+</template>
 
 <style scoped>
 </style>

@@ -1,3 +1,135 @@
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { FormInst, useMessage, UploadFileInfo, UploadInst } from "naive-ui";
+import ProjectApi from "~/request/project";
+import { ArchiveOutline } from "@vicons/ionicons5";
+import baseUrl from "~/config/base-url";
+
+const props = defineProps({
+  pid: Number,
+});
+
+const emit = defineEmits(["cancel"]);
+
+const message = useMessage();
+
+const formRef = ref<FormInst | null>(null);
+
+const uploadRef = ref<UploadInst | null>(null);
+
+const form = ref({
+  name: "",
+  address: "",
+  case_dir: "",
+  is_delete: false,
+  id: "",
+  cover_name: "",
+  path_name: "",
+});
+
+const rules = {
+  name: {
+    required: true,
+    trigger: ["input"],
+    message: "请输入项目名称",
+  },
+  address: {
+    required: true,
+    trigger: ["blur", "input"],
+    message: "请输入git地址",
+  },
+  case_dir: {
+    required: true,
+    trigger: ["blur", "input"],
+    message: "请输入用例目录",
+  },
+};
+
+// 上传图片
+const fileListRef = ref<UploadFileInfo[]>([]);
+const handleFinish = ({
+  file,
+  event,
+}: {
+  file: UploadFileInfo;
+  event?: ProgressEvent;
+}) => {
+  const jsonresp = JSON.parse((event?.target as XMLHttpRequest).response);
+  console.log(fileListRef.value);
+  // console.log(jsonresp);
+  if (jsonresp.success) {
+    form.value.cover_name = file.name;
+    form.value.path_name = jsonresp.result.name;
+    message.success("上传成功");
+  } else {
+    fileListRef.value[0].id = "";
+    fileListRef.value[0].status = "error";
+    message.error(jsonresp.error.message);
+  }
+  return file;
+};
+
+// 获取一条项目信息
+const getProject = async () => {
+  const pId = props.pid + ''
+  const resp = await ProjectApi.getProject(pId);
+  if (resp.success === true) {
+    form.value = resp.result;
+    if (form.value.path_name != "") {
+      fileListRef.value.push({
+        id: form.value.path_name,
+        name: form.value.cover_name,
+        status: "finished",
+      });
+    }
+  } else {
+    message.error(resp.error.message);
+  }
+};
+
+// 关闭dialog
+const cancelProject = () => {
+  emit("cancel", {});
+};
+
+// 新增&编辑保存按钮
+const onSubmit = () => {
+  formRef.value?.validate((errors) => {
+    if (!errors) {
+      if (props.pid === 0) {
+        ProjectApi.createProject(form.value).then((resp: any) => {
+          if (resp.success === true) {
+            message.success("创建成功！");
+            cancelProject();
+          } else {
+            message.error("创建失败！");
+          }
+        });
+      } else {
+        const pId = props.pid + ''
+        ProjectApi.updateProject(pId, form.value).then((resp: any) => {
+          if (resp.success === true) {
+            message.success("更新成功！");
+            cancelProject();
+          } else {
+            message.error("更新失败！");
+          }
+        });
+      }
+    } else {
+      return false;
+    }
+  });
+};
+
+onMounted(() => {
+  if (props.pid === 0) {
+  } else {
+    getProject();
+  }
+});
+</script>
+
 <template>
   <div class="project-form">
     <n-form
@@ -55,139 +187,6 @@
     </n-form>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { FormInst, useMessage, UploadFileInfo, UploadInst } from "naive-ui";
-import ProjectApi from "~/request/project";
-import { ArchiveOutline } from "@vicons/ionicons5";
-import baseUrl from "~/config/base-url";
-
-const props = defineProps({
-  pid: Number,
-});
-
-const emit = defineEmits(["cancel"]);
-
-const message = useMessage();
-
-const formRef = ref<FormInst | null>(null);
-
-const uploadRef = ref<UploadInst | null>(null);
-
-const form = ref({
-  name: "",
-  address: "",
-  case_dir: "",
-  is_delete: false,
-  id: "",
-  cover_name: "",
-  path_name: "",
-});
-
-const rules = {
-  name: {
-    required: true,
-    trigger: ["blur", "input"],
-    message: "请输入项目名称",
-  },
-  address: {
-    required: true,
-    trigger: ["blur", "input"],
-    message: "请输入git地址",
-  },
-  case_dir: {
-    required: true,
-    trigger: ["blur", "input"],
-    message: "请输入用例目录",
-  },
-};
-
-// 上传图片
-const fileListRef = ref<UploadFileInfo[]>([]);
-const handleFinish = ({
-  file,
-  event,
-}: {
-  file: UploadFileInfo;
-  event?: ProgressEvent;
-}) => {
-  const jsonresp = JSON.parse((event?.target as XMLHttpRequest).response);
-  console.log(fileListRef.value);
-  // console.log(jsonresp);
-  if (jsonresp.success) {
-    form.value.cover_name = file.name;
-    form.value.path_name = jsonresp.result.name;
-    message.success("上传成功");
-  } else {
-    fileListRef.value[0].id = "";
-    fileListRef.value[0].status = "error";
-    message.error(jsonresp.error.message);
-  }
-  return file;
-};
-
-// 获取一条项目信息
-const getProject = async () => {
-  const pId = props.pid + ''
-  const resp = await ProjectApi.getProject(pId);
-  if (resp.success === true) {
-    // console.log(resp.result);
-    form.value = resp.result;
-    if (form.value.path_name != "") {
-      fileListRef.value.push({
-        id: form.value.path_name,
-        name: form.value.cover_name,
-        status: "finished",
-      });
-    }
-  } else {
-    message.error(resp.error.message);
-  }
-};
-
-// 关闭dialog
-const cancelProject = () => {
-  emit("cancel", {});
-};
-
-// 新增&编辑保存按钮
-const onSubmit = () => {
-  formRef.value?.validate((errors) => {
-    if (!errors) {
-      if (props.pid === 0) {
-        ProjectApi.createProject(form.value).then((resp: any) => {
-          if (resp.success === true) {
-            message.success("创建成功！");
-            cancelProject();
-          } else {
-            message.error("创建失败！");
-          }
-        });
-      } else {
-        const pId = props.pid + ''
-        ProjectApi.updateProject(pId, form.value).then((resp: any) => {
-          if (resp.success === true) {
-            message.success("更新成功！");
-            cancelProject();
-          } else {
-            message.error("更新失败！");
-          }
-        });
-      }
-    } else {
-      return false;
-    }
-  });
-};
-
-onMounted(() => {
-  if (props.pid === 0) {
-  } else {
-    getProject();
-  }
-});
-</script>
 
 <style scoped>
 .dialog-footer {
