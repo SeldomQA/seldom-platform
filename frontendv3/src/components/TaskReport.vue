@@ -153,7 +153,7 @@
 import { reactive, ref, onMounted, effect, watch, h } from "vue";
 import { useMessage, NButton } from "naive-ui";
 import type { DataTableColumns, DataTableRowKey } from "naive-ui";
-import TaskReportDialog from "~/components/taskReportModal.vue";
+import TaskReportDialog from "~/components/TaskReportModal.vue";
 import TaskApi from "~/request/task";
 
 
