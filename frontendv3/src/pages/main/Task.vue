@@ -1,11 +1,10 @@
-<script lang="ts">
+<script setup lang="ts">
 import { reactive, onMounted, h, defineComponent, ref } from "vue";
 import {
   NButton,
   NIcon,
   useMessage,
   useDialog,
-  TreeOption,
   SelectOption,
   FormInst,
   NSpace,
@@ -16,9 +15,9 @@ import { SearchOutline } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
 import TaskReport from "~/components/TaskReport.vue";
-import TaskModal from "~/components/taskModal.vue";
+import TaskModal from "~/components/TaskModal.vue";
 
-type Song = {
+type RowData = {
   id: number;
   name: string;
   env: string;
@@ -31,8 +30,8 @@ type Song = {
 const createColumns = ({
   play,
 }: {
-  play: (row: Song, action: String) => void;
-}): DataTableColumns<Song> => {
+  play: (row: RowData, action: String) => void;
+}): DataTableColumns<RowData> => {
   return [
     {
       title: "ID",
@@ -144,247 +143,248 @@ const createColumns = ({
   ];
 };
 
+type Tdatas = {
+  loading: boolean;
+
+  projectId: string;
+  caseNumber: number;
+  tableData: [];
+  teamIdSelected: string;
+  tid?: number;
+  query: {
+    project_id: null;
+    team_id: null;
+    name: null;
+  };
+  taskFlag: boolean;
+};
+const datas = reactive<Tdatas>({
+  loading: true,
+  projectId: "",
+  caseNumber: 0,
+  tableData: [],
+  teamIdSelected: "",
+  tid: 0,
+  query: {
+    project_id: null,
+    team_id: null,
+    name: null,
+  },
+  taskFlag: true,
+});
+
 type ModalDatas = {
-  type?: number | null;
-  taskId?: number | null;
+  type?: number;
+  taskId?: number;
   title: string;
 };
 
-export default defineComponent({
-  components: {
-    SearchOutline,
-  },
-  setup() {
-    const datas = reactive({
-      loading: true,
-      projectId: "",
-      caseNumber: 0,
-      tableData: [],
-      teamIdSelected: "",
-      tid: 0,
-      query: {
-        project_id: null,
-        team_id: null,
-        name: null,
-      },
-      taskFlag: true,
-    });
+const modalDatas = reactive<ModalDatas>({
+  title: "",
+  type: 1,
+});
 
-    const modalDatas: ModalDatas = reactive({
-      title: "",
-    });
+const message = useMessage();
+const dialog = useDialog();
 
-    const message = useMessage();
-    const dialog = useDialog();
+type TteamOptions = {
+  value: string;
+  label: string;
+};
+type TteamModel = {
+  teamOptions: TteamOptions[];
+  envOptions: [];
+};
 
-    const model = ref({
-      teamOptions: [],
-      envOptions: [],
-    });
+const model = ref<TteamModel>({
+  teamOptions: [],
+  envOptions: [],
+});
 
-    // 初始化获取团队列表
-    const initTeamList = async () => {
-      const resp = await TeamApi.getTeamAll();
-      if (resp.success === true) {
-        for (let i = 0; i < resp.result.length; i++) {
-          model.value.teamOptions.push({
-            value: resp.result[i].id,
-            label: resp.result[i].name,
-          });
-        }
-      } else {
-        message.error("查询失败!");
-      }
-    };
-
-    const changeTeam = (value: string, option: SelectOption) => {
-      datas.teamIdSelected = value;
-    };
-
-    const initTaskList = async () => {
-      datas.query.project_id = sessionStorage.projectId;
-      if (
-        datas.query.project_id == null ||
-        datas.query.project_id == undefined
-      ) {
-        message.warning("请选择项目");
-      } else {
-        datas.loading = true;
-        const resp = await TaskApi.getTaskAll(datas.query);
-        if (resp.success === true) {
-          datas.tableData = resp.result;
-        } else {
-          message.error("获得任务列表失败！");
-        }
-        datas.loading = false;
-      }
-    };
-
-    // 新增编辑任务modal
-    const showModalTask = ref(false);
-
-    const openModalTask = (type: number) => {
-      if (sessionStorage.projectId == "") {
-        message.warning("请选择项目");
-      } else {
-        switch (type) {
-          case 1:
-            modalDatas.title = "新增任务";
-            modalDatas.type = 1;
-            datas.tid = null;
-            break;
-          case 2:
-            modalDatas.title = "编辑任务";
-            modalDatas.type = 2;
-            break;
-        }
-        showModalTask.value = true;
-      }
-    };
-
-    const segmented = {
-      content: "soft",
-      footer: "soft",
-    };
-
-    const formRef = ref<FormInst | null>(null);
-
-    const options = [{}];
-
-    // 删除任务
-    const deleteTask = (row: Song) => {
-      dialog.warning({
-        title: "警告",
-        content: "检查是否有正在运行的定时任务，确定删除?",
-        positiveText: "确定",
-        negativeText: "不确定",
-        onPositiveClick: () => {
-          TaskApi.deleteTask(row.id.toString()).then((resp) => {
-            if (resp.success === true) {
-              initTaskList();
-              message.success("删除任务成功！");
-            } else {
-              message.error("删除任务失败！");
-            }
-          });
-        },
-        onNegativeClick: () => {
-          message.error("不确定");
-        },
+// 初始化获取团队列表
+const initTeamList = async () => {
+  const resp = await TeamApi.getTeamAll();
+  if (resp.success === true) {
+    for (let i = 0; i < resp.result.length; i++) {
+      model.value.teamOptions.push({
+        value: resp.result[i].id,
+        label: resp.result[i].name,
       });
-    };
+    }
+  } else {
+    message.error("查询失败!");
+  }
+};
 
-    // 运行任务
-    const runTask = async (row: Song) => {
-      const resp = await TaskApi.runningTask(row.id.toString());
-      if (resp.success === true) {
-        message.success("开始运行！");
-        initTaskList();
-      } else {
-        message.error("运行失败！");
-      }
-    };
+const changeTeam = (value: string, option: SelectOption) => {
+  datas.teamIdSelected = value;
+};
 
-    // 显示任务报告列表
-    const clickTaskName = (row: Song) => {
-      datas.tid = row.id;
-      datas.taskFlag = false;
-    };
-    // 返回任务列表
-    const goBack = () => {
-      datas.taskFlag = true;
-    };
+const initTaskList = async () => {
+  datas.query.project_id = sessionStorage.projectId;
+  if (datas.query.project_id == null || datas.query.project_id == undefined) {
+    message.warning("请选择项目");
+  } else {
+    datas.loading = true;
+    const resp = await TaskApi.getTaskAll(datas.query);
+    if (resp.success === true) {
+      datas.tableData = resp.result;
+    } else {
+      message.error("获得任务列表失败！");
+    }
+    datas.loading = false;
+  }
+};
 
-    // 定时设置
-    const showModalTimer = ref(false);
+// 新增编辑任务modal
+const showModalTask = ref(false);
 
-    const formRefTimer = ref<FormInst | null>(null);
+const openModalTask = (type: number) => {
+  if (sessionStorage.projectId == "") {
+    message.warning("请选择项目");
+  } else {
+    switch (type) {
+      case 1:
+        modalDatas.title = "新增任务";
+        modalDatas.type = 1;
+        datas.tid = undefined;
+        break;
+      case 2:
+        modalDatas.title = "编辑任务";
+        modalDatas.type = 2;
+        break;
+    }
+    showModalTask.value = true;
+  }
+};
 
-    const formValueTimer = ref<{
-      minute: string | null;
-      hour: string | null;
-      day_of_week: string | null;
-      day: string | null;
-      month: string | null;
-    }>({
-      minute: "*",
-      hour: "*",
-      day_of_week: "*",
-      day: "*",
-      month: "*",
-    });
+const segmented = {
+  content: "soft",
+  footer: "soft",
+};
 
-    const closeModal = () => {
-      showModalTask.value = false;
-      initTaskList();
-    };
+const formRef = ref<FormInst | null>(null);
 
-    onMounted(() => {
-      initTeamList();
-      initTaskList();
+const options = [{}];
 
-      //   datas.tasktHeartbeat = setInterval(() => {
-      //     checkTask();
-      //   }, 5000);
-    });
+// 删除任务
+const deleteTask = (row: RowData) => {
+  dialog.warning({
+    title: "警告",
+    content: "检查是否有正在运行的定时任务，确定删除?",
+    positiveText: "确定",
+    negativeText: "不确定",
+    onPositiveClick: () => {
+      TaskApi.deleteTask(row.id.toString()).then((resp: any) => {
+        if (resp.success === true) {
+          initTaskList();
+          message.success("删除任务成功！");
+        } else {
+          message.error("删除任务失败！");
+        }
+      });
+    },
+    onNegativeClick: () => {
+      message.error("不确定");
+    },
+  });
+};
 
-    return {
-      datas,
-      model,
-      initTaskList,
-      columns: createColumns({
-        play(row: Song, action: String) {
-          switch (action) {
-            case "run":
-              runTask(row);
-              break;
-            case "set":
-              showModalTimer.value = true;
-              break;
-            case "edit":
-              openModalTask(2);
-              datas.tid = row.id;
-              break;
-            case "delete":
-              deleteTask(row);
-              break;
-            case "clickTaskName":
-              clickTaskName(row);
-              break;
-          }
-        },
-      }),
-      pagination: false as const,
-      changeTeam,
-      // modal
-      modalDatas,
-      segmented,
-      showModalTask,
-      openModalTask,
-      formRef,
-      showModalTimer,
-      closeModal,
-      rulesTimer: {
-        name: {
-          required: true,
-          message: "请输入任务名称",
-          trigger: ["input"],
-        },
-        env: {
-          type: "number",
-          required: true,
-          trigger: ["blur", "change"],
-          message: "请选择运行环境",
-        },
-        email: {
-          required: true,
-          message: "请输入邮箱地址",
-          trigger: ["input"],
-        },
-      },
-      goBack,
-    };
+// 运行任务
+const runTask = async (row: RowData) => {
+  const resp = await TaskApi.runningTask(row.id.toString());
+  if (resp.success === true) {
+    message.success("开始运行！");
+    initTaskList();
+  } else {
+    message.error("运行失败！");
+  }
+};
+
+// 显示任务报告列表
+const clickTaskName = (row: RowData) => {
+  datas.tid = row.id;
+  datas.taskFlag = false;
+};
+// 返回任务列表
+const goBack = () => {
+  datas.taskFlag = true;
+};
+
+// 定时设置
+const showModalTimer = ref(false);
+
+const formRefTimer = ref<FormInst | null>(null);
+
+const formValueTimer = ref<{
+  minute: string | null;
+  hour: string | null;
+  day_of_week: string | null;
+  day: string | null;
+  month: string | null;
+}>({
+  minute: "*",
+  hour: "*",
+  day_of_week: "*",
+  day: "*",
+  month: "*",
+});
+
+const closeModal = () => {
+  showModalTask.value = false;
+  initTaskList();
+};
+
+const columns = createColumns({
+  play(row: RowData, action: String) {
+    switch (action) {
+      case "run":
+        runTask(row);
+        break;
+      case "set":
+        showModalTimer.value = true;
+        break;
+      case "edit":
+        openModalTask(2);
+        datas.tid = row.id;
+        break;
+      case "delete":
+        deleteTask(row);
+        break;
+      case "clickTaskName":
+        clickTaskName(row);
+        break;
+    }
   },
+});
+const pagination = false;
+
+const rulesTimer = {
+  name: {
+    required: true,
+    message: "请输入任务名称",
+    trigger: ["input"],
+  },
+  env: {
+    type: "number",
+    required: true,
+    trigger: ["blur", "change"],
+    message: "请选择运行环境",
+  },
+  email: {
+    required: true,
+    message: "请输入邮箱地址",
+    trigger: ["input"],
+  },
+};
+
+onMounted(() => {
+  initTeamList();
+  initTaskList();
+
+  //   datas.tasktHeartbeat = setInterval(() => {
+  //     checkTask();
+  //   }, 5000);
 });
 </script>
 
@@ -509,6 +509,7 @@ export default defineComponent({
       <div></div>
     </n-modal> -->
     </div>
+
     <div class="task-report" v-else>
       <div class="pageheader">
         <n-space justify="space-between" class="breadcrumb-navigation">
@@ -524,11 +525,7 @@ export default defineComponent({
           </n-breadcrumb>
         </n-space>
       </div>
-      <TaskReport :tid="datas.tid"/>
+      <TaskReport :tid="datas.tid" />
     </div>
   </div>
 </template>
-
-<script></script>
-
-<style></style>

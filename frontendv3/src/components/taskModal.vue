@@ -47,7 +47,6 @@
             block-line
             expand-on-click
             :data="datas.fileData"
-            :default-expanded-keys="defaultExpandedKeys"
             key-field="label"
             :node-props="nodeProps"
           />
@@ -68,13 +67,10 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted, h, watch } from "vue";
+import { reactive, ref, onMounted, h } from "vue";
 import {
   FormInst,
   useMessage,
-  StepsProps,
-  NTree,
-  TransferRenderSourceList,
   SelectOption,
   TreeOption,
   NIcon,
@@ -86,8 +82,14 @@ import ProjectApi from "~/request/project";
 import TaskApi from "~/request/task";
 
 const props = defineProps({
-  type: Number,
-  tid: Number,
+  type: {
+    type: Number,
+    required: true,
+  },
+  tid: {
+    type: Number,
+    required: true,
+  },
 });
 
 const emits = defineEmits(["close"]);
@@ -109,12 +111,17 @@ type ModalDatas = {
   targetDatas: string[];
 };
 
-const datas = reactive({
+type Tdatas = {
+  fileData: TreeOption[] | undefined;
+  caseData: [];
+};
+
+const datas = reactive<Tdatas>({
   fileData: [],
   caseData: [],
 });
 
-const modalDatas: ModalDatas = reactive({
+const modalDatas = reactive<ModalDatas>({
   sourceDatas: [],
   targetDatas: [],
 });
@@ -147,13 +154,30 @@ const rulesTask = {
   },
 };
 
-const model = ref({
+type TteamOptions = {
+  value: string;
+  label: string;
+};
+
+type TteamModel = {
+  teamOptions: TteamOptions[];
+  envOptions: TteamOptions[];
+};
+
+const model = ref<TteamModel>({
   teamOptions: [],
   envOptions: [],
 });
 
+type TrespDatas = {
+  label: string;
+  full_name: string;
+  children?: [];
+  leaf: boolean;
+};
+
 // 格式化tree数据
-const treeDataFormat = (datas) => {
+const treeDataFormat = (datas: TrespDatas[]) => {
   return datas.map((_, index) => {
     const label = _.label;
     const full_name = _.full_name;
@@ -199,8 +223,8 @@ const initTeamList = async () => {
   }
 };
 
+//初始化环境列表
 const initEnvsList = async () => {
-  datas.loading = true;
   const resp = await ProjectApi.getEnvs();
   if (resp.success === true) {
     for (let i = 0; i < resp.result.length; i++) {
@@ -212,20 +236,19 @@ const initEnvsList = async () => {
   } else {
     message.error(resp.error.message);
   }
-  datas.loading = false;
 };
 
 // 点击项目文件
-const handleNodeClick = (data) => {
+const handleNodeClick = (data: any) => {
   // 如果是文件返回 类&方法
   if (data.label.match(".py")) {
     ProjectApi.getProjectCases(sessionStorage.projectId, data.full_name).then(
-      (resp) => {
+      (resp: any) => {
         if (resp.success === true) {
           message.success("获取用例成功");
           // console.log(resp.result);
           datas.caseData = resp.result;
-          modalDatas.sourceDatas = resp.result.map((_, index) => ({
+          modalDatas.sourceDatas = resp.result.map((_: any, index: Number) => ({
             label: _.case_name,
             value: _.case_hash,
           }));
@@ -243,7 +266,7 @@ const handleNodeClick = (data) => {
     ProjectApi.getProjectSubdirectory(
       sessionStorage.projectId,
       data.full_name
-    ).then((resp) => {
+    ).then((resp: any) => {
       if (resp.success === true) {
         message.success("获取用例成功");
         data.children = treeDataFormat(resp.result);
@@ -262,8 +285,6 @@ const nodeProps = ({ option }: { option: TreeOption }) => {
   };
 };
 
-const defaultExpandedKeys = ref(["40", "41"]);
-
 const changeTeamModel = (value: string, option: SelectOption) => {
   formValue.value.team_id = value;
 };
@@ -277,19 +298,23 @@ const initTaskDetails = async () => {
   // console.log(props.tid);
   if (props.tid == null) {
   } else {
-    const resp = await TaskApi.getTaskDetails(props.tid);
+    const resp = await TaskApi.getTaskDetails(props.tid.toString());
     if (resp.success === true) {
       formValue.value = resp.result;
       formValue.value.taskId = resp.result.id;
 
       //数据返回导致该回显有点问题，延后处理
-      modalDatas.sourceDatas = resp.result.case_list.map((_, index) => ({
-        label: _.label,
-        value: _.key,
-      }));
-      modalDatas.targetDatas = resp.result.case_list.map((_, index) => _.key);
+      modalDatas.sourceDatas = resp.result.case_list.map(
+        (_: any, index: Number) => ({
+          label: _.label,
+          value: _.key,
+        })
+      );
+      modalDatas.targetDatas = resp.result.case_list.map(
+        (_: any, index: Number) => _.key
+      );
 
-      console.log(modalDatas.targetDatas);
+      // console.log(modalDatas.targetDatas);
     } else {
       message.error(resp.error.message);
     }
@@ -302,7 +327,7 @@ const handleSave = (e: MouseEvent) => {
   e.preventDefault();
   formRef.value?.validate((errors) => {
     if (!errors) {
-      console.log(modalDatas.targetDatas);
+      // console.log(modalDatas.targetDatas);
       let payload = {
         taskId: props.tid,
         project: sessionStorage.projectId,
@@ -311,9 +336,9 @@ const handleSave = (e: MouseEvent) => {
         team_id: formValue.value.team_id,
         cases: modalDatas.targetDatas,
       };
-      console.log(payload);
+      // console.log(payload);
       if (props.type === 1) {
-        TaskApi.createTask(payload).then((resp) => {
+        TaskApi.createTask(payload).then((resp: any) => {
           if (resp.success === true) {
             message.success("创建成功！");
             emits("close");
@@ -322,7 +347,7 @@ const handleSave = (e: MouseEvent) => {
           }
         });
       } else {
-        TaskApi.updateTask(props.tid, payload).then((resp) => {
+        TaskApi.updateTask(props.tid.toString(), payload).then((resp: any) => {
           if (resp.success === true) {
             message.success("更新成功！");
             emits("close");
@@ -333,7 +358,6 @@ const handleSave = (e: MouseEvent) => {
       }
     } else {
       message.error("必填项校验不通过");
-      console.log(errors);
     }
   });
 };
