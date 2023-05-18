@@ -1,3 +1,57 @@
+<script setup lang="ts">
+import { reactive, ref, onMounted, effect, watch, h } from "vue";
+import { useMessage } from "naive-ui";
+import TaskApi from "~/request/task";
+
+const props = defineProps({
+  rid: { type: Number, required: true },
+  type: String,
+});
+
+const message = useMessage();
+
+const datas = reactive({
+  showStatus: true,
+  showTitle: "报告详情",
+  resultData: [],
+  caseDetails: {
+    doc: "",
+    error_out: "",
+    failure_out: "",
+    skipped_message: "",
+    system_err: "",
+    system_out: "",
+  },
+});
+
+// 初始化任务详情
+const initTaskDetails = async () => {
+  const data = {};
+  console.log(props.rid);
+  const resp = await TaskApi.getReportResult(props.rid.toString(), data);
+  if (resp.success === true) {
+    datas.resultData = resp.result;
+  } else {
+    message.error(resp.error.message);
+  }
+};
+
+// 点击用例详情
+const caseRowClick = (row: any) => {
+  return {
+    style: "cursor: pointer;",
+    onClick: () => {
+      datas.caseDetails = row;
+    },
+  };
+};
+
+onMounted(() => {
+  // 初始化方法
+  initTaskDetails();
+});
+</script>
+
 <template>
   <div class="report-dialog" width="1200px">
     <div style="min-height: 600px; overflow-y: scroll">
@@ -100,98 +154,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { reactive, ref, onMounted, effect, watch, h } from "vue";
-import { useMessage } from "naive-ui";
-import TaskApi from "~/request/task";
-
-const props = defineProps({
-  rid: Number,
-  type: String,
-});
-
-const message = useMessage();
-
-const datas = reactive({
-  showStatus: true,
-  showTitle: "报告详情",
-  resultData: [],
-  caseDetails: {
-    doc: "",
-    error_out: "",
-    failure_out: "",
-    skipped_message: "",
-    system_err: "",
-    system_out: "",
-  },
-});
-
-// 初始化任务详情
-const initTaskDetails = async () => {
-  const data = {};
-  console.log(props.rid);
-  const resp = await TaskApi.getReportResult(props.rid, data);
-  if (resp.success === true) {
-    datas.resultData = resp.result;
-  } else {
-    message.error(resp.error.message);
-  }
-};
-
-// 点击用例详情
-const caseRowClick = (row) => {
-  return {
-    style: "cursor: pointer;",
-    onClick: () => {
-      datas.caseDetails = row;
-    },
-  };
-};
-
-onMounted(() => {
-  // 初始化方法
-  initTaskDetails();
-});
-</script>
-
-<style scoped>
-/* .n-transfer-panel {
-  height: 500px !important;
-}
-.n-transfer-panel__list {
-  height: 500px !important;
-}
-.n-transfer-panel {
-  width: 320px !important;
-}
-.report-dialog .n-form--inline .n-form-item__content {
-  width: 100% !important;
-}
-.n-textarea__inner {
-  background-color: #f1f3fa !important;
-}
-
-#doc {
-  color: #727cf5;
-}
-
-#error {
-  color: #fa5c7c;
-}
-
-#failure {
-  color: #fd7e14;
-}
-
-#skipped-message {
-  color: #8a969c;
-}
-
-#system-err {
-  color: #fa5c7c;
-}
-
-#system-out {
-  color: #6b5eae;
-} */
-</style>
+<style scoped></style>

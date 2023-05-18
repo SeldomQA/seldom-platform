@@ -1,71 +1,3 @@
-<template>
-  <div class="case-sync-modal">
-    <n-form
-      ref="formRef"
-      :model="formValue"
-      :rules="rulesTask"
-      label-placement="left"
-      inline
-      :label-width="80"
-      size="medium"
-      show-require-mark
-    >
-      <n-form-item label="任务名称" path="name">
-        <n-input v-model:value="formValue.name" placeholder="请输入任务名称" />
-      </n-form-item>
-      <n-form-item label="运行环境" path="env_id">
-        <n-select
-          v-model:value="formValue.env_id"
-          style="width: 200px"
-          :options="model.envOptions"
-          placeholder="请选择运行环境"
-          @update:value="changeEnv"
-        >
-        </n-select>
-      </n-form-item>
-      <n-form-item label="团队" path="team_id">
-        <n-select
-          style="width: 200px"
-          v-model:value="formValue.team_id"
-          placeholder="选择团队"
-          :options="model.teamOptions"
-          @update:value="changeTeamModel"
-          clearable
-        >
-        </n-select>
-      </n-form-item>
-      <n-form-item>
-        <n-button type="primary" @click="handleSave"> 保存 </n-button>
-      </n-form-item>
-    </n-form>
-    <n-divider title-placement="left"> 选择用例 </n-divider>
-    <div>
-      <n-grid x-gap="16" :cols="6">
-        <n-gi>
-          <n-tree
-            class="filetree"
-            block-line
-            expand-on-click
-            :data="datas.fileData"
-            key-field="label"
-            :node-props="nodeProps"
-          />
-        </n-gi>
-        <n-gi span="5">
-          <n-transfer
-            ref="transfer"
-            virtual-scroll
-            :options="modalDatas.sourceDatas"
-            v-model:value="modalDatas.targetDatas"
-            source-filterable
-            target-filterable
-          />
-        </n-gi>
-      </n-grid>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { reactive, ref, onMounted, h } from "vue";
 import {
@@ -369,3 +301,71 @@ onMounted(() => {
   initTaskDetails();
 });
 </script>
+
+<template>
+  <div class="case-sync-modal">
+    <n-form
+      ref="formRef"
+      :model="formValue"
+      :rules="rulesTask"
+      label-placement="left"
+      inline
+      :label-width="80"
+      size="medium"
+      show-require-mark
+    >
+      <n-form-item label="任务名称" path="name">
+        <n-input v-model:value="formValue.name" placeholder="请输入任务名称" />
+      </n-form-item>
+      <n-form-item label="运行环境" path="env_id">
+        <n-select
+          v-model:value="formValue.env_id"
+          style="width: 200px"
+          :options="model.envOptions"
+          placeholder="请选择运行环境"
+          @update:value="changeEnv"
+        >
+        </n-select>
+      </n-form-item>
+      <n-form-item label="团队" path="team_id">
+        <n-select
+          style="width: 200px"
+          v-model:value="formValue.team_id"
+          placeholder="选择团队"
+          :options="model.teamOptions"
+          @update:value="changeTeamModel"
+          clearable
+        >
+        </n-select>
+      </n-form-item>
+      <n-form-item>
+        <n-button type="primary" @click="handleSave"> 保存 </n-button>
+      </n-form-item>
+    </n-form>
+    <n-divider title-placement="left"> 选择用例 </n-divider>
+    <div>
+      <n-grid x-gap="16" :cols="6">
+        <n-gi>
+          <n-tree
+            class="filetree"
+            block-line
+            expand-on-click
+            :data="datas.fileData"
+            key-field="label"
+            :node-props="nodeProps"
+          />
+        </n-gi>
+        <n-gi span="5">
+          <n-transfer
+            ref="transfer"
+            virtual-scroll
+            :options="modalDatas.sourceDatas"
+            v-model:value="modalDatas.targetDatas"
+            source-filterable
+            target-filterable
+          />
+        </n-gi>
+      </n-grid>
+    </div>
+  </div>
+</template>

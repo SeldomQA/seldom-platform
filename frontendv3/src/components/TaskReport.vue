@@ -5,160 +5,15 @@
 * @desc 任务管理/报告列表
 */
 -->
-<template>
-  <div class="task-report">
-    <!-- <el-table
-      :data="tableData"
-      border
-      style="width: 100%">
-      <el-table-column
-        prop="id"
-        label="ID"
-        width="80">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="名称">
-      </el-table-column>
-      <el-table-column
-        prop="tests"
-        label="总数"
-        width="100">
-        <template slot-scope="scope">
-          <span v-if="scope.row.tests === 0">
-            {{scope.row.tests}}
-          </span>
-          <span v-else>
-            <el-button @click="showReport(scope.row)" type="text" size="small">
-              <el-tag>{{scope.row.tests}}</el-tag>
-            </el-button>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="passed"
-        label="通过"
-        width="100">
-        <template slot-scope="scope">
-          <span v-if="scope.row.passed === 0">
-            {{scope.row.passed}}
-          </span>
-          <span v-else>
-            <el-button @click="showReport(scope.row, 'success')" type="text" size="small">
-              <el-tag type="success">{{scope.row.passed}}</el-tag>
-            </el-button>
-          </span>
-      </template>
-      </el-table-column>
-      <el-table-column
-        prop="error"
-        label="错误"
-        width="100">
-        <template slot-scope="scope">
-          <span v-if="scope.row.error === 0">
-            {{scope.row.error}}
-          </span>
-          <span v-else>
-            <el-button @click="showReport(scope.row, 'error')" type="text" size="small">
-              <el-tag type="danger">{{scope.row.error}}</el-tag>
-            </el-button>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="failure"
-        label="失败"
-        width="100">
-        <template slot-scope="scope">
-          <span v-if="scope.row.failure === 0">
-            {{scope.row.failure}}
-          </span>
-          <span v-else>
-            <el-button @click="showReport(scope.row, 'failure')" type="text" size="small">
-              <el-tag type="warning">{{scope.row.failure}}</el-tag>
-            </el-button>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="skipped"
-        label="跳过"
-        width="100">
-        <template slot-scope="scope">
-          <span v-if="scope.row.skipped === 0">
-            {{scope.row.skipped}}
-          </span>
-          <span v-else>
-            <el-button @click="showReport(scope.row, 'skipped')" type="text" size="small">
-              <el-tag type="info">{{scope.row.skipped}}</el-tag>
-            </el-button>
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="run_time"
-        label="运行">
-      </el-table-column>
-      <el-table-column
-        prop="create_time"
-        label="创建时间">
-      </el-table-column>
-    </el-table> -->
-
-    <n-space justify="space-between">
-      <Doughnut
-        id="my-chart-id"
-        :options="doughnutChartOptions"
-        :data="doughnutChartData"
-      />
-      <Bar id="my-chart-id" :options="barChartOptions" :data="barChartData" />
-    </n-space>
-
-    <n-data-table
-      class="table"
-      :columns="columnsReport"
-      :data="datas.tableData"
-      :pagination="pagination"
-      :bordered="false"
-      :row-key="rowKey"
-      :row-props="rowProps"
-      v-model:checked-row-keys="checkedRowKeysRef"
-    />
-
-    <!-- 分页 -->
-    <!-- <div class="foot-page">
-      <el-pagination
-        background
-        @current-change="handleCurrentChange"
-        layout="prev, pager, next"
-        :total="total"
-      >
-      </el-pagination>
-    </div> -->
-    <!-- 引用组件 -->
-    <n-modal
-      v-model:show="datas.reportDialog"
-      class="custom-card"
-      preset="card"
-      title="报告详情"
-      size="huge"
-      :bordered="false"
-    >
-      <TaskReportDialog :rid="datas.reportId" :type="datas.resultType" />
-    </n-modal>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { reactive, ref, onMounted, effect, watch, h } from "vue";
+import { reactive, ref, onMounted, h } from "vue";
 import { useMessage, NButton } from "naive-ui";
-import type { DataTableColumns, DataTableRowKey } from "naive-ui";
+import type { DataTableColumns } from "naive-ui";
 import TaskReportDialog from "~/components/TaskReportModal.vue";
 import TaskApi from "~/request/task";
 
-
 const props = defineProps({
-  tid: Number,
+  tid: { type: Number, required: true },
 });
 
 const message = useMessage();
@@ -200,10 +55,9 @@ const initReportList = async () => {
   }
 };
 // 显示报告详情
-const showReport = async (row: Song, type) => {
+const showReport = async (row: RowData, type: string) => {
   datas.reportDialog = true;
   datas.reportId = row.id;
-  console.log( datas.reportId);
   datas.resultType = type;
 };
 // 创建任务子组件的回调
@@ -211,12 +65,12 @@ const cancelDialog = () => {
   datas.reportDialog = false;
 };
 // 跳转到第几页
-const handleCurrentChange = (val) => {
+const handleCurrentChange = (val: number) => {
   datas.req.page = val;
   initReportList();
 };
 
-type Song = {
+type RowData = {
   id: number;
   name: string;
   tests: number;
@@ -228,11 +82,11 @@ type Song = {
   create_time: string;
 };
 
-const rowKey = (row: Song) => row.id;
+const rowKey = (row: RowData) => row.id;
 
 const checkedRowKeysRef = ref<[number]>([0]);
 
-const rowProps = (row: Song) => {
+const rowProps = (row: RowData) => {
   return {
     style: "cursor: pointer;",
     onClick: () => {
@@ -247,8 +101,8 @@ const rowProps = (row: Song) => {
 const createColumnsReport = ({
   clickReportName,
 }: {
-  clickReportName: (row: Song) => void;
-}): DataTableColumns<Song> => {
+  clickReportName: (row: RowData) => void;
+}): DataTableColumns<RowData> => {
   return [
     {
       type: "selection",
@@ -257,17 +111,6 @@ const createColumnsReport = ({
     {
       title: "名称",
       key: "name",
-      // render(row) {
-      //   return h(
-      //     NButton,
-      //     {
-      //       size: "small",
-      //       bordered: false,
-      //       onClick: () => clickReportName(row),
-      //     },
-      //     { default: () => row.name }
-      //   );
-      // },
     },
     {
       title: "总数",
@@ -314,7 +157,7 @@ const createColumnsReport = ({
   ];
 };
 
-const clickReportName = (row: Song) => {
+const clickReportName = (row: RowData) => {
   console.log(row);
 };
 
@@ -333,7 +176,6 @@ import {
   ArcElement,
   CategoryScale,
   LinearScale,
-  ChartData,
 } from "chart.js";
 
 ChartJS.register(
@@ -477,12 +319,51 @@ onMounted(() => {
 });
 </script>
 
-<style>
-.el-popover.home-popover {
-  width: 70px;
-  min-width: auto;
-}
-</style>
+<template>
+  <div class="task-report">
+    <n-space justify="space-between">
+      <Doughnut
+        id="my-chart-id"
+        :options="doughnutChartOptions"
+        :data="doughnutChartData"
+      />
+      <Bar id="my-chart-id" :options="barChartOptions" :data="barChartData" />
+    </n-space>
+
+    <n-data-table
+      class="table"
+      :columns="columnsReport"
+      :data="datas.tableData"
+      :pagination="pagination"
+      :bordered="false"
+      :row-key="rowKey"
+      :row-props="rowProps"
+      v-model:checked-row-keys="checkedRowKeysRef"
+    />
+
+    <!-- 分页 -->
+    <!-- <div class="foot-page">
+      <el-pagination
+        background
+        @current-change="handleCurrentChange"
+        layout="prev, pager, next"
+        :total="total"
+      >
+      </el-pagination>
+    </div> -->
+    <!-- 引用组件 -->
+    <n-modal
+      v-model:show="datas.reportDialog"
+      class="custom-card"
+      preset="card"
+      title="报告详情"
+      size="huge"
+      :bordered="false"
+    >
+      <TaskReportDialog :rid="datas.reportId" :type="datas.resultType" />
+    </n-modal>
+  </div>
+</template>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
