@@ -1,22 +1,13 @@
 <script setup lang="ts">
-import { FormInst, useMessage } from "naive-ui";
-import {
-  defineComponent,
-  reactive,
-  ref,
-  onMounted,
-  effect,
-  watch,
-} from "vue";
+import { useMessage } from "naive-ui";
+import { reactive, ref, onMounted } from "vue";
 import CaseApi from "~/request/case";
 
 const props = defineProps({
-  caseid: Number,
+  caseid: { type: Number, required: true },
 });
 
 const message = useMessage();
-
-const datas = reactive({});
 
 type TResult = {
   name: string;
@@ -33,10 +24,9 @@ const result = ref<TResult>({
 });
 
 const getResult = async () => {
-  await CaseApi.getCaseResult(props.caseid).then((resp) => {
+  await CaseApi.getCaseResult(props.caseid.toString()).then((resp: any) => {
     if (resp.success === true) {
       result.value = resp.result;
-      console.log(result.value);
     } else {
       message.error(resp.error.message);
     }
