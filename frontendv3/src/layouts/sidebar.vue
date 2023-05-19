@@ -1,8 +1,3 @@
-<template>
-  <img src="../assets/seldom-platform.gif" style="height: 40px" />
-  <n-menu :options="menuOptions" @update:value="handleUpdateValue" />
-</template>
-
 <script lang="ts">
 import { defineComponent, h, Component } from "vue";
 import { NIcon } from "naive-ui";
@@ -11,12 +6,10 @@ import { RouterLink } from "vue-router";
 import {
   HomeOutline,
   FolderOpenOutline,
-  DocumentTextOutline,
   CalendarOutline,
   SettingsOutline,
   CloudOutline,
   PeopleOutline,
-  MailOutline,
 } from "@vicons/ionicons5";
 
 function renderIcon(icon: Component) {
@@ -79,7 +72,7 @@ const menuOptions: MenuOption[] = [
           ),
         key: "go-back-team",
         icon: renderIcon(PeopleOutline),
-      }
+      },
     ],
   },
 
@@ -117,26 +110,10 @@ const menuOptions: MenuOption[] = [
     key: "go-back-task",
     icon: renderIcon(CalendarOutline),
   },
-  // {
-  //   label: () =>
-  //     h(
-  //       RouterLink,
-  //       {
-  //         to: {
-  //           name: "main-Report",
-  //           params: {
-  //             lang: "zh-CN",
-  //           },
-  //         },
-  //       },
-  //       { default: () => "报告管理" }
-  //     ),
-  //   key: "go-back-report",
-  //   icon: renderIcon(DocumentTextOutline),
-  // },
 ];
 
 export default defineComponent({
+  name: "Sidebar",
   setup() {
     return {
       menuOptions,
@@ -149,7 +126,12 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<template>
+  <img src="../assets/seldom-platform.gif" style="height: 40px" />
+  <n-menu :options="menuOptions" @update:value="handleUpdateValue" />
+</template>
+
+<style scoped>
 .tagline {
   font-size: 26px;
   line-height: 1.25;

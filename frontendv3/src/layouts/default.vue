@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Sidebar from "./sidebar.vue";
-import Header from "./header.vue";
+import Sidebar from "~/layouts/Sidebar.vue";
+import Header from "~/layouts/Header.vue";
 import { darkTheme } from "naive-ui";
 import type { GlobalTheme } from "naive-ui";
 import { ref, onMounted, watch, provide, nextTick } from "vue";
