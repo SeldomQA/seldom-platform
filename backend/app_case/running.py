@@ -39,31 +39,31 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
         # 设置浏览器headless模式
         if browser in ["gc", "chrome"]:
             chrome_options = ChromeOptions()
-            chrome_options.headless = True
+            chrome_options.add_argument("-headless")
             browser = {
                 "browser": "chrome",
-                "option": chrome_options
+                "options": chrome_options
             }
         elif browser in ["ff", "firefox"]:
             firefox_options = FirefoxOptions()
             firefox_options.add_argument("-headless")
             browser = {
                 "browser": "firefox",
-                "option": firefox_options
+                "options": firefox_options
             }
         elif browser in ["edge"]:
             edge_options = EdgeOptions()
             edge_options.add_argument("headless")
             browser = {
                 "browser": "edge",
-                "option": edge_options
+                "options": edge_options
             }
         else:
             chrome_options = ChromeOptions()
-            chrome_options.headless = True
+            chrome_options.add_argument("-headless")
             browser = {
                 "browser": "chrome",
-                "option": chrome_options
+                "options": chrome_options
             }
     else:
         browser = None
