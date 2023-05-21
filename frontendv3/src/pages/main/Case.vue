@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ProjectApi from "~/request/project";
 import CaseApi from "~/request/case";
-import { reactive, onMounted, h, defineComponent, ref } from "vue";
+import { reactive, onMounted, h, ref } from "vue";
 import {
   NIcon,
   useMessage,
@@ -11,9 +11,10 @@ import {
   NButton,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
-import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
-import CaseResult from "~/components/CaseResult.vue";
-import CaseSync from "~/components/CaseSync.vue";
+import { FolderOpenOutline, LogoPython, Refresh } from "@vicons/ionicons5";
+import CaseResult from "@/CaseResult.vue";
+import CaseSync from "@/CaseSync.vue";
+import CaseSyncLog from "@/CaseSyncLog.vue";
 
 type RowData = {
   id: number;
@@ -25,9 +26,9 @@ type RowData = {
 };
 
 const createColumns = ({
-  play,
+  caseAction,
 }: {
-  play: (row: RowData, action: String) => void;
+  caseAction: (row: RowData, action: String) => void;
 }): DataTableColumns<RowData> => {
   return [
     {
@@ -78,21 +79,23 @@ const createColumns = ({
                 NButton,
                 {
                   strong: true,
-                  tertiary: true,
+                  secondary: true,
                   size: "small",
-                  onClick: () => play(row, "report"),
+                  type: "info",
+                  onClick: () => caseAction(row, "run"),
                 },
-                { default: () => "查看" }
+                { default: () => "执行" }
               ),
               h(
                 NButton,
                 {
                   strong: true,
-                  tertiary: true,
+                  secondary: true,
                   size: "small",
-                  onClick: () => play(row, "run"),
+                  type: "primary",
+                  onClick: () => caseAction(row, "report"),
                 },
-                { default: () => "执行" }
+                { default: () => "查看" }
               ),
             ],
           }
@@ -114,7 +117,8 @@ const datas = reactive({
   },
   env: null,
   selectedCase: {},
-  showCaseSync: false,
+  syncCaseDialog: false,
+  syncLogDialog: false,
   cid: 0,
 });
 
@@ -134,7 +138,7 @@ const model = ref<TEnvModel>({
 const initProjectFile = async () => {
   const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
   if (resp.success === true) {
-    datas.fileData = resp.result.files;
+    datas.fileData = treeDataFormat(resp.result.files);
     datas.caseNumber = resp.result.case_number;
   } else {
     message.error(resp.error.message);
@@ -162,6 +166,7 @@ const treeDataFormat = (datas: any) => {
   });
 };
 
+// 初始化环境列表
 const initEnvsList = async () => {
   datas.loading = true;
   const resp = await ProjectApi.getEnvs();
@@ -193,7 +198,6 @@ const handleNodeClick = (data: any) => {
     ProjectApi.getProjectCases(datas.projectId, data.full_name).then(
       (resp: any) => {
         if (resp.success === true) {
-          message.success("获取用例成功");
           datas.caseData = resp.result;
         } else {
           message.error(resp.error.message);
@@ -209,8 +213,6 @@ const handleNodeClick = (data: any) => {
     ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name).then(
       (resp: any) => {
         if (resp.success === true) {
-          message.success("获取用例成功");
-          // console.log(resp.result);
           data.children = treeDataFormat(resp.result);
           // datas.caseData = resp.result
           // datas.initProject()
@@ -222,29 +224,25 @@ const handleNodeClick = (data: any) => {
   }
 };
 
-// 同步项目用例
-const showCreate = () => {
-  datas.showCaseSync = true;
+// 显示同步用例弹窗
+const showSync = () => {
+  if (datas.projectId === "" || datas.projectId === undefined) {
+    message.warning("请选择项目！");
+    return
+  }
+  datas.syncCaseDialog = true;
+};
+
+// 同步用例（错误）日志
+const showLog = () => {
+  if (datas.projectId === "" || datas.projectId === undefined) {
+    message.warning("请选择项目");
+    return
+  }
+  datas.syncLogDialog = true;
 };
 
 const caseSync = ref();
-
-const cancelCallback = () => {
-  message.success("Cancel");
-};
-
-// 合并用例
-const submitCallback = async () => {
-  const resp = await ProjectApi.syncMerge(
-    sessionStorage.projectId,
-    caseSync.value.datas.req
-  );
-  if (resp.success === true) {
-    message.success("合并成功！");
-  } else {
-    message.error(resp.error.message);
-  }
-};
 
 const changeEnv = (value: string, option: SelectOption) => {
   datas.env = value;
@@ -265,11 +263,10 @@ const runCase = async (row: RowData) => {
       message.error("运行失败");
     }
   }
-  // initProjectFile()
 };
 
-// refresh
-const refresh = () => {
+// 刷新用例（状态）
+const refreshCase = () => {
   if (selectedTreeNode.value == null || selectedTreeNode == undefined) {
     message.warning("请选择左侧树节点用例文件");
   } else {
@@ -289,6 +286,14 @@ const refresh = () => {
 
 // 打开报告
 const openReport = (row: RowData) => {
+  console.log('row', row.status)
+  if (row.status === 0) {
+    message.warning("请先执行用例！")
+    return
+  } else if (row.status === 1) {
+    message.warning("正在执行用例！")
+    return
+  }
   datas.selectedCase = row;
   datas.cid = row.id;
   showModal.value = true;
@@ -297,7 +302,7 @@ const openReport = (row: RowData) => {
 const showModal = ref(false);
 
 const columns = createColumns({
-  play(row: RowData, action: String) {
+  caseAction(row: RowData, action: String) {
     switch (action) {
       case "run":
         runCase(row);
@@ -316,6 +321,12 @@ const nodeProps = ({ option }: { option: TreeOption }) => {
       handleNodeClick(option);
     },
   };
+};
+
+// 关闭弹窗回调
+const cancelDialog = () => {
+  datas.syncCaseDialog = false;
+  initProjectFile();
 };
 
 onMounted(() => {
@@ -339,7 +350,10 @@ onMounted(() => {
     <n-card class="main-card">
       <div>
         <n-space justify="space-between">
-          <n-button type="primary" @click="showCreate">同步</n-button>
+          <div>
+            <n-button type="primary" @click="showSync">同步</n-button>
+            <n-button @click="showLog" style="left: 10px;">日志</n-button>
+          </div>
           <n-form inline label-placement="left">
             <n-form-item label="环境">
               <n-select
@@ -361,7 +375,11 @@ onMounted(() => {
       </div>
       <n-space justify="space-between" align="center">
         <h3>用例列表</h3>
-        <n-button type="primary" @click="refresh">刷新</n-button>
+        <n-button strong secondary type="primary" size="small" @click="refreshCase">
+          <template #icon>
+            <Refresh />
+          </template>
+        </n-button>
       </n-space>
       <div>
         <n-grid x-gap="16" :cols="6">
@@ -387,31 +405,45 @@ onMounted(() => {
       </div>
     </n-card>
 
-    <n-modal id="result" v-model:show="showModal">
+    <!-- 同步用例弹窗 -->
+    <n-modal v-model:show="datas.syncCaseDialog">
+      <n-card
+        title="同步用例"
+        style="width:800px"
+        role="dialog"
+      >
+        <CaseSync ref="caseSync"  @cancel="cancelDialog"/>
+      </n-card>
+    </n-modal>
+
+    <!-- 同步日志弹窗 -->
+    <n-modal v-model:show="datas.syncLogDialog">
+      <n-card
+        title="同步日志"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+        style="width: 85%"
+      >
+        <CaseSyncLog/>
+      </n-card>
+    </n-modal>
+
+    <!-- 查看用例运行结果弹窗 -->
+    <n-modal v-model:show="showModal">
       <n-card
         title="执行结果"
         :bordered="false"
         size="huge"
         role="dialog"
         aria-modal="true"
+        style="width: 85%"
       >
         <CaseResult :caseid="datas.cid" />
       </n-card>
     </n-modal>
 
-    <n-modal
-      id="syncpage"
-      v-model:show="datas.showCaseSync"
-      preset="dialog"
-      title="同步用例"
-      size="huge"
-      positive-text="合并"
-      negative-text="取消"
-      @positive-click="submitCallback"
-      @negative-click="cancelCallback"
-    >
-      <CaseSync ref="caseSync" />
-    </n-modal>
   </div>
 </template>
 
@@ -428,16 +460,4 @@ onMounted(() => {
   text-align: left;
 }
 
-#result {
-  height: 720px;
-  width: 1280px;
-}
-
-#syncpage {
-  width: 1080px;
-}
-
-.n-dialog__content {
-  height: 85%;
-}
 </style>

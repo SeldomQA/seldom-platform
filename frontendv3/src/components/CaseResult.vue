@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMessage } from "naive-ui";
-import { reactive, ref, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import CaseApi from "~/request/case";
 
 const props = defineProps({
@@ -52,8 +52,16 @@ onMounted(() => {
       </n-descriptions-item>
     </n-descriptions>
     <n-divider title-placement="left">运行日志</n-divider>
-    <textarea style="width: 100%; border-color: gray" rows="34">
+    <textarea class="log-style" rows="34">
       {{ result.system_out }}
     </textarea>
   </div>
 </template>
+
+<style scoped>
+.log-style {
+  width: 100%;
+  border-color: gray;
+  background-color:rgb(251, 249, 246);
+}
+</style>

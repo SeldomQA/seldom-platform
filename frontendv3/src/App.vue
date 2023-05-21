@@ -52,4 +52,8 @@ body {
 .dialog-footer {
   float: right;
 }
+
+.main-card {
+  min-height: 700px;
+}
 </style>
