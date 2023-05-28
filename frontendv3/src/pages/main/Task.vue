@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, onMounted, h, defineComponent, ref } from "vue";
+import { reactive, onMounted, h, ref } from "vue";
 import {
   NButton,
   NIcon,
@@ -10,12 +10,11 @@ import {
   NSpace,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
-import baseUrl from "~/config/base-url";
 import { SearchOutline } from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
-import TaskReport from "~/components/TaskReport.vue";
-import TaskModal from "~/components/TaskModal.vue";
+import TaskReport from "@/TaskReport.vue";
+import TaskModal from "@/TaskModal.vue";
 
 type RowData = {
   id: number;
@@ -95,7 +94,7 @@ const createColumns = ({
               h(
                 NButton,
                 {
-                  type: "primary",
+                  type: "info",
                   strong: true,
                   secondary: true,
                   size: "small",
@@ -116,7 +115,7 @@ const createColumns = ({
               h(
                 NButton,
                 {
-                  type: "warning",
+                  type: "primary",
                   strong: true,
                   secondary: true,
                   size: "small",
@@ -381,10 +380,6 @@ const rulesTimer = {
 onMounted(() => {
   initTeamList();
   initTaskList();
-
-  //   datas.tasktHeartbeat = setInterval(() => {
-  //     checkTask();
-  //   }, 5000);
 });
 </script>
 
@@ -403,6 +398,7 @@ onMounted(() => {
       <n-card class="main-card">
         <div>
           <n-space justify="space-between">
+            <n-button type="primary" @click="openModalTask(1)">创建</n-button>
             <n-form inline :model="model" label-placement="left">
               <n-form-item label="团队">
                 <n-select
@@ -432,7 +428,6 @@ onMounted(() => {
                 </n-button>
               </n-form-item>
             </n-form>
-            <n-button type="primary" @click="openModalTask(1)">创建</n-button>
           </n-space>
         </div>
         <n-data-table
@@ -447,7 +442,7 @@ onMounted(() => {
         v-model:show="showModalTask"
         class="custom-card"
         preset="card"
-        style="width: 80%"
+        style="width: 1200px"
         :title="modalDatas.title"
         size="huge"
         :bordered="false"
@@ -515,7 +510,7 @@ onMounted(() => {
         <n-space justify="space-between" class="breadcrumb-navigation">
           <div>
             <n-button quaternary @click="goBack">返回</n-button>
-            <span>任务管理</span>
+            <span>任务报告</span>
           </div>
 
           <n-breadcrumb separator=">">
@@ -525,7 +520,9 @@ onMounted(() => {
           </n-breadcrumb>
         </n-space>
       </div>
-      <TaskReport :tid="datas.tid" />
+      <n-card class="main-card">
+        <TaskReport :tid="datas.tid" />
+      </n-card>
     </div>
   </div>
 </template>

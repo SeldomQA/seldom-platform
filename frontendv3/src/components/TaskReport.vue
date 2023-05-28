@@ -192,22 +192,10 @@ const barChartData = ref({
   labels: ["总数", "通过", "错误", "失败", "跳过"],
   datasets: [
     {
-      label: "432",
-      data: [40, 50, 60, 30, 10],
-      backgroundColor: [
-        "rgba(54, 162, 235, 0.8)",
-        "rgba(75, 192, 192, 0.8)",
-        "rgba(255, 99, 132, 0.8)",
-        "rgba(255, 206, 86, 0.8)",
-        "rgba(153, 102, 255, 0.8)",
-      ],
-      borderColor: [
-        "rgba(54, 162, 235, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(255, 99, 132, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(153, 102, 255, 1)",
-      ],
+      label: "总数",
+      data: [0, 0, 0, 0, 0],
+      backgroundColor: ["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
+      borderColor: ["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
       borderWidth: 1,
       //柱体弧度
       borderRadius: 10,
@@ -229,21 +217,9 @@ const doughnutChartData = ref({
   datasets: [
     {
       label: "数量",
-      data: [65, 59, 80, 81, 56],
-      backgroundColor: [
-        "rgba(54, 162, 235, 0.9)",
-        "rgba(75, 192, 192, 0.9)",
-        "rgba(255, 99, 132, 0.9)",
-        "rgba(255, 206, 86, 0.9)",
-        "rgba(153, 102, 255, 0.9)",
-      ],
-      borderColor: [
-        "rgba(54, 162, 235, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(255, 99, 132, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(153, 102, 255, 1)",
-      ],
+      data: [1, 1, 1, 1, 1],
+      backgroundColor: ["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
+      borderColor: ["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
       cutoutPercentage: 10,
       hoverOffset: 50,
     },
@@ -262,22 +238,10 @@ const renderBarChartData = (data: any) => ({
   labels: ["总数", "通过", "错误", "失败", "跳过"],
   datasets: [
     {
-      label: "432",
+      label: "总数",
       data: data,
-      backgroundColor: [
-        "rgba(54, 162, 235, 0.8)",
-        "rgba(75, 192, 192, 0.8)",
-        "rgba(255, 99, 132, 0.8)",
-        "rgba(255, 206, 86, 0.8)",
-        "rgba(153, 102, 255, 0.8)",
-      ],
-      borderColor: [
-        "rgba(54, 162, 235, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(255, 99, 132, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(153, 102, 255, 1)",
-      ],
+      backgroundColor: ["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
+      borderColor:["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
       borderWidth: 1,
       //柱体弧度
       borderRadius: 10,
@@ -293,20 +257,8 @@ const renderDoughnutChartData = (data: any) => ({
     {
       label: "数量",
       data: data,
-      backgroundColor: [
-        "rgba(54, 162, 235, 0.9)",
-        "rgba(75, 192, 192, 0.9)",
-        "rgba(255, 99, 132, 0.9)",
-        "rgba(255, 206, 86, 0.9)",
-        "rgba(153, 102, 255, 0.9)",
-      ],
-      borderColor: [
-        "rgba(54, 162, 235, 1)",
-        "rgba(75, 192, 192, 1)",
-        "rgba(255, 99, 132, 1)",
-        "rgba(255, 206, 86, 1)",
-        "rgba(153, 102, 255, 1)",
-      ],
+      backgroundColor: ["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
+      borderColor: ["#5c60f5", "#00CC88", "#FF3366", "#FF8C00", "#CFD6DF"],
       cutoutPercentage: 10,
       hoverOffset: 50,
     },
@@ -358,6 +310,7 @@ onMounted(() => {
       preset="card"
       title="报告详情"
       size="huge"
+      style="width: 1200px"
       :bordered="false"
     >
       <TaskReportDialog :rid="datas.reportId" :type="datas.resultType" />
@@ -367,11 +320,6 @@ onMounted(() => {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* 定义当前组件使用的CSS */
-.foot-page {
-  margin-top: 20px;
-  text-align: right;
-}
 .table {
   height: 100%;
 }

@@ -41,6 +41,7 @@ type FormDatas = {
 type ModalDatas = {
   sourceDatas: { label: string; value: string }[];
   targetDatas: string[];
+  caseHashList: string[];
 };
 
 type Tdatas = {
@@ -56,6 +57,7 @@ const datas = reactive<Tdatas>({
 const modalDatas = reactive<ModalDatas>({
   sourceDatas: [],
   targetDatas: [],
+  caseHashList: []
 });
 
 const formValue = ref<FormDatas>({
@@ -177,13 +179,25 @@ const handleNodeClick = (data: any) => {
     ProjectApi.getProjectCases(sessionStorage.projectId, data.full_name).then(
       (resp: any) => {
         if (resp.success === true) {
-          message.success("获取用例成功");
-          // console.log(resp.result);
           datas.caseData = resp.result;
-          modalDatas.sourceDatas = resp.result.map((_: any, index: Number) => ({
-            label: _.case_name,
+          const fileCase = resp.result.map((_: any, index: Number) => ({
+            label: _.class_name + "." +_.case_name,
             value: _.case_hash,
           }));
+          // 判断用例是否在 "穿梭框" 列表，不再则添加
+          for(let i of fileCase) {
+            var inSourceList: boolean = false;
+            for(let j of modalDatas.caseHashList) {
+              if(i.value == j) {
+                inSourceList = true;
+                break;
+              }
+            }
+            if (inSourceList == false) {
+              modalDatas.sourceDatas.push(i);
+              modalDatas.caseHashList.push(i.value);
+            }
+          }
         } else {
           message.error(resp.error.message);
         }
@@ -200,7 +214,6 @@ const handleNodeClick = (data: any) => {
       data.full_name
     ).then((resp: any) => {
       if (resp.success === true) {
-        message.success("获取用例成功");
         data.children = treeDataFormat(resp.result);
       } else {
         message.error(resp.error.message);
@@ -227,7 +240,6 @@ const changeEnv = (value: string, option: SelectOption) => {
 
 // 初始化任务详情
 const initTaskDetails = async () => {
-  // console.log(props.tid);
   if (props.tid == null) {
   } else {
     const resp = await TaskApi.getTaskDetails(props.tid.toString());
@@ -245,8 +257,6 @@ const initTaskDetails = async () => {
       modalDatas.targetDatas = resp.result.case_list.map(
         (_: any, index: Number) => _.key
       );
-
-      // console.log(modalDatas.targetDatas);
     } else {
       message.error(resp.error.message);
     }
@@ -259,7 +269,6 @@ const handleSave = (e: MouseEvent) => {
   e.preventDefault();
   formRef.value?.validate((errors) => {
     if (!errors) {
-      // console.log(modalDatas.targetDatas);
       let payload = {
         taskId: props.tid,
         project: sessionStorage.projectId,
@@ -268,7 +277,6 @@ const handleSave = (e: MouseEvent) => {
         team_id: formValue.value.team_id,
         cases: modalDatas.targetDatas,
       };
-      // console.log(payload);
       if (props.type === 1) {
         TaskApi.createTask(payload).then((resp: any) => {
           if (resp.success === true) {
@@ -303,7 +311,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="case-sync-modal">
+  <div class="task-modal">
     <n-form
       ref="formRef"
       :model="formValue"
@@ -343,9 +351,9 @@ onMounted(() => {
       </n-form-item>
     </n-form>
     <n-divider title-placement="left"> 选择用例 </n-divider>
-    <div>
-      <n-grid x-gap="16" :cols="6">
-        <n-gi>
+    <div style="height: 500px;">
+      <n-grid x-gap="16" :cols="8">
+        <n-gi span="2">
           <n-tree
             class="filetree"
             block-line
@@ -355,7 +363,7 @@ onMounted(() => {
             :node-props="nodeProps"
           />
         </n-gi>
-        <n-gi span="5">
+        <n-gi span="6">
           <n-transfer
             ref="transfer"
             virtual-scroll
@@ -363,9 +371,16 @@ onMounted(() => {
             v-model:value="modalDatas.targetDatas"
             source-filterable
             target-filterable
+            class="transfer-style"
           />
         </n-gi>
       </n-grid>
     </div>
   </div>
 </template>
+
+<style scoped>
+.transfer-style {
+  height: 500px;
+}
+</style>

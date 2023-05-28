@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, onMounted, effect, watch, h } from "vue";
+import { reactive, onMounted} from "vue";
 import { useMessage } from "naive-ui";
 import TaskApi from "~/request/task";
 
@@ -53,9 +53,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="report-dialog" width="1200px">
-    <div style="min-height: 600px; overflow-y: scroll">
-      <span style="float: left; width: 30%">
+  <div class="report-modal">
+    <n-grid x-gap="16" :cols="4">
+      <n-gi span="1">
+        <div class="class-list">
         <n-data-table
           class="table"
           :columns="[
@@ -66,38 +67,39 @@ onMounted(() => {
           ]"
           :data="datas.resultData"
           :row-props="caseRowClick"
-          style="width: 100%"
           height="500"
           :bordered="false"
         />
-      </span>
-      <span style="float: right; width: 65%; margin-right: 10px">
+        </div>
+      </n-gi>
+      <n-gi span="3">
+      <span>
         <n-descriptions label-placement="left" title="用例详情" :column="2">
-          <n-descriptions-item label="Case name">{{
-            datas.caseDetails.name
-          }}</n-descriptions-item>
-          <n-descriptions-item label="Run time">{{
-            datas.caseDetails.run_time
-          }}</n-descriptions-item>
-          <n-descriptions-item label="Test class">{{
-            datas.caseDetails.class_name
-          }}</n-descriptions-item>
+          <n-descriptions-item label="Case name">
+            {{ datas.caseDetails.name }}
+          </n-descriptions-item>
+          <n-descriptions-item label="Run time">
+            {{ datas.caseDetails.run_time }}
+          </n-descriptions-item>
+          <n-descriptions-item label="Test class">
+            {{ datas.caseDetails.class_name }}
+          </n-descriptions-item>
         </n-descriptions>
         <div v-if="datas.caseDetails.doc !== ''">
-          <p>doc</p>
+          <h4> doc </h4>
           <n-input
-            id="doc"
+            class="log-bg"
             type="textarea"
-            :rows="3"
+            :rows="2"
             placeholder="null"
             v-model:value="datas.caseDetails.doc"
           >
           </n-input>
         </div>
         <div v-if="datas.caseDetails.system_err !== ''">
-          <p>system err</p>
+          <h4> system err </h4>
           <n-input
-            id="system-err"
+            class="log-bg"
             type="textarea"
             :rows="10"
             placeholder="null"
@@ -106,9 +108,9 @@ onMounted(() => {
           </n-input>
         </div>
         <div v-if="datas.caseDetails.system_out !== ''">
-          <p>system out</p>
+          <h4>system out</h4>
           <n-input
-            id="system-out"
+            class="log-bg"
             type="textarea"
             :rows="10"
             placeholder="null"
@@ -117,9 +119,9 @@ onMounted(() => {
           </n-input>
         </div>
         <div v-if="datas.caseDetails.failure_out !== ''">
-          <p>failure</p>
+          <h4>failure</h4>
           <n-input
-            id="failure"
+            class="log-bg"
             type="textarea"
             :rows="10"
             placeholder="null"
@@ -128,9 +130,9 @@ onMounted(() => {
           </n-input>
         </div>
         <div v-if="datas.caseDetails.error_out !== ''">
-          <p>error</p>
+          <h4>error</h4>
           <n-input
-            id="error"
+            class="log-bg"
             type="textarea"
             :rows="10"
             placeholder="null"
@@ -139,9 +141,9 @@ onMounted(() => {
           </n-input>
         </div>
         <div v-if="datas.caseDetails.skipped_message !== ''">
-          <p>skipped message</p>
+          <h4>skipped message</h4>
           <n-input
-            id="skipped-message"
+            class="log-bg"
             type="textarea"
             :rows="2"
             placeholder="null"
@@ -150,8 +152,17 @@ onMounted(() => {
           </n-input>
         </div>
       </span>
-    </div>
+    </n-gi>
+    </n-grid>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.class-list {
+  min-height: 600px;
+  overflow-y: scroll
+}
+.log-bg {
+  background-color: #FBF9F6;
+}
+</style>
