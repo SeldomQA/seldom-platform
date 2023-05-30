@@ -32,17 +32,6 @@ const datas = reactive({
   },
 });
 
-const form = ref({
-  name: "",
-  region: "",
-  date1: "",
-  date2: "",
-  delivery: false,
-  type: [],
-  resource: "",
-  user: "",
-});
-
 // 初始化任务列表
 const initReportList = async () => {
   datas.req.task_id = props.tid;
@@ -54,6 +43,13 @@ const initReportList = async () => {
     message.error("获得任务列表失败！");
   }
 };
+
+// 翻页（改变页数）
+const pageTurning = (page: any) => {
+  datas.req.page = page
+  initReportList()
+}
+
 // 显示报告详情
 const showReport = async (row: RowData, type: string) => {
   datas.reportDialog = true;
@@ -63,11 +59,6 @@ const showReport = async (row: RowData, type: string) => {
 // 创建任务子组件的回调
 const cancelDialog = () => {
   datas.reportDialog = false;
-};
-// 跳转到第几页
-const handleCurrentChange = (val: number) => {
-  datas.req.page = val;
-  initReportList();
 };
 
 type RowData = {
@@ -294,15 +285,14 @@ onMounted(() => {
     />
 
     <!-- 分页 -->
-    <!-- <div class="foot-page">
-      <el-pagination
-        background
-        @current-change="handleCurrentChange"
-        layout="prev, pager, next"
-        :total="total"
-      >
-      </el-pagination>
-    </div> -->
+    <div class="foot-page">
+      <n-space vertical>
+        <n-pagination 
+          :default-page-size="datas.req.size"
+          :item-count="datas.total"
+          :on-update:page="(page: number) => pageTurning(page)"/>
+      </n-space>
+    </div>
     <!-- 引用组件 -->
     <n-modal
       v-model:show="datas.reportDialog"

@@ -53,6 +53,12 @@ body {
   float: right;
 }
 
+.foot-page {
+  margin-top: 15px;
+  height: 30px;
+  float: right;
+}
+
 .main-card {
   min-height: 700px;
 }
