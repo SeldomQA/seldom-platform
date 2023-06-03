@@ -136,10 +136,11 @@
     </el-table>
     <!-- 分页 -->
     <div class="foot-page">
-      <el-pagination
+     <el-pagination
         background
-        @current-change="handleCurrentChange"
-        layout="prev, pager, next"
+        @current-change="changeCurrentPage"
+        layout="total, prev, pager, next"
+        :page-size="query.size"
         :total="total">
       </el-pagination>
     </div>
@@ -167,7 +168,7 @@ export default {
       resultType: '',
       tableData: [],
       total: 0,
-      req: {
+      query: {
         page: 1,
         size: 10,
         task_id: 0
@@ -185,7 +186,7 @@ export default {
     }
   },
   created() {
-    this.req.task_id = this.tid
+    this.query.task_id = this.tid
   },
 
   mounted() {
@@ -196,7 +197,7 @@ export default {
   methods: {
     // 初始化任务列表
     async initReportList() {
-      const resp = await TaskApi.getReportAll(this.req)
+      const resp = await TaskApi.getReportAll(this.query)
       if (resp.success === true) {
         this.tableData = resp.result
         this.total = resp.total
@@ -215,8 +216,8 @@ export default {
       this.reportDialog = false
     },
     // 跳转到第几页
-    handleCurrentChange(val) {
-      this.req.page = val
+    changeCurrentPage(val) {
+      this.query.page = val
       this.initReportList()
     },
     onSubmit() {}

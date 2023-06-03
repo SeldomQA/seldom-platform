@@ -36,8 +36,7 @@
         <el-table
           :data="tableData"
           border
-          style="width: 100%"
-          height="500">
+          style="width: 100%">
           <el-table-column
             fixed
             prop="id"
@@ -105,6 +104,16 @@
           </el-table-column>
         </el-table>
       </div>
+      <!-- 分页 -->
+      <div class="foot-page">
+       <el-pagination
+          background
+          @current-change="changeCurrentPage"
+          layout="total, prev, pager, next"
+          :page-size="query.size"
+          :total="total">
+        </el-pagination>
+      </div>
 
       <!-- 子组件 -->
       <TaskDialog v-if="taskDailog" :pid=projectId :tid=taskId @cancel="cancelDialog"></TaskDialog>
@@ -147,8 +156,11 @@ export default {
       query: {
         project_id: '',
         team_id: '',
-        name: ''
-      }
+        name: '',
+        page: 1,
+        size: 10
+      },
+      total: 0
     }
   },
   created() {
@@ -204,6 +216,7 @@ export default {
       const resp = await TaskApi.getTaskAll(this.query)
       if (resp.success === true) {
         this.tableData = resp.result
+        this.total = resp.total
       } else {
         this.$message.error('获得任务列表失败！')
       }
@@ -244,6 +257,11 @@ export default {
         this.$message.error('运行失败！')
       }
     },
+    // 跳转到第几页
+    changeCurrentPage(val) {
+      this.query.page = val
+      this.initTaskList()
+    },
     // 显示任务报告列表
     clickTaskName(row) {
       this.taskTitle = row.name + ' - 报告列表'
@@ -254,7 +272,6 @@ export default {
     goBack() {
       this.taskFlag = true
     }
-
   }
 }
 </script>
@@ -268,6 +285,11 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.foot-page {
+  margin-top: 20px;
+  float: right;
+  margin-bottom: 20px;
+}
 /* 定义当前组件使用的CSS */
 .el-checkbox {
   text-align: left;
