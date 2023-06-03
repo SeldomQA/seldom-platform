@@ -9,7 +9,7 @@ from app_project.models import Project, Env
 from app_case.models import TestCase
 from app_team.models import Team
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
-from app_task.api_schma import TaskIn, ReportOut, ReportIn
+from app_task.api_schma import TaskIn, TaskOut, ReportOut, ReportIn
 from app_task.running import seldom_running
 from app_utils.response import response, model_to_dict, Error
 from app_utils.pagination import CustomPagination
@@ -66,7 +66,8 @@ def get_task(request, task_id: int):
     return response(result=task_dict)
 
 
-@router.get('/list')
+@router.get('/list', response=List[TaskOut])
+@paginate(CustomPagination)
 def get_task_list(request, project_id: int, team_id: str = None, name: str = None):
     """
     获得任务列表
@@ -83,20 +84,19 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
     task_list = []
     for task in tasks:
         task_dict = model_to_dict(task)
+        task_dict["project_id"] = task.project_id
         try:
-            env = Env.objects.get(id=task.env_id)
-            task_dict["env"] = env.name
+            task_dict["env"] = Env.objects.get(id=task.env_id).name
         except Env.DoesNotExist:
             task_dict["env"] = ""
 
         try:
-            team = Team.objects.get(id=task.team_id)
-            task_dict["team"] = team.name
+            task_dict["team"] = Team.objects.get(id=task.team_id).name
         except Team.DoesNotExist:
             task_dict["team"] = ""
 
         task_list.append(task_dict)
-    return response(result=task_list)
+    return task_list
 
 
 @router.put('/{task_id}/')

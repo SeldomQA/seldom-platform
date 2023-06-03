@@ -1,4 +1,4 @@
-from typing import Any,Union
+from typing import Any, Union
 from ninja import Schema
 from datetime import datetime, timedelta, date, time
 
@@ -10,6 +10,22 @@ class TaskIn(Schema):
     env_id: int
     team_id: int
     cases: list
+
+
+class TaskOut(Schema):
+    id: int
+    name: str
+    status: int
+    env_id: int
+    env: str
+    team_id: int
+    team: str
+    timed: str
+    email: str = None
+    execute_count: int
+    create_time: Union[datetime]
+    update_time: Union[datetime]
+    project_id: int
 
 
 class ReportIn(Schema):
