@@ -8,7 +8,7 @@
 <template>
   <div class="main-card">
       <div class="filter-line">
-        <el-button cy-data="create-team" type="primary" size="small" @click="showCreate()">创建</el-button>
+        <el-button cy-data="create-team" type="primary" @click="showCreate()">创建</el-button>
       </div>
       <div>
         <el-table :data="teamData" border style="width: 100%">

@@ -11,8 +11,8 @@
       <div style="text-align: left;">
         <el-form :inline="true">
           <el-form-item>
-            <el-button type="primary" @click="showSync()" size="small">同步</el-button>
-            <el-button type="warning" @click="showLog()" size="small">日志</el-button>
+            <el-button type="primary" @click="showSync()">同步</el-button>
+            <el-button type="warning" @click="showLog()">日志</el-button>
           </el-form-item>
           <el-form-item label="用例" style="float: right;">
            <el-tag>{{caseNumber}}</el-tag> 条

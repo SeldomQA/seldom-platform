@@ -10,8 +10,17 @@
     <el-card class="main-card" v-if="taskFlag">
       <div style="text-align: left;">
         <el-form :inline="true">
-          <el-form-item label="团队">
-            <el-select v-model="query.team_id" clearable placeholder="选择团队" size="small">
+          <el-form-item>
+            <el-button cy-data="create-task" type="primary" @click="showCreateTask()">创建</el-button>
+          </el-form-item>
+          <el-form-item class="span-right">
+            <el-button type="primary" icon="el-icon-search" @click="initTaskList">搜索</el-button>
+          </el-form-item>
+          <el-form-item label="名称" class="span-right">
+            <el-input v-model="query.name" clearable placeholder="请输入任务名称"></el-input>
+          </el-form-item>
+          <el-form-item label="团队" class="span-right">
+            <el-select v-model="query.team_id" clearable placeholder="选择团队">
               <el-option
                 v-for="item in teamOptions"
                 :key="item.value"
@@ -19,15 +28,6 @@
                 :value="item.value">
               </el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item label="名称">
-            <el-input v-model="query.name" placeholder="请输入任务名称" size="small"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" icon="el-icon-search" size="small" @click="initTaskList">搜索</el-button>
-          </el-form-item>
-          <el-form-item  style="float: right;">
-            <el-button cy-data="create-task" type="primary" size="small" @click="showCreateTask()">创建</el-button>
           </el-form-item>
         </el-form>
       </div>

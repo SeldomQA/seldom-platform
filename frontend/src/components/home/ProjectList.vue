@@ -9,7 +9,7 @@
   <div class="main-card">
     <div shadow="never">
       <div class="filter-line">
-        <el-button cy-data="create-project" type="primary" size="small" @click="showCreate()">创建</el-button>
+        <el-button cy-data="create-project" type="primary" @click="showCreate()">创建</el-button>
       </div>
       <el-row>
         <div v-if="tableData.length === 0">
@@ -25,14 +25,18 @@
                     style="height: 120px; width: 120px"
                   />
                 </div>
-                <el-descriptions title="  " :column="1">
+                <el-descriptions title="  " :column="1" labelStyle="width: 80px">
                   <el-descriptions-item label="测试目录">{{item.case_dir}}</el-descriptions-item>
                   <el-descriptions-item label="文件数量">{{item.test_num}}</el-descriptions-item>
                   <el-descriptions-item label="状态">
                     <el-tag size="small" v-if="item.is_clone==0">未克隆</el-tag>
                     <el-tag size="small" v-else>已克隆</el-tag>
                   </el-descriptions-item>
-                  <el-descriptions-item label="Git地址">{{item.address}}</el-descriptions-item>
+                  <el-descriptions-item label="Git地址">{{item.address}}
+                    <el-link :href="item.address" type="primary" target="_blank">
+                      <i class="el-icon-link"></i>
+                    </el-link>
+                  </el-descriptions-item>
                 </el-descriptions>
               <div slot="header" class="clearfix">
                 <span>【{{item.id}}】{{item.name}} </span>

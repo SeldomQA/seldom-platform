@@ -3,11 +3,18 @@
     <el-dialog :title=showTitle :visible.sync="showStatus" @close="cancelTeam()" width="600px">
       <el-form v-if="inResize === true" :rules="rules" ref="form" :model="form" label-width="80px">
         <el-form-item label="名称" prop="name">
-          <el-input cy-data="team-name" v-model="form.name"></el-input>
+          <el-input
+            cy-data="team-name"
+            v-model="form.name"
+            placeholder="团队名称">
+            </el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-          <el-input cy-data="email-name" v-model="form.email"></el-input>
-          <el-alert title="多个邮箱用分号“;”分割" type="success"></el-alert>
+          <el-input
+            cy-data="email-name"
+            v-model="form.email"
+            placeholder="团队邮箱，多个邮箱用分号“;”分割">
+          </el-input>
         </el-form-item>
         <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
           <div class="dialog-footer">

@@ -3,7 +3,11 @@
     <el-dialog :title=showTitle :visible.sync="showStatus" @close="cancelEnv()" width="600px">
       <el-form v-if="inResize === true" :rules="rules" ref="form" :model="form" label-width="80px">
         <el-form-item label="名称" prop="name">
-          <el-input cy-data="enviornment-name" v-model="form.name"></el-input>
+          <el-input
+            cy-data="enviornment-name"
+            v-model="form.name"
+            placeholder="环境名称">
+          </el-input>
         </el-form-item>
         <el-form-item label="类型" prop="test_type">
           <el-select v-model="form.test_type" style="width: 100%;" @change="testTypeChange()">
@@ -16,10 +20,18 @@
           </el-select>
         </el-form-item>
         <el-form-item label="env" prop="env">
-          <el-input cy-data="enviornment-env"  v-model="form.env"></el-input>
+          <el-input
+              cy-data="enviornment-env"
+              v-model="form.env"
+              placeholder="Seldom env 配置">
+            </el-input>
         </el-form-item>
         <el-form-item v-if="form.test_type=='web'" label="browser" prop="browser">
-          <el-select v-model="form.browser" cy-data="enviornment-browser" style="width: 100%;">
+          <el-select
+            v-model="form.browser"
+            cy-data="enviornment-browser"
+            placeholder="Seldom browser 配置"
+            style="width: 100%;">
             <el-option
               v-for="item in browserOptions"
               :key="item.value"
@@ -29,7 +41,11 @@
           </el-select>
         </el-form-item>
         <el-form-item v-if="form.test_type=='http'" label="base_url" prop="base_url">
-          <el-input cy-data="enviornment-url"  v-model="form.base_url"></el-input>
+          <el-input
+              cy-data="enviornment-url"
+              v-model="form.base_url"
+              placeholder="Seldom base_url 配置">
+            </el-input>
         </el-form-item>
         <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
           <div class="dialog-footer">

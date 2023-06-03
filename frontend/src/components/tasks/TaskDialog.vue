@@ -2,12 +2,12 @@
   <div class="dialog">
     <el-dialog :title=showTitle :visible.sync="showStatus" @close="cancelDialog()" width="1200px">
       <div style="text-align: left;">
-        <el-form ref="taskform" :model="taskform" :rules="taskRule" :inline="true" label-width="80px">
-          <el-form-item label="任务名称" prop="name">
+        <el-form ref="taskform" :model="taskform" :rules="taskRule" :inline="true">
+          <el-form-item label="名称" prop="name" size="small" placeholder="任务名称">
             <el-input v-model="taskform.name"></el-input>
           </el-form-item>
-          <el-form-item label="运行环境" prop="env_id">
-           <el-select v-model="taskform.env_id" placeholder="选择环境">
+          <el-form-item label="环境" prop="env_id">
+           <el-select v-model="taskform.env_id" size="small" placeholder="选择环境">
               <el-option
                 v-for="item in envOptions"
                 :key="item.value"
@@ -17,7 +17,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="团队" prop="team_id">
-           <el-select v-model="taskform.team_id" placeholder="选择团队">
+           <el-select v-model="taskform.team_id" size="small" placeholder="选择团队">
               <el-option
                 v-for="item in teamOptions"
                 :key="item.value"
@@ -26,12 +26,9 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <!-- <el-form-item label="告警邮箱" prop="lark_email">
-            <el-input v-model="taskform.lark_email"></el-input>
-          </el-form-item> -->
           <el-form-item>
             <div class="dialog-footer">
-              <el-button cy-data="save-task" type="primary" @click="createTask('taskform')">保存</el-button>
+              <el-button cy-data="save-task" type="primary" size="small" @click="createTask('taskform')">保存</el-button>
             </div>
           </el-form-item>
         </el-form>
@@ -69,7 +66,7 @@
           <el-transfer
             v-model="taskform.cases"
             :data="caseData"
-            :titles="['Source', 'Target']">
+            :titles="['待选择用例', '已选择用例']">
           </el-transfer>
         </div>
       </div>

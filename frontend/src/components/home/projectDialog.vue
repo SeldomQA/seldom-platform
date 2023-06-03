@@ -3,14 +3,25 @@
     <el-dialog :title=showTitle :visible.sync="showStatus" @close="cancelProject()" width="600px">
       <el-form v-if="inResize === true" :rules="rules" ref="form" :model="form" label-width="80px">
         <el-form-item label="名称" prop="name">
-          <el-input cy-data="project-name" v-model="form.name"></el-input>
+          <el-input
+            cy-data="project-name"
+            v-model="form.name"
+            placeholder="项目名称">
+          </el-input>
         </el-form-item>
         <el-form-item label="Git地址" prop="address">
-          <el-input cy-data="project-address"  v-model="form.address"></el-input>
-          <el-alert title="克隆项目：项目的git地址" type="success" :closable="false"></el-alert>
+          <el-input
+            cy-data="project-address"
+            v-model="form.address"
+            placeholder="项目地址：github/gitlab/gitee..">
+          </el-input>
         </el-form-item>
         <el-form-item label="测试目录" prop="address">
-          <el-input cy-data="project-test-dir"  v-model="form.case_dir"></el-input>
+          <el-input
+            cy-data="project-test-dir"
+            v-model="form.case_dir"
+            placeholder="项目测试目录：test_dir">
+          </el-input>
         </el-form-item>
         <el-form-item label="图片" prop="image">
           <div id="image">
@@ -25,8 +36,8 @@
         </el-form-item>
         <el-form-item style="margin-top: 22px; margin-bottom: 0px;">
           <div class="dialog-footer">
-            <el-button cy-data="cancel-project" @click="cancelProject()">取消</el-button>
-            <el-button cy-data="save-project" type="primary" @click="onSubmit('form')">保存</el-button>
+            <el-button cy-data="cancel-project" size="small" @click="cancelProject()">取消</el-button>
+            <el-button cy-data="save-project" type="primary" size="small" @click="onSubmit('form')">保存</el-button>
           </div>
         </el-form-item>
       </el-form>
