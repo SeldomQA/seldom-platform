@@ -142,29 +142,18 @@ const createColumns = ({
   ];
 };
 
-type Tdatas = {
-  loading: boolean;
 
-  projectId: string;
-  caseNumber: number;
-  tableData: [];
-  teamIdSelected: string;
-  tid?: number;
-  query: {
-    project_id: null;
-    team_id: null;
-    name: null;
-  };
-  taskFlag: boolean;
-};
-const datas = reactive<Tdatas>({
+const datas = reactive({
   loading: true,
   projectId: "",
   caseNumber: 0,
   tableData: [],
   teamIdSelected: "",
   tid: 0,
+  total: 0,
   query: {
+    page: 1,
+    size: 5,
     project_id: null,
     team_id: null,
     name: null,
@@ -219,6 +208,7 @@ const changeTeam = (value: string, option: SelectOption) => {
   datas.teamIdSelected = value;
 };
 
+// 初始化任务例表
 const initTaskList = async () => {
   datas.query.project_id = sessionStorage.projectId;
   if (datas.query.project_id == null || datas.query.project_id == undefined) {
@@ -228,6 +218,7 @@ const initTaskList = async () => {
     const resp = await TaskApi.getTaskAll(datas.query);
     if (resp.success === true) {
       datas.tableData = resp.result;
+      datas.total = resp.total;
     } else {
       message.error("获得任务列表失败！");
     }
@@ -246,7 +237,7 @@ const openModalTask = (type: number) => {
       case 1:
         modalDatas.title = "新增任务";
         modalDatas.type = 1;
-        datas.tid = undefined;
+        datas.tid = 0;
         break;
       case 2:
         modalDatas.title = "编辑任务";
@@ -261,10 +252,6 @@ const segmented = {
   content: "soft",
   footer: "soft",
 };
-
-const formRef = ref<FormInst | null>(null);
-
-const options = [{}];
 
 // 删除任务
 const deleteTask = (row: RowData) => {
@@ -305,29 +292,17 @@ const clickTaskName = (row: RowData) => {
   datas.tid = row.id;
   datas.taskFlag = false;
 };
+
 // 返回任务列表
 const goBack = () => {
   datas.taskFlag = true;
 };
 
-// 定时设置
-const showModalTimer = ref(false);
-
-const formRefTimer = ref<FormInst | null>(null);
-
-const formValueTimer = ref<{
-  minute: string | null;
-  hour: string | null;
-  day_of_week: string | null;
-  day: string | null;
-  month: string | null;
-}>({
-  minute: "*",
-  hour: "*",
-  day_of_week: "*",
-  day: "*",
-  month: "*",
-});
+// 翻页（改变页数）
+const pageChange = (page: any) => {
+  datas.query.page = page
+  initTaskList()
+}
 
 const closeModal = () => {
   showModalTask.value = false;
@@ -339,9 +314,6 @@ const columns = createColumns({
     switch (action) {
       case "run":
         runTask(row);
-        break;
-      case "set":
-        showModalTimer.value = true;
         break;
       case "edit":
         openModalTask(2);
@@ -356,26 +328,8 @@ const columns = createColumns({
     }
   },
 });
-const pagination = false;
 
-const rulesTimer = {
-  name: {
-    required: true,
-    message: "请输入任务名称",
-    trigger: ["input"],
-  },
-  env: {
-    type: "number",
-    required: true,
-    trigger: ["blur", "change"],
-    message: "请选择运行环境",
-  },
-  email: {
-    required: true,
-    message: "请输入邮箱地址",
-    trigger: ["input"],
-  },
-};
+const pagination = false;
 
 onMounted(() => {
   initTeamList();
@@ -430,12 +384,22 @@ onMounted(() => {
             </n-form>
           </n-space>
         </div>
+        <!-- 任务表 -->
         <n-data-table
           :columns="columns"
           :data="datas.tableData"
           :pagination="pagination"
           :bordered="false"
         />
+        <!-- 分页 -->
+        <div class="foot-page">
+          <n-space vertical>
+            <n-pagination 
+              :default-page-size="datas.query.size"
+              :item-count="datas.total"
+              :on-update:page="(page: number) => pageChange(page)"/>
+          </n-space>
+        </div>
       </n-card>
 
       <n-modal
@@ -455,54 +419,6 @@ onMounted(() => {
         />
       </n-modal>
 
-      <!-- <n-modal
-      v-model:show="showModalTimer"
-      class="custom-card"
-      preset="card"
-      style="width: 80%"
-      title="定时任务"
-      size="huge"
-      :bordered="false"
-      :segmented="segmented"
-    >
-      <n-form
-        ref="formRef"
-        :model="formValue"
-        :rules="rulesTimer"
-        label-placement="left"
-        inline
-        :label-width="80"
-        size="medium"
-        show-require-mark
-      >
-        <n-form-item label="秒" path="name">
-          <n-input
-            v-model:value="formValue.name"
-            placeholder="请输入任务名称"
-          />
-        </n-form-item>
-        <n-form-item label="分" path="env">
-          <n-select
-            v-model:value="formValue.env_id"
-            style="width: 200px"
-            :options="model.envOptions"
-            placeholder="请选择运行环境"
-          >
-          </n-select>
-        </n-form-item>
-        <n-form-item label="时" path="team_id">
-          <n-input
-            v-model:value="formValue.team_id"
-            placeholder="请输入邮箱地址"
-          />
-        </n-form-item>
-        <n-form-item>
-          <n-button type="primary" @click="handleSave"> 保存 </n-button>
-        </n-form-item>
-      </n-form>
-      <n-divider title-placement="left"> 选择用例 </n-divider>
-      <div></div>
-    </n-modal> -->
     </div>
 
     <div class="task-report" v-else>

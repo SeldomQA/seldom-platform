@@ -25,7 +25,7 @@ const datas = reactive({
   resultType: "",
   tableData: [],
   total: 0,
-  req: {
+  query: {
     page: 1,
     size: 10,
     task_id: 0,
@@ -34,8 +34,8 @@ const datas = reactive({
 
 // 初始化任务列表
 const initReportList = async () => {
-  datas.req.task_id = props.tid;
-  const resp = await TaskApi.getReportAll(datas.req);
+  datas.query.task_id = props.tid;
+  const resp = await TaskApi.getReportAll(datas.query);
   if (resp.success === true) {
     datas.tableData = resp.result;
     datas.total = resp.total;
@@ -45,8 +45,8 @@ const initReportList = async () => {
 };
 
 // 翻页（改变页数）
-const pageTurning = (page: any) => {
-  datas.req.page = page
+const pageChange = (page: any) => {
+  datas.query.page = page
   initReportList()
 }
 
@@ -288,9 +288,9 @@ onMounted(() => {
     <div class="foot-page">
       <n-space vertical>
         <n-pagination 
-          :default-page-size="datas.req.size"
+          :default-page-size="datas.query.size"
           :item-count="datas.total"
-          :on-update:page="(page: number) => pageTurning(page)"/>
+          :on-update:page="(page: number) => pageChange(page)"/>
       </n-space>
     </div>
     <!-- 引用组件 -->
