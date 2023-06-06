@@ -147,7 +147,7 @@ const handlePasswordInput = () => {
           </a>
         </div>
         <div>
-          <img src="src/assets/login-bg.png" alt="" style="width: 60%;">
+          <img src="../assets/login-bg.png" alt="" style="width: 60%;">
         </div>
         <n-divider>特色</n-divider>
         <div class="feature-option">
