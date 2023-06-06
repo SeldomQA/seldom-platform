@@ -240,7 +240,7 @@ const changeEnv = (value: string, option: SelectOption) => {
 
 // 初始化任务详情
 const initTaskDetails = async () => {
-  if (props.tid == null) {
+  if (props.tid === 0) {
   } else {
     const resp = await TaskApi.getTaskDetails(props.tid.toString());
     if (resp.success === true) {
@@ -269,6 +269,10 @@ const handleSave = (e: MouseEvent) => {
   e.preventDefault();
   formRef.value?.validate((errors) => {
     if (!errors) {
+      if (modalDatas.targetDatas.length === 0) {
+        message.error("请选择测试用例！");
+        return;
+      }
       let payload = {
         taskId: props.tid,
         project: sessionStorage.projectId,
