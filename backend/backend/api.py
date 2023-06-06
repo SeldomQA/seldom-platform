@@ -40,6 +40,14 @@ def on_invalid_token(request, exc):
     return api.create_response(request, {"detail": "Invalid token supplied"}, status=401)
 
 
+@api.get('/ping')
+def api_check(request):
+    """
+    健康检查接口
+    """
+    return {"result": "ok"}
+
+
 api.add_router("/project/", project_router)
 api.add_router("/case/", case_router)
 api.add_router("/task/", task_router)
