@@ -7,6 +7,7 @@ import os
 import shutil
 import hashlib
 import subprocess
+import requests
 from django.shortcuts import get_object_or_404
 from ninja import File
 from ninja import Router
@@ -41,6 +42,18 @@ def create_project(request, project: ProjectIn):
         project_case_dir = "test_dir"
     else:
         project_case_dir = project.case_dir
+
+    # 检查项目地址是否可用
+    if project.address.startswith("http") is False:
+        return response(error=Error.PROJECT_ADDRESS_ERROR)
+
+    try:
+        resp = requests.get(project.address)
+        if resp.status_code != 200:
+            return response(error=Error.PROJECT_ADDRESS_ERROR)
+    except BaseException:
+        return response(error=Error.PROJECT_ADDRESS_ERROR)
+
     project_obj = Project.objects.create(
         name=project.name,
         address=project.address,
