@@ -1,5 +1,6 @@
 import {
   createMemoryHistory,
+  createWebHashHistory,
   createRouter as _createRouter,
   createWebHistory,
 } from "vue-router";
@@ -11,7 +12,7 @@ export const routes = pageRoutes;
 
 export function createRouter() {
   const router = _createRouter({
-    history: createWebHistory(),
+    history: createWebHashHistory(),
     routes,
   });
 
