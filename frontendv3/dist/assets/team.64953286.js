@@ -1,0 +1,1 @@
+import{r as t}from"./HttpCommon.aa596ed2.js";class r{createTeam(e){return t.post("/api/team/create",e)}getTeamAll(e){return t.get("/api/team/list",e)}getTeamDetails(e){return t.get("/api/team/"+e+"/")}updateTeam(e,a){return t.put("/api/team/"+e+"/",a)}deleteTeam(e){return t.del("/api/team/"+e+"/")}}const i=new r;export{i as T};
