@@ -147,7 +147,7 @@ const deleteTeam = (id: number) => {
           message.success("删除成功！");
           initTeamList();
         } else {
-          message.error("删除失败");
+          message.error(resp.error.message);
         }
       })
     },

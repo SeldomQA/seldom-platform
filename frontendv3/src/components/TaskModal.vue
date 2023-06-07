@@ -153,7 +153,7 @@ const initTeamList = async () => {
       });
     }
   } else {
-    message.error("查询失败!");
+    message.error(resp.error.message);
   }
 };
 
@@ -287,7 +287,7 @@ const handleSave = (e: MouseEvent) => {
             message.success("创建成功！");
             emits("close");
           } else {
-            message.error("创建失败！");
+            message.error(resp.error.message);
           }
         });
       } else {
@@ -296,7 +296,7 @@ const handleSave = (e: MouseEvent) => {
             message.success("更新成功！");
             emits("close");
           } else {
-            message.error("更新失败！");
+            message.error(resp.error.message);
           }
         });
       }

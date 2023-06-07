@@ -112,7 +112,6 @@ function commonRequest(
     function (error) {
       // 超出 2xx 范围的状态码都会触发该函数。
       // 对响应错误做点什么
-      console.log("返回错误", error);
       if (error.response.status === 401) {
         message.error("token失效");
         // this.$router.push({ path: '/' });

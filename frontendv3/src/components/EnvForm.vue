@@ -106,7 +106,7 @@ const saveEnv = () => {
             message.success("创建成功！");
             cancelDialog();
           } else {
-            message.error("创建失败！");
+            message.error(resp.error.message);
           }
         });
       } else {
@@ -116,7 +116,7 @@ const saveEnv = () => {
             message.success("更新成功！");
             cancelDialog();
           } else {
-            message.error("更新失败！");
+            message.error(resp.error.message);
           }
         });
       }

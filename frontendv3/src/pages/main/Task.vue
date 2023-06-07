@@ -200,7 +200,7 @@ const initTeamList = async () => {
       });
     }
   } else {
-    message.error("查询失败!");
+    message.error(resp.error.message);
   }
 };
 
@@ -220,7 +220,7 @@ const initTaskList = async () => {
       datas.tableData = resp.result;
       datas.total = resp.total;
     } else {
-      message.error("获得任务列表失败！");
+      message.error(resp.error.message);
     }
     datas.loading = false;
   }
@@ -266,7 +266,7 @@ const deleteTask = (row: RowData) => {
           initTaskList();
           message.success("删除任务成功！");
         } else {
-          message.error("删除任务失败！");
+          message.error(resp.error.message);
         }
       });
     },
@@ -283,7 +283,7 @@ const runTask = async (row: RowData) => {
     message.success("开始运行！");
     initTaskList();
   } else {
-    message.error("运行失败！");
+    message.error(resp.error.message);
   }
 };
 

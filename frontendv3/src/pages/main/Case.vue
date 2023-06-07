@@ -257,10 +257,9 @@ const runCase = async (row: RowData) => {
       env: datas.env,
     });
     if (resp.success === true) {
-      // datas.fileData = resp.result
       message.success("开始执行");
     } else {
-      message.error("运行失败");
+      message.error(resp.error.message);
     }
   }
 };

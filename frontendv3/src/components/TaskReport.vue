@@ -40,7 +40,7 @@ const initReportList = async () => {
     datas.tableData = resp.result;
     datas.total = resp.total;
   } else {
-    message.error("获得任务列表失败！");
+    message.error(resp.error.message);
   }
 };
 

@@ -88,12 +88,12 @@ export default defineComponent({
     const handleSelect = (key: string | number) => {
       switch (key) {
         case "logout":
-          UserApi.logout({ token: token.value }).then((resp) => {
+          UserApi.logout({ token: token.value }).then((resp: any) => {
             if (resp.success === true) {
               sessionStorage.clear();
               router.push("/login");
             } else {
-              message.error("退出失败！");
+              message.error(resp.error.message);
             }
           });
           break;

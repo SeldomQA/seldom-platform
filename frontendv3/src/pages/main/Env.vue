@@ -59,7 +59,7 @@ const deleteEnv = (id: number) => {
           message.success("删除成功！");
           getEnvList();
         } else {
-          message.error("删除失败");
+          message.error(resp.error.message);
         }
       })
     },
