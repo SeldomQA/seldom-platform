@@ -1,8 +1,8 @@
 # seldom-platform
 
-> Based on the seldom formwork test platform, End the platform VS framework debate.
+> Based on the seldom formwork test platform.
 
-基于seldom框架的测试平台, 结束平台与框架之争。
+基于seldom框架的测试平台。
 
 ## Project
 
@@ -23,16 +23,21 @@
 
 * 功能：
 
-| 功能      | frontend | frontendv3 |
-| --------- | -------- | ---------- |
-| 登录&注册 | ✔️        | ✔️          |
-| 项目配置  | ✔️        | ✔️          |
-| 环境配置  | ✔️        | ✔️          |
-| 团队配置  | ✔️        | ✔️          |
-| 用例管理  | ✔️        | ✔️          |
-| 任务管理  | ✔️        | ✔️          |
-| 报告列表  | ✔️        | ✔️          |
-| 报告详情  | ✔️        | ✔️          |
+| 功能      | 进度 |
+| --------- | ------- |
+| 登录&注册 | ✔️      |
+| 项目配置  | ✔️      |
+| 环境配置  | ✔️      |
+| 团队配置  | ✔️      |
+| 用例管理  | ✔️      |
+| 任务管理  | ✔️      |
+| 定时任务  | ..      |
+
+## Online experience
+
+地址：http://seldom.testpub.cn/
+
+QQ官方交流群：948994709，获取体验账号。
 
 
 ## Function
