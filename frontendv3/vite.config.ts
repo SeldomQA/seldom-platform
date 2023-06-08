@@ -29,10 +29,5 @@ export default defineConfig({
       "~": resolve(__dirname, "./src"),
       "@": resolve(__dirname, "./src/components"),
     },
-  },
-  build: {
-    rollupOptions: {
-      external: ['src/assets/login-bg.png'],
-    },
-  },
+  }
 });

@@ -3,4 +3,3 @@ django-ninja==0.22.1
 seldom==3.2.2
 django-cors-headers==3.13.0
 django-redis==5.2.0
-uwsgi==2.0.20
