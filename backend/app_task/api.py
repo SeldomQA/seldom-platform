@@ -79,7 +79,7 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
     if name is not None and name != "":
         query["name__contains"] = name
 
-    tasks = TestTask.objects.filter(**query).order_by("-create_time")
+    tasks = TestTask.objects.filter(**query).order_by("-create_time")[:1000]
 
     task_list = []
     for task in tasks:
@@ -185,7 +185,7 @@ def get_report_list(request, task_id: int):
     """
     if task_id == 0:
         return response(error=Error.TASK_ID_NULL)
-    return TaskReport.objects.filter(task_id=task_id).order_by("-create_time")[:1000]
+    return TaskReport.objects.get_queryset(task_id=task_id).order_by("-create_time")[:1000]
 
 
 @router.post("/report/{report_id}/results")
