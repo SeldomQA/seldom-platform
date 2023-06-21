@@ -57,7 +57,7 @@ const datas = reactive<Tdatas>({
 const modalDatas = reactive<ModalDatas>({
   sourceDatas: [],
   targetDatas: [],
-  caseHashList: []
+  caseHashList: [],
 });
 
 const formValue = ref<FormDatas>({
@@ -181,14 +181,14 @@ const handleNodeClick = (data: any) => {
         if (resp.success === true) {
           datas.caseData = resp.result;
           const fileCase = resp.result.map((_: any, index: Number) => ({
-            label: _.class_name + "." +_.case_name,
+            label: _.class_name + "." + _.case_name,
             value: _.case_hash,
           }));
           // 判断用例是否在 "穿梭框" 列表，不再则添加
-          for(let i of fileCase) {
+          for (let i of fileCase) {
             var inSourceList: boolean = false;
-            for(let j of modalDatas.caseHashList) {
-              if(i.value == j) {
+            for (let j of modalDatas.caseHashList) {
+              if (i.value == j) {
                 inSourceList = true;
                 break;
               }
@@ -253,6 +253,9 @@ const initTaskDetails = async () => {
           label: _.label,
           value: _.key,
         })
+      );
+      modalDatas.caseHashList = resp.result.case_list.map(
+        (_: any, index: Number) => _.key
       );
       modalDatas.targetDatas = resp.result.case_list.map(
         (_: any, index: Number) => _.key
@@ -355,7 +358,7 @@ onMounted(() => {
       </n-form-item>
     </n-form>
     <n-divider title-placement="left"> 选择用例 </n-divider>
-    <div style="height: 500px;">
+    <div style="height: 500px">
       <n-grid x-gap="16" :cols="8">
         <n-gi span="2">
           <n-tree
