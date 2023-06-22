@@ -55,7 +55,7 @@ def get_task(request, task_id: int):
         case_obj = TestCase.objects.get(case_hash=c)
         case_list.append({
             "key": case_obj.case_hash,
-            "label": str(case_obj.id) + " " + case_obj.class_name + "." + case_obj.case_name
+            "label": case_obj.class_name + "." + case_obj.case_name
         })
     task_dict = model_to_dict(task_obj)
 
