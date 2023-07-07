@@ -216,7 +216,7 @@ server {
         proxy_pass_request_headers      on;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://vuesrv.klook-vue:8080;  # 后端服务地址
+        proxy_pass http://vuesrv.testpub-vue:8080;  # 后端服务地址
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
