@@ -42,7 +42,7 @@ function makeRequest(
   const header: TNomalObject = {};
   if (process.env.NODE_ENV === "local") {
     // header["Access-Control-Allow-Origin"] = "*";
-    // header["x-account-email"] = "yuchou.zou@klook.com";
+    // header["x-account-email"] = "defnngj@gmail.com";
     // header["x-account-fullname"] = "yuchou.zou";
   } else {
     // header["Access-Control-Allow-Origin"] = "*";
