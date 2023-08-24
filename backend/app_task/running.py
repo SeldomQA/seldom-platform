@@ -146,15 +146,20 @@ def seldom_running(test_dir, case_info, report_name, task_id):
             skipped_message = ""
             for node in nodes:
                 if node.nodeName == "doc":
-                    doc = node.firstChild.data
+                    doc = node.childNodes[1].data
+
                 if node.nodeName == "system-out":
-                    system_out = node.firstChild.data
+                    system_out = node.childNodes[1].data
+
                 if node.nodeName == "system-err":
-                    system_error = node.firstChild.data
+                    system_error = node.childNodes[1].data
+
                 if node.nodeName == "failure":
-                    failure_out = node.firstChild.data
+                    failure_out = node.childNodes[1].data
+
                 if node.nodeName == "error":
-                    error_out = node.firstChild.data
+                    error_out = node.childNodes[1].data
+
                 if node.nodeName == "skipped":
                     skipped_message = node.getAttribute("message")
 
