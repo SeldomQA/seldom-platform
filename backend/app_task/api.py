@@ -185,7 +185,7 @@ def get_report_list(request, task_id: int):
     """
     if task_id == 0:
         return response(error=Error.TASK_ID_NULL)
-    return TaskReport.objects.get_queryset(task_id=task_id).order_by("-create_time")[:1000]
+    return TaskReport.objects.filter(task_id=task_id).order_by("-create_time")[:1000]
 
 
 @router.post("/report/{report_id}/results")
