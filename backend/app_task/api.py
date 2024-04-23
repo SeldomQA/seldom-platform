@@ -85,6 +85,8 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
     for task in tasks:
         task_dict = model_to_dict(task)
         task_dict["project_id"] = task.project_id
+        if task_dict["email"] is None:
+            task_dict["email"] = ""
         try:
             task_dict["env"] = Env.objects.get(id=task.env_id).name
         except Env.DoesNotExist:
@@ -96,6 +98,7 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
             task_dict["team"] = ""
 
         task_list.append(task_dict)
+
     return task_list
 
 
