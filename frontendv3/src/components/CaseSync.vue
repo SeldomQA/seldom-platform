@@ -57,16 +57,33 @@ const syncCase = async () => {
 const syncResult = async () => {
   const resp = await ProjectApi.syncResult(sessionStorage.projectId.toString());
   if (resp.success === true) {
-    currentStatus.value = "finish";
     datas.addCase = resp.result.add_case;
     datas.delCase = resp.result.del_case;
     datas.req = resp.result;
+    currentStatus.value = "finish";
+    next();
+    currentStatus.value = "process";
+    datas.stepButton = "合并"
   } else {
     message.error(resp.error.message);
     currentStatus.value = "error";
     datas.succCode = 0;
   }
   loading.value = false;
+};
+
+// 4.合并用例
+const mergeCase = async () => {
+  const resp = await ProjectApi.syncMerge(
+    sessionStorage.projectId,
+    datas.req
+  );
+  if (resp.success === true) {
+    message.success("合并成功！");
+    cancelDialog()
+  } else {
+    message.error(resp.error.message);
+  }
 };
 
 const syncRunning = async () => {
@@ -81,6 +98,9 @@ const syncRunning = async () => {
     case 3:
       syncResult();
       break;
+    case 4:
+      mergeCase();
+      break;
     default:
       break;
   }
@@ -89,23 +109,11 @@ const syncRunning = async () => {
 
 const next = () => {
   if (currentRef.value === null) currentRef.value = 1;
-  else if (currentRef.value >= 3) currentRef.value = null;
+  else if (currentRef.value >= 4) currentRef.value = null;
   else currentRef.value++;
 };
 
-// 合并用例
-const mergeCase = async () => {
-  const resp = await ProjectApi.syncMerge(
-    sessionStorage.projectId,
-    datas.req
-  );
-  if (resp.success === true) {
-    message.success("合并成功！");
-    cancelDialog()
-  } else {
-    message.error(resp.error.message);
-  }
-};
+
 
 // 关闭dialog
 const emit = defineEmits(["cancel"]);
@@ -126,54 +134,41 @@ onMounted(() => {
         <n-step title="拉取代码" description="" />
         <n-step title="同步用例" description="" />
         <n-step title="查找结果" description="" />
+        <n-step title="合并结果" description="" />
       </n-steps>
 
-      <div class="sync-button">
-        <n-button
-          v-if="datas.succCode == 1"
-          n-button
-          type="primary"
-          size="small"
-          :loading="loading"
-          @click="syncRunning"
-          > {{ datas.stepButton }}
-        </n-button>
-        <n-button
-          v-else
-          type="warning"
-          size="small"
-          :loading="loading"
-          @click="syncRunning"
-        >
-          重试
-        </n-button>
-      </div>
-
-      <n-space>
-        <n-card title="新增用例" class="add-case-list">
-          <n-list class="case-list">
-            <div v-for="i in datas.addCase">
-            <n-list-item>
-              {{ i.class_name }}.{{ i.case_name }}
-            </n-list-item>
-            </div>
-          </n-list>
-        </n-card>
-        <n-card  title="删除用例" class="del-case-list">
-          <n-list class="case-list">
-            <div v-for="i in datas.delCase">
+      <div style="margin-top: 20px;">
+        <n-space>
+          <n-card title="新增用例" size="small" class="add-case-list">
+            <n-list class="case-list">
+              <div v-for="i in datas.addCase">
               <n-list-item>
-               {{ i.class_name }}.{{ i.case_name }}
+                {{ i.class_name }}.{{ i.case_name }}
               </n-list-item>
               </div>
-          </n-list>
-        </n-card>
-        
-      </n-space>
+            </n-list>
+          </n-card>
+          <n-card  title="删除用例" size="small" class="del-case-list">
+            <n-list class="case-list">
+              <div v-for="i in datas.delCase">
+                <n-list-item>
+                {{ i.class_name }}.{{ i.case_name }}
+                </n-list-item>
+                </div>
+            </n-list>
+          </n-card>
+        </n-space>
+      </div>
       <div class="dialog-footer">
         <n-space>
           <n-button @click="cancelDialog()">取消</n-button>
-          <n-button type="primary" @click="mergeCase()">合并</n-button>
+          <n-button
+            type="primary"
+            :loading="loading"
+            @click="syncRunning"
+            >
+            {{ datas.stepButton }}
+          </n-button>
         </n-space>
       </div>
     </n-space>
@@ -183,7 +178,7 @@ onMounted(() => {
 <style scoped>
 
 .sync-button {
-  text-align: right;
+  text-align: left;
   margin-right: 10px;
 }
 .add-case-list {

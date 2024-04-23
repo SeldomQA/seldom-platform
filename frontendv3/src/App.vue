@@ -50,6 +50,7 @@ body {
 }
 
 .dialog-footer {
+  margin-top: 10px;
   float: right;
 }
 
