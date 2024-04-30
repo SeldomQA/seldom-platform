@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "==4.2.11"
+django-ninja = "==1.1.0"
+seldom = "==3.6.0"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
