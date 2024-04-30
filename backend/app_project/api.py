@@ -141,7 +141,7 @@ def async_project_code(request, project_id: int):
             test_num = 0
             for _, _, filenames in os.walk(project_address):
                 file_counts = len(filenames)
-                test_num = test_num + file_counts
+                test_num += file_counts
             project_obj.test_num = test_num
             project_obj.is_clone = 1
             project_obj.save()
@@ -157,7 +157,7 @@ def async_project_code(request, project_id: int):
             test_num = 0
             for _, _, filenames in os.walk(project_address):
                 file_counts = len(filenames)
-                test_num = test_num + file_counts
+                test_num += file_counts
             project_obj.test_num = test_num
             project_obj.save()
             return response()
@@ -192,7 +192,7 @@ def sync_project_case(request, project_id: int):
     case_hash_list = []
     # 从seldom项目中找到新增的用例
     for seldom in seldom_case:
-        case_hash = get_hash(f"""{seldom["file"]}.{seldom["class"]["name"]}.{seldom["method"]["name"]}""")
+        case_hash = get_hash(f"""{project_id}.{seldom["file"]}.{seldom["class"]["name"]}.{seldom["method"]["name"]}""")
         if case_hash not in case_hash_list:
             case_hash_list.append(case_hash)
             TestCaseTemp.objects.create(
