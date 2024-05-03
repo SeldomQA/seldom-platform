@@ -138,13 +138,7 @@ const handlePasswordInput = () => {
       <div class="features">
         <div>
           <h1>Seldom Platform.</h1>
-          <span style="color: #869ab8">基于Seldom框架的测试平台.</span>
-          <a href="https://github.com/SeldomQA/seldom" target="_blank">
-            <n-button type="primary" quaternary>GitHub</n-button>
-          </a>
-          <a href="https://seldomqa.github.io/" target="_blank">
-            <n-button type="info" quaternary>在线文档</n-button>
-          </a>
+          <span style="color: #869ab8">基于Seldom框架的自动化测试平台.</span>
         </div>
         <div>
           <img src="../assets/login-bg.png" alt="" style="width: 60%;">
@@ -179,6 +173,15 @@ const handlePasswordInput = () => {
             借助于平台的能力，可以方便的管理用例的执行、创建定时任务、展示统计结果。
           </p>
         </div>
+        <n-divider>帮助</n-divider>
+        <div>
+          <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
+            <n-button type="primary" quaternary>GitHub</n-button>
+          </a>
+          <a href="https://seldomqa.github.io/" target="_blank">
+            <n-button type="info" quaternary>在线文档</n-button>
+          </a>
+        </div> 
       </div>
     </header>
     <div class="content">
