@@ -32,6 +32,7 @@ class Env(models.Model):
     name = models.CharField("名称", max_length=50, null=False)
     test_type = models.CharField("环境值", max_length=20, null=True, default="http")
     env = models.CharField("环境值", max_length=50, null=True, default="")
+    rerun = models.IntegerField("重跑次数", default=0)
     browser = models.CharField("环境值", max_length=20, null=True, default="")
     base_url = models.CharField("URL", max_length=200, null=True, default="")
     app_server = models.CharField("APP服务", max_length=100, null=True, default="")

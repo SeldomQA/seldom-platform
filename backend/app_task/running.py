@@ -91,7 +91,7 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     file.add_to_path(project_address_temp)
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, browser=browser, report=report_name, base_url=base_url)
+    main_extend = TestMainExtend(path=test_dir, browser=browser, report=report_name, base_url=base_url, rerun=env.rerun)
     main_extend.run_cases(case_info)
     time.sleep(2)
 

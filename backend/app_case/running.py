@@ -1,12 +1,10 @@
 import os
 import time
-import threading
 from xml.dom.minidom import parse
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver import EdgeOptions
 from selenium.webdriver import FirefoxOptions
 from seldom.logging import log
-from seldom.utils import file
 from seldom import Seldom
 from seldom import TestMainExtend
 from app_project.models import Env
@@ -74,7 +72,7 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
         base_url = None
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, base_url=base_url)
+    main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, base_url=base_url, rerun=env.rerun)
     main_extend.run_cases(case_info)
 
     # 2. 借助项目中的文件执行

@@ -16,6 +16,7 @@ class EnvIn(Schema):
     name: str
     test_type: str
     env: Optional[str] = None
+    rerun: int = None
     browser: Optional[str] = None
     base_url: Optional[str] = None
     app_server: Optional[str] = None

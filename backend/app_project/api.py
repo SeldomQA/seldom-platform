@@ -446,6 +446,7 @@ def create_env(request, env: EnvIn):
         name=env.name,
         test_type=env.test_type,
         env=env.env,
+        rerun=env.rerun,
         browser=env.browser,
         base_url=env.base_url,
         app_server=env.app_server,
@@ -504,6 +505,7 @@ def update_env(request, env_id: int, env: EnvIn):
         env_obj.name = env.name
         env_obj.test_type = env.test_type
         env_obj.env = env.env
+        env_obj.rerun = env.rerun
         env_obj.browser = env.browser
         env_obj.base_url = env.base_url
         env_obj.app_server = env.app_server
