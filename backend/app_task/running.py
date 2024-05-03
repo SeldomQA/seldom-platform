@@ -42,39 +42,39 @@ def seldom_running(test_dir, case_info, report_name, task_id):
 
     # 环境判断
     env = Env.objects.get(id=task.env_id)
-    if env.browser == "":
-        browser = None
-    else:
+    if env.browser != "":
         browser = env.browser
         # 设置浏览器headless模式
         if browser in ["gc", "chrome"]:
             chrome_options = ChromeOptions()
-            chrome_options.headless = True
+            chrome_options.add_argument("--headless=new")
             browser = {
                 "browser": "chrome",
-                "option": chrome_options
+                "options": chrome_options
             }
         elif browser in ["ff", "firefox"]:
             firefox_options = FirefoxOptions()
             firefox_options.add_argument("-headless")
             browser = {
                 "browser": "firefox",
-                "option": firefox_options
+                "options": firefox_options
             }
         elif browser in ["edge"]:
             edge_options = EdgeOptions()
-            edge_options.add_argument("headless")
+            edge_options.add_argument("--headless=new")
             browser = {
                 "browser": "edge",
-                "option": edge_options
+                "options": edge_options
             }
         else:
             chrome_options = ChromeOptions()
-            chrome_options.headless = True
+            chrome_options.add_argument("--headless=new")
             browser = {
                 "browser": "chrome",
-                "option": chrome_options
+                "options": chrome_options
             }
+    else:
+        browser = None
 
     if env.env == "":
         Seldom.env = None
@@ -91,7 +91,11 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     file.add_to_path(project_address_temp)
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, browser=browser, report=report_name, base_url=base_url, rerun=env.rerun)
+    main_extend = TestMainExtend(path=test_dir, report=report_name, rerun=env.rerun)
+    if env.test_type == "http":
+        main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url, rerun=env.rerun)
+    elif env.test_type == "web":
+        main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, rerun=env.rerun)
     main_extend.run_cases(case_info)
     time.sleep(2)
 
@@ -107,16 +111,16 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     tests = 0
     run_time = float(0)
     for suite in testsuite:
-        errors = errors + int(suite.getAttribute("errors"))
-        failures = failures + int(suite.getAttribute("failures"))
-        skipped = skipped + int(suite.getAttribute("skipped"))
-        tests = tests + int(suite.getAttribute("tests"))
-        run_time = run_time + float(suite.getAttribute("time"))
+        errors += int(suite.getAttribute("errors"))
+        failures += int(suite.getAttribute("failures"))
+        skipped +=  int(suite.getAttribute("skipped"))
+        tests += int(suite.getAttribute("tests"))
+        run_time += float(suite.getAttribute("time"))
 
     name = report_name
     passed = int(tests) - int(errors) - int(failures) - int(skipped)
 
-    with open(report_path, "r", encoding="utf-8") as f:
+    with open(report_path, encoding="utf-8") as f:
         report_text = f.read()
         # 保存表
         result = TaskReport.objects.create(
@@ -146,19 +150,19 @@ def seldom_running(test_dir, case_info, report_name, task_id):
             skipped_message = ""
             for node in nodes:
                 if node.nodeName == "doc":
-                    doc = node.childNodes[1].data
+                    doc = node.childNodes[0].data
 
                 if node.nodeName == "system-out":
-                    system_out = node.childNodes[1].data
+                    system_out = node.childNodes[0].data
 
                 if node.nodeName == "system-err":
-                    system_error = node.childNodes[1].data
+                    system_error = node.childNodes[0].data
 
                 if node.nodeName == "failure":
-                    failure_out = node.childNodes[1].data
+                    failure_out = node.childNodes[0].data
 
                 if node.nodeName == "error":
-                    error_out = node.childNodes[1].data
+                    error_out = node.childNodes[0].data
 
                 if node.nodeName == "skipped":
                     skipped_message = node.getAttribute("message")
@@ -178,7 +182,7 @@ def seldom_running(test_dir, case_info, report_name, task_id):
         # 修改状态（2-已运行）
         test_case = TestTask.objects.get(id=task_id)
         test_case.status = 2
-        test_case.execute_count = test_case.execute_count + 1
+        test_case.execute_count += 1
         test_case.save()
 
         # 删除报告文件

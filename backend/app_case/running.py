@@ -37,7 +37,7 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
         # 设置浏览器headless模式
         if browser in ["gc", "chrome"]:
             chrome_options = ChromeOptions()
-            chrome_options.add_argument("-headless")
+            chrome_options.add_argument("--headless=new")
             browser = {
                 "browser": "chrome",
                 "options": chrome_options
@@ -51,14 +51,14 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
             }
         elif browser in ["edge"]:
             edge_options = EdgeOptions()
-            edge_options.add_argument("headless")
+            edge_options.add_argument("--headless=new")
             browser = {
                 "browser": "edge",
                 "options": edge_options
             }
         else:
             chrome_options = ChromeOptions()
-            chrome_options.add_argument("-headless")
+            chrome_options.add_argument("--headless=new")
             browser = {
                 "browser": "chrome",
                 "options": chrome_options
@@ -72,7 +72,11 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
         base_url = None
 
     # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, base_url=base_url, rerun=env.rerun)
+    main_extend = TestMainExtend(path=test_dir, report=report_name, rerun=env.rerun)
+    if env.test_type == "http":
+        main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url, rerun=env.rerun)
+    elif env.test_type == "web":
+        main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, rerun=env.rerun)
     main_extend.run_cases(case_info)
 
     # 2. 借助项目中的文件执行
