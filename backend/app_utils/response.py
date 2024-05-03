@@ -31,7 +31,7 @@ class Error:
     CASE_AUDIT_NULL = {"20042": "没有审核通过的用例"}
     CASE_DIR_ERROR = {"20043": "用例目录不存在"}
 
-    ENV_IS_NULL = {"10041": "查询环境未空"}
+    ENV_IS_NULL = {"10041": "查询环境为空"}
 
     TASK_ID_NULL = {"10056": "任务ID不能为空"}
 
