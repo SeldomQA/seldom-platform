@@ -381,7 +381,7 @@ onMounted(() => {
         </n-button>
       </n-space>
       <div>
-        <n-grid x-gap="16" :cols="6">
+        <n-grid x-gap="16" :cols="5">
           <n-gi>
             <n-tree
               class="filetree"
@@ -392,7 +392,7 @@ onMounted(() => {
               :node-props="nodeProps"
             />
           </n-gi>
-          <n-gi span="5">
+          <n-gi span="4">
             <n-data-table
               :columns="columns"
               :data="datas.caseData"
