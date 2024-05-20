@@ -154,3 +154,47 @@ CACHES = {
         }
     }
 }
+
+# 日志配置
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {  # 如果你还想同时输出到文件，可以保留这个配置
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',  # 确保这个路径是正确的，或者Django有权限写入
+        },
+        'console': {  # 这就是控制台日志的配置
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'  # 或者 'verbose'，取决于你想要的日志格式
+        },
+    },
+    'loggers': {
+        # 'django': {  # Django自身的日志
+        #     'handlers': ['file', 'console'],  # 这里将日志同时输出到文件和控制台
+        #     'level': 'DEBUG',
+        #     'propagate': True,
+        # },
+        'myapp': {  # 你的应用日志，可以自定义
+            'handlers': ['console'],  # 只输出到控制台
+            'level': 'DEBUG',
+            'propagate': False,  # 阻止日志信息进一步传播到上级logger
+        },
+    },
+    'root': {  # 顶级logger的配置，会应用于所有没有明确定义logger的地方
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
