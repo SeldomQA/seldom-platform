@@ -134,14 +134,14 @@ def async_project_code(request, project_id: int):
     第一步：git克隆&拉取项目代码
     默认克隆： seldom-api-testing -> 复制 seldom-api-testing_a 和 seldom-api-testing_b
     """
-    project_obj = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project, pk=project_id)
 
     # 本地git项目资源
-    local = LocalGitResource(project_obj.name, project_obj.address)
+    local = LocalGitResource(project.name, project.address)
 
     # 判断项目是否存在
     if local.git_project_is_exists():
-        logger.info(f"==> git pull {project_obj.address}")
+        logger.info(f"==> git pull {project.address}")
         res = subprocess.check_call(["git", "pull"], cwd=local.git_project_dir())
         if res == 0:
             # 获取文件数量
@@ -150,18 +150,18 @@ def async_project_code(request, project_id: int):
                 file_counts = len(filenames)
                 test_num += file_counts
 
-            project_obj.test_num = test_num
-            project_obj.save()
+            project.test_num = test_num
+            project.save()
             return response()
         else:
             return response(error=Error.PROJECT_CLONE_ERROR)
     else:
-        logger.info(f"==> git clone {project_obj.address}")
-        res = subprocess.check_call(["git", "clone", project_obj.address], cwd=local.project_dir)
+        logger.info(f"==> git clone {project.address}")
+        res = subprocess.check_call(["git", "clone", project.address], cwd=local.project_dir)
         if res == 0:
             # 获取文件数量
             test_num = 0
-            for _, _, filenames in os.walk(local.git_project_name):
+            for _, _, filenames in os.walk(local.git_project_dir()):
                 file_counts = len(filenames)
                 test_num += file_counts
 
@@ -172,10 +172,11 @@ def async_project_code(request, project_id: int):
             copytree(source_project, blue_project)
             copytree(source_project, green_project)
 
-            project_obj.test_num = test_num
-            project_obj.is_clone = 1
-            project_obj.run_version = "blue"
-            project_obj.save()
+            logger.info("save clone project data")
+            project.test_num = test_num
+            project.is_clone = 1
+            project.run_version = "blue"
+            project.save()
 
             return response()
         else:
