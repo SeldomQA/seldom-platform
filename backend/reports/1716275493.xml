@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite name="test_base.test_assert.TestAssert-20240521151133" tests="1" file="test_base/test_assert.py" time="1.083" timestamp="2024-05-21T15:11:34" failures="0" errors="0" skipped="0">
+		<testcase classname="test_base.test_assert.TestAssert" name="test_json_assert" time="1.083" timestamp="2024-05-21T15:11:34" file="resource\github\gitee-api-project\seldom-api-testing_green\test_dir\test_base\test_assert.py" line="15">
+			<doc><![CDATA[
+        JSON data assertion.
+        ]]></doc>
+			<system-out><![CDATA[2024-05-21 15:11:33 | INFO     | request.py | -------------- Request -----------------[🚀]
+2024-05-21 15:11:33 | INFO     | request.py | [method]: GET      [url]: https://httpbin.org/get 
+2024-05-21 15:11:34 | INFO     | request.py | -------------- Response ----------------[🛬️]
+2024-05-21 15:11:34 | INFO     | request.py | successful with status 200
+2024-05-21 15:11:34 | DEBUG    | request.py | [type]: json      [time]: 1.065455
+2024-05-21 15:11:34 | DEBUG    | request.py | [response]:
+ {
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate",
+    "Host": "httpbin.org",
+    "User-Agent": "python-requests/2.30.0",
+    "X-Amzn-Trace-Id": "Root=1-664c4925-199ff10f3a24905149b4a850"
+  },
+  "origin": "14.155.62.194",
+  "url": "https://httpbin.org/get"
+}
+2024-05-21 15:11:34 | INFO     | case.py | 👀 assertStatusCode -> 200.
+2024-05-21 15:11:34 | INFO     | case.py | 👀 assertJSON -> {'headers': {'Host': 'httpbin.org', 'User-Agent': 'python-requests/2.26.0'}}.
+2024-05-21 15:11:34 | WARNING  | case.py | ['💡 Assert data has not key: args', '💡 Assert data has not key: origin', '💡 Assert data has not key: url']
+]]></system-out>
+		</testcase>
+	</testsuite>
+</testsuites>

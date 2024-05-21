@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+	<testsuite name="test_base.test_assert.TestAssert-20240521151215" tests="3" file="test_base/test_assert.py" time="2.865" timestamp="2024-05-21T15:12:18" failures="0" errors="0" skipped="0">
+		<testcase classname="test_base.test_assert.TestAssert" name="test_json_assert" time="0.949" timestamp="2024-05-21T15:12:16" file="resource\github\gitee-api-project\seldom-api-testing_green\test_dir\test_base\test_assert.py" line="15">
+			<doc><![CDATA[
+        JSON data assertion.
+        ]]></doc>
+			<system-out><![CDATA[2024-05-21 15:12:15 | INFO     | request.py | -------------- Request -----------------[🚀]
+2024-05-21 15:12:15 | INFO     | request.py | [method]: GET      [url]: https://httpbin.org/get 
+2024-05-21 15:12:16 | INFO     | request.py | -------------- Response ----------------[🛬️]
+2024-05-21 15:12:16 | INFO     | request.py | successful with status 200
+2024-05-21 15:12:16 | DEBUG    | request.py | [type]: json      [time]: 0.935293
+2024-05-21 15:12:16 | DEBUG    | request.py | [response]:
+ {
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate",
+    "Host": "httpbin.org",
+    "User-Agent": "python-requests/2.30.0",
+    "X-Amzn-Trace-Id": "Root=1-664c494e-1200396c328198f95554b6bd"
+  },
+  "origin": "14.155.62.194",
+  "url": "https://httpbin.org/get"
+}
+2024-05-21 15:12:16 | INFO     | case.py | 👀 assertStatusCode -> 200.
+2024-05-21 15:12:16 | INFO     | case.py | 👀 assertJSON -> {'headers': {'Host': 'httpbin.org', 'User-Agent': 'python-requests/2.26.0'}}.
+2024-05-21 15:12:16 | WARNING  | case.py | ['💡 Assert data has not key: args', '💡 Assert data has not key: origin', '💡 Assert data has not key: url']
+]]></system-out>
+		</testcase>
+		<testcase classname="test_base.test_assert.TestAssert" name="test_path_assert" time="0.945" timestamp="2024-05-21T15:12:17" file="resource\github\gitee-api-project\seldom-api-testing_green\test_dir\test_base\test_assert.py" line="47">
+			<doc><![CDATA[
+        JMESPath assertion.
+        ]]></doc>
+			<system-out><![CDATA[2024-05-21 15:12:16 | INFO     | request.py | -------------- Request -----------------[🚀]
+2024-05-21 15:12:16 | INFO     | request.py | [method]: GET      [url]: https://httpbin.org/get 
+2024-05-21 15:12:16 | DEBUG    | request.py | [params]:
+{
+  "foot": "bread"
+}
+2024-05-21 15:12:17 | INFO     | request.py | -------------- Response ----------------[🛬️]
+2024-05-21 15:12:17 | INFO     | request.py | successful with status 200
+2024-05-21 15:12:17 | DEBUG    | request.py | [type]: json      [time]: 0.933199
+2024-05-21 15:12:17 | DEBUG    | request.py | [response]:
+ {
+  "args": {
+    "foot": "bread"
+  },
+  "headers": {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate",
+    "Host": "httpbin.org",
+    "User-Agent": "python-requests/2.30.0",
+    "X-Amzn-Trace-Id": "Root=1-664c494f-650963ee405630832890152c"
+  },
+  "origin": "14.155.62.194",
+  "url": "https://httpbin.org/get?foot=bread"
+}
+2024-05-21 15:12:17 | INFO     | case.py | 👀 assertPath -> args.foot >> bread.
+]]></system-out>
+		</testcase>
+		<testcase classname="test_base.test_assert.TestAssert" name="test_schema_assert" time="0.971" timestamp="2024-05-21T15:12:18" file="resource\github\gitee-api-project\seldom-api-testing_green\test_dir\test_base\test_assert.py" line="24">
+			<doc><![CDATA[
+        json-schema assertion.
+        ]]></doc>
+			<system-out><![CDATA[2024-05-21 15:12:17 | INFO     | request.py | -------------- Request -----------------[🚀]
+2024-05-21 15:12:17 | INFO     | request.py | [method]: GET      [url]: https://httpbin.org/get 
+2024-05-21 15:12:18 | INFO     | request.py | -------------- Response ----------------[🛬️]
+2024-05-21 15:12:18 | INFO     | request.py | successful with status 200
+2024-05-21 15:12:18 | DEBUG    | request.py | [type]: json      [time]: 0.949846
+2024-05-21 15:12:18 | DEBUG    | request.py | [response]:
+ {
+  "args": {},
+  "headers": {
+    "Accept": "*/*",
+    "Accept-Encoding": "gzip, deflate",
+    "Host": "httpbin.org",
+    "User-Agent": "python-requests/2.30.0",
+    "X-Amzn-Trace-Id": "Root=1-664c4950-453a35857865116e4cf24bea"
+  },
+  "origin": "14.155.62.194",
+  "url": "https://httpbin.org/get"
+}
+2024-05-21 15:12:18 | INFO     | case.py | 👀 assertStatusCode -> 200.
+2024-05-21 15:12:18 | INFO     | case.py | 👀 assertSchema -> {
+  "type": "object",
+  "properties": {
+    "headers": {
+      "Host": "httpbin.org",
+      "User-Agent": "python-requests/2.22.0"
+    },
+    "origin": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "minLength": 20
+    }
+  }
+}.
+]]></system-out>
+		</testcase>
+	</testsuite>
+</testsuites>

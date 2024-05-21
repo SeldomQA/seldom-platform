@@ -1,0 +1,51 @@
+'test_assert' module incorrectly imported from 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing_green\\test_dir\\test_base'.
+Expected 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing\\test_dir\\test_base'. Is this module globally installed?
+Traceback (most recent call last):
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\ninja\operation.py", line 107, in run
+    result = self.view_func(request, **values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\github\seldom-platform\backend\app_project\api.py", line 204, in sync_project_case
+    main_extend = TestMainExtend(path=test_dir)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\seldom\running\runner.py", line 275, in __init__
+    super().__init__(path=path, browser=browser, base_url=base_url, debug=debug, timeout=timeout,
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\seldom\running\runner.py", line 164, in __init__
+    self.TestSuits = seldomTestLoader.rediscover(self.path)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\seldom\running\loader_extend.py", line 165, in rediscover
+    tests = list(self._find_tests(start_dir, pattern))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\python311\Lib\unittest\loader.py", line 385, in _find_tests
+    yield from self._find_tests(full_path, pattern)
+  File "c:\python311\Lib\unittest\loader.py", line 377, in _find_tests
+    tests, should_recurse = self._find_test_path(full_path, pattern)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\python311\Lib\unittest\loader.py", line 429, in _find_test_path
+    raise ImportError(
+ImportError: 'test_assert' module incorrectly imported from 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing_green\\test_dir\\test_base'. Expected 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing\\test_dir\\test_base'. Is this module globally installed?
+ERROR 'test_assert' module incorrectly imported from 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing_green\\test_dir\\test_base'. Expected 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing\\test_dir\\test_base'. Is this module globally installed?
+Traceback (most recent call last):
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\ninja\operation.py", line 107, in run
+    result = self.view_func(request, **values)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\github\seldom-platform\backend\app_project\api.py", line 204, in sync_project_case
+    main_extend = TestMainExtend(path=test_dir)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\seldom\running\runner.py", line 275, in __init__
+    super().__init__(path=path, browser=browser, base_url=base_url, debug=debug, timeout=timeout,
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\seldom\running\runner.py", line 164, in __init__
+    self.TestSuits = seldomTestLoader.rediscover(self.path)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\fnngj\.virtualenvs\backend-tjPNZscH\Lib\site-packages\seldom\running\loader_extend.py", line 165, in rediscover
+    tests = list(self._find_tests(start_dir, pattern))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\python311\Lib\unittest\loader.py", line 385, in _find_tests
+    yield from self._find_tests(full_path, pattern)
+  File "c:\python311\Lib\unittest\loader.py", line 377, in _find_tests
+    tests, should_recurse = self._find_test_path(full_path, pattern)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\python311\Lib\unittest\loader.py", line 429, in _find_test_path
+    raise ImportError(
+ImportError: 'test_assert' module incorrectly imported from 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing_green\\test_dir\\test_base'. Expected 'D:\\github\\seldom-platform\\backend\\resource\\github\\gitee-seldom-api\\seldom-api-testing\\test_dir\\test_base'. Is this module globally installed?
+Internal Server Error: /api/project/5/sync_case
+ERROR Internal Server Error: /api/project/5/sync_case
