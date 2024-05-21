@@ -17,16 +17,19 @@ def get_hash(string: str) -> str:
     return string_hash
 
 
-def copytree(project_dir: str, copy_dir: str) -> None:
+def copytree(source_dir: str, target_dir: str) -> None:
     """
     复制项目目录
-    :param project_dir:
-    :param copy_dir:
+    :param source_dir:
+    :param target_dir:
     """
+    # 如果目标目录不存在则创建
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
 
     def handle_remove_read_only(func, path, exc):
         """
-
+        删除目录
         :param func:
         :param path:
         :param exc:
@@ -40,6 +43,6 @@ def copytree(project_dir: str, copy_dir: str) -> None:
             raise
 
     # 删除
-    shutil.rmtree(copy_dir, onerror=handle_remove_read_only)
+    shutil.rmtree(target_dir, onerror=handle_remove_read_only)
     # 复制
-    shutil.copytree(project_dir, copy_dir)
+    shutil.copytree(source_dir, target_dir)
