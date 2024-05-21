@@ -1,17 +1,23 @@
+import logging
 import os
-import time
 import threading
+import time
+
 from django.shortcuts import get_object_or_404
 from ninja import Router
 from seldom.utils import file
-from app_project.models import Project
-from app_case.models import TestCase, CaseResult
-from app_utils.response import response, Error
-from app_utils.project_utils import project_dir
+
 from app_case.api_schma import RunCaseIn
+from app_case.models import TestCase, CaseResult
 from app_case.running import seldom_running
+from app_project.models import Project
+from app_utils.git_utils import LocalGitResource
+from app_utils.module_utils import clear_test_modules
+from app_utils.response import response, Error
 
 router = Router(tags=["case"])
+
+logger = logging.getLogger('myapp')
 
 
 @router.post('/{case_id}/running')
@@ -41,14 +47,17 @@ def running_case(request, case_id: int, env: RunCaseIn):
     project = Project.objects.get(id=case.project_id)
 
     # 项目相关目录
-    project_base_dir = project_dir(project.address, temp=True)
-    project_case_dir = file.join(project_base_dir, project.case_dir)
+    local = LocalGitResource(project.name, project.address)
+    project_root_dir = local.git_project_dir(suffix=project.run_version)
+    project_case_dir = file.join(project_root_dir, project.case_dir)
     # 判断目录是否存在
     if os.path.exists(project_case_dir) is False:
         return response(error=Error.CASE_DIR_ERROR)
 
+    # * 清除测试模块
+    clear_test_modules(project_case_dir)
     # 添加环境变量
-    file.add_to_path(project_base_dir)
+    file.add_to_path(project_root_dir)
 
     # 定义报告
     report_name = f'{str(time.time()).split(".")[0]}.xml'

@@ -1,7 +1,9 @@
 # django-ninja
+
 基于django 的后端项目。
 
 ## 主要技术栈
+
 * django
 * django-ninja
 * seldom
@@ -16,14 +18,27 @@
 
 * 执行数据库同步
 
-```
+> 如果需要干净的数据库，删除 `dev.sqlite3` 数据库文件，执行下面的步骤。
+
+```bash
 > python manage.py makemigrations
 > python manage.py migrate
+
+> python .\manage.py createsuperuser
+用户名 (leave blank to use 'user'): guest
+电子邮件地址: guest@gmail.com
+Password:
+Password (again):
+Superuser created successfully.
 ```
 
+* `makemigrations` 命令用于检测你对模型（models）所做的更改，并创建一个或多个迁移文件，这些文件描述了将这些更改应用到数据库所需的步骤。
+* `migrate` 命令用于将 makemigrations 命令生成的迁移文件应用到数据库中。
+* `createsuperuser` 命令用户创建超级管理员账号。
+
 * Redis
-  - Windows: https://github.com/tporadowski/redis
-  - Linux：https://github.com/redis/redis
+    - Windows: https://github.com/tporadowski/redis
+    - Linux：https://github.com/redis/redis
 
 ```shell
 > redis-server  # 启动redis
@@ -51,11 +66,13 @@
 ```
 
 * 命令启动
+
 ```shell
 > uwsgi --http 127.0.0.1:8080 --chdir /home/app/seldom-platform/backend/ --wsgi-file backend/wsgi.py --master --processes 4 --threads 2
 ```
 
 配置文件启动（参考`uwsgi.ini`文件）
+
 ```shell
 > uwsgi --ini uwsgi.ini
 ```
