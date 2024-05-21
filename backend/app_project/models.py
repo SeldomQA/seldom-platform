@@ -13,8 +13,9 @@ class Project(models.Model):
     update_time = models.DateTimeField(auto_now=True)
     cover_name = models.CharField("封面名称", max_length=64, default="")
     path_name = models.CharField("封面路径名称", max_length=64, default="")
-    test_num = models.IntegerField("文件数", default=0)
+    test_num = models.IntegerField("测试文件数", default=0)
     is_clone = models.IntegerField("克隆", default=0)
+    run_version = models.CharField("当前运行版本（蓝绿运行）", max_length=200, default="")
 
     def __str__(self):
         return self.name

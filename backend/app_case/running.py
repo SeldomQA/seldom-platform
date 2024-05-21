@@ -1,17 +1,18 @@
 import os
 import time
 from xml.dom.minidom import parse
+
+from seldom import Seldom
+from seldom import TestMainExtend
+from seldom.logging import log
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver import EdgeOptions
 from selenium.webdriver import FirefoxOptions
-from seldom.logging import log
-from seldom import Seldom
-from seldom import TestMainExtend
-from app_project.models import Env
-from app_case.models import TestCase, CaseResult
-from backend.settings import REPORT_DIR
-from app_utils import background
 
+from app_case.models import TestCase, CaseResult
+from app_project.models import Env
+from app_utils import background
+from backend.settings import REPORT_DIR
 
 # Use 10 background threads.
 background.n = 10
@@ -79,9 +80,6 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
         main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, rerun=env.rerun)
     main_extend.run_cases(case_info)
 
-    # 2. 借助项目中的文件执行
-    # from cases_collect import run_cases
-    # run_cases(case_info, report_name)
     time.sleep(1)
 
     # 打开xml文档

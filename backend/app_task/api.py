@@ -1,20 +1,21 @@
-import os
-import time
 import threading
+import time
 from typing import List
-from seldom.utils import file
+
 from ninja import Router
 from ninja.pagination import paginate
-from app_project.models import Project, Env
-from app_case.models import TestCase
-from app_team.models import Team
-from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
-from app_task.api_schma import TaskIn, TaskOut, ReportOut, ReportIn
-from app_task.running import seldom_running
-from app_utils.response import response, model_to_dict, Error
-from app_utils.pagination import CustomPagination
-from app_utils.project_utils import project_dir
+from seldom.utils import file
 
+from app_case.models import TestCase
+from app_project.models import Project, Env
+from app_task.api_schma import TaskIn, TaskOut, ReportOut, ReportIn
+from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
+from app_task.running import seldom_running
+from app_team.models import Team
+from app_utils.git_utils import LocalGitResource
+from app_utils.module_utils import clear_test_modules
+from app_utils.pagination import CustomPagination
+from app_utils.response import response, model_to_dict, Error
 
 router = Router(tags=["task"])
 
@@ -161,11 +162,14 @@ def running_task(request, task_id: int):
     project = Project.objects.get(id=task.project_id)
 
     # 项目相关目录
-    project_base_dir = project_dir(project.address, temp=True)
-    project_case_dir = file.join(project_base_dir, project.case_dir)
+    local = LocalGitResource(project.name, project.address)
+    project_root_dir = local.git_project_dir(suffix=project.run_version)
+    project_case_dir = file.join(project_root_dir, project.case_dir)
 
+    # * 清除测试模块
+    clear_test_modules(project_case_dir)
     # 添加环境变量
-    file.add_to_path(project_base_dir)
+    file.add_to_path(project_root_dir)
 
     # 定义报告
     report_name = f'{task.id}_{str(time.time()).split(".")[0]}.xml'

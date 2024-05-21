@@ -1,26 +1,24 @@
 import time
 from xml.dom.minidom import parse
 
-from selenium.webdriver import ChromeOptions
-from selenium.webdriver import EdgeOptions
-from selenium.webdriver import FirefoxOptions
 from seldom import (
     SMTP,
     Seldom,
     TestMainExtend
 )
-from seldom.utils import file
 from seldom.logging import log
+from seldom.utils import file
+from selenium.webdriver import ChromeOptions
+from selenium.webdriver import EdgeOptions
+from selenium.webdriver import FirefoxOptions
 
-from app_project.models import Project, Env
-from app_team.models import Team
+from app_project.models import Env
 from app_task.models import TestTask, TaskReport, ReportDetails
-from backend.settings import REPORT_DIR
-from backend.config import EmailConfig
+from app_team.models import Team
 from app_utils import background
-from app_utils.project_utils import project_dir
 from app_utils.email_utila import send_email_config
-
+from backend.config import EmailConfig
+from backend.settings import REPORT_DIR
 
 # Use 10 background threads.
 background.n = 10
@@ -85,11 +83,6 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     else:
         base_url = env.base_url
 
-    # 项目添加环境变量
-    project = Project.objects.get(id=task.project_id)
-    project_address_temp = project_dir(project.address, temp=True)
-    file.add_to_path(project_address_temp)
-
     # 1. 直接执行
     main_extend = TestMainExtend(path=test_dir, report=report_name, rerun=env.rerun)
     if env.test_type == "http":
@@ -113,7 +106,7 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     for suite in testsuite:
         errors += int(suite.getAttribute("errors"))
         failures += int(suite.getAttribute("failures"))
-        skipped +=  int(suite.getAttribute("skipped"))
+        skipped += int(suite.getAttribute("skipped"))
         tests += int(suite.getAttribute("tests"))
         run_time += float(suite.getAttribute("time"))
 

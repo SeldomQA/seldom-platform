@@ -3,10 +3,11 @@ author: @bugmaster
 date: 2022-02-07
 function: 项目管理
 """
-import os
-import shutil
 import hashlib
+import logging
+import os
 import subprocess
+
 import requests
 from django.shortcuts import get_object_or_404
 from ninja import File
@@ -15,12 +16,17 @@ from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
 from seldom.utils import file
-from app_project.models import Project, Env
-from app_project.api_schma import ProjectIn, EnvIn, MergeCase
+
 from app_case.models import TestCase, TestCaseTemp
+from app_project.api_schma import ProjectIn, EnvIn, MergeCase
+from app_project.models import Project, Env
+from app_utils.git_utils import LocalGitResource
+from app_utils.module_utils import clear_test_modules
+from app_utils.project_utils import get_hash, copytree
 from app_utils.response import response, Error, model_to_dict
-from app_utils.project_utils import github_dir, reports_dir, project_dir, get_hash, copytree
-from backend.settings import BASE_DIR
+from backend.settings import BASE_DIR, REPORT_DIR
+
+logger = logging.getLogger('myapp')
 
 # upload image
 IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
@@ -51,7 +57,8 @@ def create_project(request, project: ProjectIn):
         resp = requests.get(project.address)
         if resp.status_code != 200:
             return response(error=Error.PROJECT_ADDRESS_ERROR)
-    except BaseException:
+    except BaseException as msg:
+        logger.error(msg)
         return response(error=Error.PROJECT_ADDRESS_ERROR)
 
     project_obj = Project.objects.create(
@@ -72,10 +79,9 @@ def get_projects(request):
     project_list = []
     for project in projects:
         # 本地项目地址
-        project_address = project_dir(project.address)
+        local = LocalGitResource(project.name, project.address)
         # 判断本地是否有克隆文件
-        if os.path.isdir(project_address) is True:
-            # 调整为已克隆
+        if local.git_project_is_exists():
             project.is_clone = 1
             project.save()
         else:
@@ -126,40 +132,51 @@ def delete_project(request, project_id: int):
 def async_project_code(request, project_id: int):
     """
     第一步：git克隆&拉取项目代码
+    默认克隆： seldom-api-testing -> 复制 seldom-api-testing_a 和 seldom-api-testing_b
     """
     project_obj = get_object_or_404(Project, pk=project_id)
 
-    local_github_dir = github_dir()
-    project_address = project_dir(project_obj.address, temp=False)
+    # 本地git项目资源
+    local = LocalGitResource(project_obj.name, project_obj.address)
 
-    if os.path.isdir(project_address) is False:
-        print("==> git clone")
-        args = ["clone", project_obj.address]
-        res = subprocess.check_call(['git'] + list(args), cwd=local_github_dir)
+    # 判断项目是否存在
+    if local.git_project_is_exists():
+        logger.info(f"==> git pull {project_obj.address}")
+        res = subprocess.check_call(["git", "pull"], cwd=local.git_project_dir())
         if res == 0:
             # 获取文件数量
             test_num = 0
-            for _, _, filenames in os.walk(project_address):
+            for _, _, filenames in os.walk(local.git_project_dir()):
                 file_counts = len(filenames)
                 test_num += file_counts
+
             project_obj.test_num = test_num
-            project_obj.is_clone = 1
             project_obj.save()
             return response()
         else:
             return response(error=Error.PROJECT_CLONE_ERROR)
     else:
-        print("==> git pull")
-        args = ["pull"]
-        res = subprocess.check_call(['git'] + list(args), cwd=project_address)
+        logger.info(f"==> git clone {project_obj.address}")
+        res = subprocess.check_call(["git", "clone", project_obj.address], cwd=local.project_dir)
         if res == 0:
             # 获取文件数量
             test_num = 0
-            for _, _, filenames in os.walk(project_address):
+            for _, _, filenames in os.walk(local.git_project_name):
                 file_counts = len(filenames)
                 test_num += file_counts
+
+            # 复制项目
+            source_project = local.git_project_dir()
+            blue_project = local.git_project_dir(suffix="blue")
+            green_project = local.git_project_dir(suffix="green")
+            copytree(source_project, blue_project)
+            copytree(source_project, green_project)
+
             project_obj.test_num = test_num
+            project_obj.is_clone = 1
+            project_obj.run_version = "blue"
             project_obj.save()
+
             return response()
         else:
             return response(error=Error.PROJECT_CLONE_ERROR)
@@ -170,24 +187,28 @@ def sync_project_case(request, project_id: int):
     """
     第二步：同步项目用例
     """
-    project_obj = get_object_or_404(Project, pk=project_id)
-    project_address = project_dir(project_obj.address, temp=False)
+    project = get_object_or_404(Project, pk=project_id)
+
+    local = LocalGitResource(project.name, project.address)
+    project_root_dir = local.git_project_dir(suffix=project.run_version)
+
+    project_test_dir = file.join(project_root_dir, project.case_dir)
+    if os.path.isdir(project_test_dir) is False:
+        return response(error=Error.PROJECT_DIR_NULL)
+
+    # * 清除测试模块
+    clear_test_modules(project_test_dir)
+    # 添加环境变量
+    file.add_to_path(project_root_dir)
 
     # 开启收集测试用例
     SeldomTestLoader.collectCaseInfo = True
     SeldomTestLoader.collectCaseList = []
-    # 把项目目录加到环境变量path
-    file.add_to_path(project_address)
 
-    test_dir = file.join(project_address, project_obj.case_dir)
-    if os.path.isdir(test_dir) is False:
-        return response(error=Error.PROJECT_DIR_NULL)
+    main_extend = TestMainExtend(path=project_test_dir)
+    seldom_case = main_extend.collect_cases(warning=True)
 
-    # 收集测试用例信息
-    main_extend = TestMainExtend(path=test_dir)
-    seldom_case = main_extend.collect_cases(json=False, warning=True)
-
-    TestCaseTemp.objects.filter(project=project_obj).delete()
+    TestCaseTemp.objects.filter(project=project).delete()
 
     case_hash_list = []
     # 从seldom项目中找到新增的用例
@@ -258,14 +279,14 @@ def async_project_merge(request, project_id: int, param: MergeCase):
     """
     第四步：合并用例
     """
-    project_obj = get_object_or_404(Project, pk=project_id)
+    project = get_object_or_404(Project, pk=project_id)
 
     # 添加用例
     add_case = param.add_case
     del_case = param.del_case
     for case in add_case:
         TestCase.objects.create(
-            project=project_obj,
+            project=project,
             file_name=case["file_name"],
             class_name=case["class_name"],
             class_doc=case["class_doc"],
@@ -276,13 +297,22 @@ def async_project_merge(request, project_id: int, param: MergeCase):
 
     # 删除用例
     for case in del_case:
-        test_case = TestCase.objects.get(project=project_obj, case_hash=case["case_hash"])
+        test_case = TestCase.objects.get(project=project, case_hash=case["case_hash"])
         test_case.delete()
 
-    project_path = project_dir(project_obj.address, temp=False)
-    project_path_temp = project_dir(project_obj.address, temp=True)
+    local = LocalGitResource(project.name, project.address)
+    project_root_dir = local.git_project_dir()
+    if project.run_version == "blue":
+        target_project = local.git_project_dir(suffix="green")
+        project.run_version = "green"
+    else:
+        target_project = local.git_project_dir(suffix="blue")
+        project.run_version = "blue"
+    # 合并代码
+    copytree(project_root_dir, target_project)
 
-    copytree(project_path, project_path_temp)
+    # 更新蓝&绿
+    project.save()
 
     return response()
 
@@ -293,8 +323,7 @@ def get_async_log(request):
     获得同步日志.
     注：暂时无法支持不同的项目，只记录最新的同步错误日志。
     """
-    sync_log_file = os.path.join(reports_dir(), "collect_warning.log")
-    print("sync_log_file", sync_log_file)
+    sync_log_file = os.path.join(REPORT_DIR, "collect_warning.log")
     with open(sync_log_file, "r") as f:
         log = f.read()
         return response(result={"log": log})
