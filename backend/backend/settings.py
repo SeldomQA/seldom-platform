@@ -140,15 +140,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 25
 
-
 # 目录配置
 REPORT_DIR = os.path.join(BASE_DIR, "reports")
 
-#redis地址
+# redis地址
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",     # http://冒号:密码@ip:port/库号 (例:"LOCATION": "redis://:123456@127.0.0.1:6379/0")
+        "LOCATION": "redis://127.0.0.1:6379",
+        # http://冒号:密码@ip:port/库号 (例:"LOCATION": "redis://:123456@127.0.0.1:6379/0")
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -173,7 +173,7 @@ LOGGING = {
         'file': {  # 如果你还想同时输出到文件，可以保留这个配置
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'debug.log',  # 确保这个路径是正确的，或者Django有权限写入
+            'filename': 'logs/debug.log',  # 确保这个路径是正确的，或者Django有权限写入
         },
         'console': {  # 这就是控制台日志的配置
             'level': 'DEBUG',
