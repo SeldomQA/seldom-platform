@@ -6,6 +6,14 @@
 
 ## 安装
 
+* 安装：`node.js > 16`
+
+* 安装`pnpm`
+
+```shell
+> npm i -g pnpm
+```
+
 * 安装项目依赖，根据`package.json`文件
 
 ```shell
