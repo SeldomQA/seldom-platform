@@ -46,6 +46,7 @@ type envForm = {
   base_url: string | null;
   browser: string | null;
   env: string | null;
+  rerun: number;
 };
 
 const form = ref<envForm>({
@@ -55,6 +56,7 @@ const form = ref<envForm>({
   base_url: null,
   browser: null,
   env: null,
+  rerun: 0,
 });
 
 const rules = {
@@ -171,6 +173,9 @@ const cancelDialog = () => {
           placeholder="浏览器名称"
           :options="browserOptions"
         />
+      </n-form-item>
+      <n-form-item label="失败重跑" path="rerun">
+        <n-input-number v-model:value="form.rerun" clearable />
       </n-form-item>
 
       <div class="dialog-footer">
