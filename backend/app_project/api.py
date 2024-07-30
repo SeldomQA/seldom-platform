@@ -479,6 +479,7 @@ def create_env(request, env: EnvIn):
         rerun=env.rerun,
         browser=env.browser,
         base_url=env.base_url,
+        remote=env.remote,
         app_server=env.app_server,
         app_info=env.app_info
     )
@@ -538,6 +539,7 @@ def update_env(request, env_id: int, env: EnvIn):
         env_obj.rerun = env.rerun
         env_obj.browser = env.browser
         env_obj.base_url = env.base_url
+        env_obj.remote = env.remote
         env_obj.app_server = env.app_server
         env_obj.app_info = env.app_info
         env_obj.save()

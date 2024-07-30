@@ -1,5 +1,6 @@
-from ninja import Schema
 from typing import Optional
+
+from ninja import Schema
 
 
 class ProjectIn(Schema):
@@ -19,6 +20,7 @@ class EnvIn(Schema):
     rerun: int = None
     browser: Optional[str] = None
     base_url: Optional[str] = None
+    remote: Optional[str] = None
     app_server: Optional[str] = None
     app_info: Optional[str] = "{}"
 

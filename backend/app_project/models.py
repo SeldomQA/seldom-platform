@@ -29,6 +29,7 @@ class Env(models.Model):
     * env = Seldom.env  # 指定当前运行环境 env=production/develop/test
     * browser = seldom.main(browser="xxx")  # web测试，指定当前运行的浏览器 xxx=chrome/firefox/edge
     * base_url = seldom.main(base_url="xxx")  # http接口测试：指定当前运行的URL xxx=http://www.httpbin.org
+    * remote selenium grid 远程节点
     """
     name = models.CharField("名称", max_length=50, null=False)
     test_type = models.CharField("环境值", max_length=20, null=True, default="http")
@@ -36,6 +37,7 @@ class Env(models.Model):
     rerun = models.IntegerField("重跑次数", default=0)
     browser = models.CharField("环境值", max_length=20, null=True, default="")
     base_url = models.CharField("URL", max_length=200, null=True, default="")
+    remote = models.CharField("remote", max_length=200, null=True, default="")
     app_server = models.CharField("APP服务", max_length=100, null=True, default="")
     app_info = models.CharField("APP信息", max_length=1000, null=True, default="{}")
     is_delete = models.BooleanField('删除', default=False)
