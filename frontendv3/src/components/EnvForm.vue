@@ -45,6 +45,7 @@ type envForm = {
   test_type: string;
   base_url: string | null;
   browser: string | null;
+  remote: string | null;
   env: string | null;
   rerun: number;
 };
@@ -55,6 +56,7 @@ const form = ref<envForm>({
   test_type: "http",
   base_url: null,
   browser: null,
+  remote: null,
   env: null,
   rerun: 0,
 });
@@ -144,9 +146,21 @@ const cancelDialog = () => {
       label-placement="left"
       label-width="auto"
     >
+     <n-divider title-placement="left">
+        基本配置
+      </n-divider>
       <n-form-item label="名称" path="name">
         <n-input v-model:value="form.name" placeholder="环境名称" clearable />
       </n-form-item>
+      <n-form-item label="环境" path="env">
+        <n-input v-model:value="form.env" placeholder="环境变量名（env）" clearable />
+      </n-form-item>
+      <n-form-item label="重跑" path="rerun">
+        <n-input-number v-model:value="form.rerun" clearable />
+      </n-form-item>
+      <n-divider title-placement="left">
+        测试类型配置
+      </n-divider>
       <n-form-item label="类型" path="test_type">
         <n-select
           v-model:value="form.test_type"
@@ -154,19 +168,16 @@ const cancelDialog = () => {
           :options="typeOptions"
         />
       </n-form-item>
-      <n-form-item label="env" path="env">
-        <n-input v-model:value="form.env" placeholder="环境变量名" clearable />
-      </n-form-item>
       <n-form-item
         v-if="form.test_type === 'http'"
-        label="base_url"
+        label="基础URL"
         path="base-url"
       >
-        <n-input v-model:value="form.base_url" placeholder="基础URL" clearable />
+        <n-input v-model:value="form.base_url" placeholder="基础URL，例如：https://httpbin.org" clearable />
       </n-form-item>
       <n-form-item
         v-if="form.test_type === 'web'"
-        label="browser"
+        label="Browser"
         path="browser">
         <n-select
           v-model:value="form.browser"
@@ -174,10 +185,13 @@ const cancelDialog = () => {
           :options="browserOptions"
         />
       </n-form-item>
-      <n-form-item label="失败重跑" path="rerun">
-        <n-input-number v-model:value="form.rerun" clearable />
+      <n-form-item
+        v-if="form.test_type === 'web'"
+        label="Remote"
+        path="remote">
+        <n-input v-model:value="form.remote" placeholder="远程节点，例如：http://192.168.1.13:4444" clearable />
       </n-form-item>
-
+      
       <div class="dialog-footer">
         <n-space>
           <n-button @click="cancelDialog()">取消</n-button>
