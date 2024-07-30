@@ -124,7 +124,9 @@ const onSubmit = () => {
 
 onMounted(() => {
   if (props.pid === 0) {
+    // 创建
   } else {
+    // 编辑
     getProject();
   }
 });
@@ -140,7 +142,8 @@ onMounted(() => {
       label-width="auto"
     >
       <n-form-item label="名称" path="name">
-        <n-input v-model:value="form.name" placeholder="项目名称" />
+        <n-input v-if="props.pid === 0" v-model:value="form.name" placeholder="项目名称"/>
+        <n-input v-else v-model:value="form.name" placeholder="项目名称" disabled />
       </n-form-item>
       <n-form-item label="Git地址" path="address">
         <n-input v-model:value="form.address" placeholder="项目的github/gitee/gitlab...地址" />
