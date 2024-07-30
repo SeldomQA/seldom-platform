@@ -40,39 +40,28 @@ def seldom_running(test_dir, case_info, report_name, task_id):
 
     # 环境判断
     env = Env.objects.get(id=task.env_id)
+    browser_conf = None
     if env.browser != "":
-        browser = env.browser
+        browser_type = env.browser
+        browser_conf = {}
+        if env.remote != "":
+            browser_conf["command_executor"] = env.remote
         # 设置浏览器headless模式
-        if browser in ["gc", "chrome"]:
+        if browser_type in ["gc", "chrome"]:
             chrome_options = ChromeOptions()
             chrome_options.add_argument("--headless=new")
-            browser = {
-                "browser": "chrome",
-                "options": chrome_options
-            }
-        elif browser in ["ff", "firefox"]:
+            browser_conf["browser"] = "chrome"
+            browser_conf["options"] = chrome_options
+        elif browser_type in ["ff", "firefox"]:
             firefox_options = FirefoxOptions()
             firefox_options.add_argument("-headless")
-            browser = {
-                "browser": "firefox",
-                "options": firefox_options
-            }
-        elif browser in ["edge"]:
+            browser_conf["browser"] = "firefox"
+            browser_conf["options"] = firefox_options
+        elif browser_type in ["edge"]:
             edge_options = EdgeOptions()
             edge_options.add_argument("--headless=new")
-            browser = {
-                "browser": "edge",
-                "options": edge_options
-            }
-        else:
-            chrome_options = ChromeOptions()
-            chrome_options.add_argument("--headless=new")
-            browser = {
-                "browser": "chrome",
-                "options": chrome_options
-            }
-    else:
-        browser = None
+            browser_conf["browser"] = "edge"
+            browser_conf["options"] = edge_options
 
     if env.env == "":
         Seldom.env = None
@@ -88,7 +77,7 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     if env.test_type == "http":
         main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url, rerun=env.rerun)
     elif env.test_type == "web":
-        main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser, rerun=env.rerun)
+        main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser_conf, rerun=env.rerun)
     main_extend.run_cases(case_info)
     time.sleep(2)
 
