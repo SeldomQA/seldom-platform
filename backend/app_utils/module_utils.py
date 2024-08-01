@@ -37,4 +37,7 @@ def clear_test_modules(directory: str) -> None:
     for module_name in list(sys.modules):
         for m in test_modules:
             if module_name.startswith(m):
-                del sys.modules[module_name]
+                try:
+                    del sys.modules[module_name]
+                except KeyError:
+                    continue
