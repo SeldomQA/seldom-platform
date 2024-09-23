@@ -37,7 +37,7 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
     if env.browser != "":
         browser_type = env.browser
         browser_conf = {}
-        if env.remote != "":
+        if env.remote != "" and env.remote is not None:
             browser_conf["command_executor"] = env.remote
         # 设置浏览器headless模式
         if browser_type in ["gc", "chrome"]:
