@@ -173,10 +173,14 @@ const handlePasswordInput = () => {
             借助于平台的能力，可以方便的管理用例的执行、创建定时任务、展示统计结果。
           </p>
         </div>
-        <n-divider>帮助</n-divider>
+        <n-divider>相关项目</n-divider>
         <div>
+          <span>@SeldomQA Team</span>
+           <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
+            <n-button type="primary" quaternary>seldom</n-button>
+          </a>
           <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
-            <n-button type="primary" quaternary>GitHub</n-button>
+            <n-button type="primary" quaternary>seldom-platform</n-button>
           </a>
           <a href="https://seldomqa.github.io/" target="_blank">
             <n-button type="info" quaternary>在线文档</n-button>
