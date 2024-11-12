@@ -1,5 +1,5 @@
-import request from "./HttpCommon";
-import { TNomalObject } from "./HttpCommon";
+import request from "./common/http";
+import { TNomalObject } from "./common/http";
 
 class UserApi {
   login(data: TNomalObject) {

@@ -1,5 +1,5 @@
-import request from "./HttpCommon.js";
-import { TNomalObject } from "./HttpCommon";
+import request from "./common/http";
+import { TNomalObject } from "./common/http";
 
 class TaskApi {
   createTask(data: TNomalObject) {
