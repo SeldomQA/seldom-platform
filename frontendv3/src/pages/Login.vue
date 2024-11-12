@@ -99,7 +99,7 @@ const submitLogin = () => {
     if (resp.success === true) {
       sessionStorage.token = resp.result.token;
       sessionStorage.user = resp.result.username;
-      router.push({ path: "/main/project" });
+      router.push({ path: "/center/project" });
       message.success("登陆成功！");
     } else {
       message.error(resp.error.message);
