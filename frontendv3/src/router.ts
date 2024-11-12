@@ -6,13 +6,44 @@ import {
 } from "vue-router";
 
 import pageRoutes from "~pages";
+import Center from "~/pages/Center.vue";
+import Project from "~/pages/center/Project.vue";
+import Env from "~/pages/center/Env.vue";
+import Team from "~/pages/center/Team.vue";
 
-export const routes = pageRoutes;
-// console.log(routes)
+// export const routes = pageRoutes;
+
+export const routes = [
+  ...pageRoutes,
+  {
+    path: '/center',
+    name: 'center',
+    component: Center,
+    children: [
+      {
+        path: 'project',
+        name: 'center-Project',
+        component: Project,
+      },
+      {
+        path: 'env',
+        name: 'center-Env',
+        component: Env,
+      },
+      {
+        path: 'team',
+        name: 'center-Team',
+        component: Team,
+      }
+    ]
+  }
+];
+
+// console.log("layout", routes)
 
 export function createRouter() {
   const router = _createRouter({
-    history: createWebHashHistory(),
+    history: createWebHistory(),
     routes,
   });
 
