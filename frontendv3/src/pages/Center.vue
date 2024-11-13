@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import CenterNav from "~/layouts/CenterNav.vue";
+import Footer from "~/layouts/footer.vue";
 import { darkTheme } from "naive-ui";
 import type { GlobalTheme } from "naive-ui";
 import { ref, onMounted, watch, provide, nextTick } from "vue";
@@ -61,9 +62,7 @@ onMounted(() => {
         </n-layout>
       </n-layout>
       <!-- 页脚 -->
-      <n-layout-footer bordered position="absolute" style="text-align: center">
-        © 2024 Powered by SeldomQA Team
-      </n-layout-footer>
+       <Footer></Footer>
     </n-layout>
   </n-layout>
 </n-config-provider>
@@ -74,17 +73,5 @@ onMounted(() => {
 .n-layout-footer {
   /* background: rgba(128, 128, 128, 0.2); */
   padding: 20px;
-}
-
-.n-layout-sider {
-  /* background: rgba(128, 128, 128, 0.3); */
-}
-
-.n-layout-content {
-  /* background: #e9eef3; */
-}
-
-.dflayout {
-  /* height: 100%; */
 }
 </style>
