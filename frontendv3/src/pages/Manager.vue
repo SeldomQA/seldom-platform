@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import CenterNav from "~/layouts/CenterNav.vue";
+import ManagerNav from "~/layouts/ManagerNav.vue";
 import Footer from "~/layouts/footer.vue";
 import { darkTheme } from "naive-ui";
 import type { GlobalTheme } from "naive-ui";
-import { ref, onMounted, watch, provide, nextTick } from "vue";
+import { ref, onMounted, provide } from "vue";
 
 const theme = ref<GlobalTheme | null>(null);
 const isRouterAlive = ref(true);
@@ -30,31 +30,30 @@ onMounted(() => {
 
 <template>
   <n-config-provider :theme="theme">
-  <n-layout class="dflayout" has-sider position="absolute">
-    <n-layout>
-      <n-layout-header bordered>
-        <CenterNav @changeThemeSignal="changeTheme"></CenterNav>
-      </n-layout-header>
-      <n-layout 
-        position="absolute" 
-        :style="theme === null ? 'top: 76px; bottom: 64px; background-color: #fbf9f6': 'top: 76px; bottom: 64px;' ">
+    <n-layout class="dflayout" has-sider position="absolute">
+      <n-layout>
+        <n-layout-header bordered>
+          <ManagerNav @changeThemeSignal="changeTheme"></ManagerNav>
+        </n-layout-header>
         <n-layout 
-        :content-style="theme === null ? 'padding: 24px; background-color: #fbf9f6' : 'padding: 24px'">
-          <div v-if="isRouterAlive">
-            <router-view></router-view>
-          </div>
+          position="absolute" 
+          :style="theme === null ? 'top: 76px; bottom: 64px; background-color: #fbf9f6': 'top: 76px; bottom: 64px;' ">
+          <n-layout
+            :content-style="theme === null ? 'padding: 24px; background-color: #fbf9f6' : 'padding: 24px'">
+            <div v-if="isRouterAlive">
+              <router-view></router-view>
+            </div>
+          </n-layout>
         </n-layout>
+        <Footer></Footer>
       </n-layout>
-      <Footer></Footer>
     </n-layout>
-  </n-layout>
-</n-config-provider>
+  </n-config-provider>
 </template>
 
 <style scoped>
 .n-layout-header,
 .n-layout-footer {
-  /* background: rgba(128, 128, 128, 0.2); */
   padding: 20px;
 }
 </style>

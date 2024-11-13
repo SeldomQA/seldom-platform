@@ -1,19 +1,22 @@
 <script lang="ts">
 import { h, defineComponent, ref, onMounted, reactive, inject } from "vue";
 import type { Component } from "vue";
-import { RouterLink } from "vue-router";
-import type { MenuOption } from "naive-ui";
-import { NIcon, useMessage  } from "naive-ui";
+import { NIcon, useMessage, SelectOption } from "naive-ui";
 import {
-  AppsOutline as ProjectIcon,
   DocumentText as DocuIcon,
   LogOutOutline as LogoutIcon,
   PersonCircle as PersonIcon,
-  CloudOutline as CloudIcon,
-  PeopleOutline as PeopleIcon,
 } from "@vicons/ionicons5";
 import { useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
+import type { MenuOption } from "naive-ui";
+import {
+  HomeOutline,
+  FolderOpenOutline,
+  CalendarOutline,
+} from "@vicons/ionicons5";
 import UserApi from "~/request/user";
+import ProjectApi from "~/request/project";
 
 
 const renderIcon = (icon: Component) => {
@@ -24,7 +27,7 @@ const renderIcon = (icon: Component) => {
   };
 };
 
-// 定义菜单
+
 const menuOptions: MenuOption[] = [
   {
     label: () =>
@@ -38,10 +41,10 @@ const menuOptions: MenuOption[] = [
             },
           },
         },
-        { default: () => "项目配置" }
+        { default: () => "配置中心" }
       ),
-    key: "go-back-home",
-    icon: renderIcon(ProjectIcon),
+    key: "go-back-center",
+    icon: renderIcon(HomeOutline),
   },
   {
     label: () =>
@@ -49,16 +52,16 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "center-Env",
+            name: "manager-Case",
             params: {
               lang: "zh-CN",
             },
           },
         },
-        { default: () => "环境配置" }
+        { default: () => "用例管理" }
       ),
-    key: "go-back-env",
-    icon: renderIcon(CloudIcon),
+    key: "go-back-case",
+    icon: renderIcon(FolderOpenOutline),
   },
   {
     label: () =>
@@ -66,20 +69,27 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "center-Team",
+            name: "manager-Task",
             params: {
               lang: "zh-CN",
             },
           },
         },
-        { default: () => "团队配置" }
+        { default: () => "任务管理" }
       ),
-    key: "go-back-team",
-    icon: renderIcon(PeopleIcon),
+    key: "go-back-task",
+    icon: renderIcon(CalendarOutline),
   },
-  
 ];
 
+type TprojectOptions = {
+  value: string;
+  label: string;
+};
+type modelRef = {
+  projectOptions: TprojectOptions[];
+  envOptions: [];
+};
 
 export default defineComponent({
   emits: ["changeThemeSignal"],
@@ -90,14 +100,42 @@ export default defineComponent({
       loading: false,
       projectValue: null,
     });
-
-    // 刷新组件
-    const reload =  inject("reload");
-
-    // 更新主题
     const mainhtml = document.getElementsByTagName("html");
     const btnLabel = ref("深色");
     const localStorage = window.localStorage;
+
+    const model = ref<modelRef>({
+      projectOptions: [],
+      envOptions: [],
+    });
+
+    // 获取项目列表
+    const initProjectList = async () => {
+      datas.loading = true;
+      const resp = await ProjectApi.getProjects();
+      if (resp.success === true) {
+        // datas.tableData = resp.result
+        for (let i = 0; i < resp.result.length; i++) {
+          model.value.projectOptions.push({
+            value: resp.result[i].id,
+            label: resp.result[i].name,
+          });
+        }
+      } else {
+        message.error(resp.error.message);
+      }
+      datas.loading = false;
+    };
+
+    // 刷新组件
+    const reload = inject("reload");
+
+    const changeProject = (value: string, option: SelectOption) => {
+      sessionStorage.projectId = value;
+      sessionStorage.projectName = option.label;
+      reload;
+    };
+
     const changeTheme = () => {
       if (btnLabel.value == "深色") {
         btnLabel.value = "浅色";
@@ -132,18 +170,25 @@ export default defineComponent({
     const token = ref<string | null>("");
 
     onMounted(() => {
-      // 本地缓存获取主题
+      //深浅主题
       const mode = localStorage.getItem("themeMode");
       if (mode == "light" || mode == null) {
         btnLabel.value = "深色";
       } else {
         btnLabel.value = "浅色";
       }
-      // 登录token
       token.value = sessionStorage.getItem("token");
-    });
 
+      //初始化选择项目下拉框里面的数据
+      initProjectList();
+      datas.projectValue = sessionStorage.projectName;
+    });
     return {
+      menuOptions,
+      handleUpdateValue(key: string, item: MenuOption) {
+        console.log("[onUpdate:value]: " + JSON.stringify(key));
+        console.log("[onUpdate:value]: " + JSON.stringify(item));
+      },
       datas,
       btnLabel,
       changeTheme,
@@ -162,11 +207,10 @@ export default defineComponent({
       token,
       handleSelect,
       PersonIcon,
+      model,
+      changeProject,
       reload,
-      menuOptions,
-      handleUpdateValue(key: string, item: MenuOption) {
-        console.log("[onUpdate:value]: " + JSON.stringify(key) + JSON.stringify(item));
-      },
+      
     };
   },
 });
@@ -180,6 +224,18 @@ export default defineComponent({
         :options="menuOptions"
         @update:value="handleUpdateValue"
         mode="horizontal"/>
+      <n-form inline :model="model" label-placement="left">
+        <n-form-item label="项目">
+          <n-select
+            style="width: 200px"
+            :options="model.projectOptions"
+            placeholder="选择项目"
+            @update:value="changeProject"
+            v-model:value="datas.projectValue"
+          >
+          </n-select>
+        </n-form-item>
+      </n-form>
       <n-space>
         <n-button @click="changeTheme">
           <template #default>
@@ -189,11 +245,12 @@ export default defineComponent({
         <n-dropdown :options="options" @select="handleSelect">
           <n-button>
             <template #icon>
-              <n-icon :component="PersonIcon"></n-icon>
-              </template>
-            </n-button>
+              <n-icon :component="PersonIcon">
+            </n-icon>
+            </template>
+          </n-button>
           </n-dropdown>
-      </n-space>
+        </n-space>
     </n-space>
   </div>
 </template>

@@ -1,7 +1,7 @@
 import {
+  createRouter as _createRouter,
   createMemoryHistory,
   createWebHashHistory,
-  createRouter as _createRouter,
   createWebHistory,
 } from "vue-router";
 
@@ -10,6 +10,9 @@ import Center from "~/pages/Center.vue";
 import Project from "~/pages/center/Project.vue";
 import Env from "~/pages/center/Env.vue";
 import Team from "~/pages/center/Team.vue";
+import Manager from "~/pages/Manager.vue";
+import Case from "~/pages/manager/Case.vue";
+import Task from "~/pages/manager/Task.vue";
 
 // export const routes = pageRoutes;
 
@@ -36,10 +39,27 @@ export const routes = [
         component: Team,
       }
     ]
+  },
+  {
+    path: '/manager',
+    name: 'manager',
+    component: Manager,
+    children: [
+      {
+        path: 'case',
+        name: 'manager-Case',
+        component: Case,
+      },
+       {
+        path: 'task',
+        name: 'manager-Task',
+        component: Task,
+      }
+    ]
   }
-];
+]
 
-// console.log("layout", routes)
+console.log("layout", routes)
 
 export function createRouter() {
   const router = _createRouter({
