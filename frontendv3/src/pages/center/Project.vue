@@ -118,10 +118,9 @@ const handleSelect = (key: string, pid: number) => {
 };
 
 const navigateToProject = (project: any) => {
-
-  // 存储项目对象
-  store.dispatch('setCurrentProject', project); 
-
+  // 存储当前项目信息
+  sessionStorage.setItem('selectProject', JSON.stringify({ id: project.id, name: project.name }));
+  // 跳转项目管理
   const url = `/manager/case`;
   router.push(url);
 };

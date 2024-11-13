@@ -4,6 +4,7 @@ import Footer from "~/layouts/footer.vue";
 import { darkTheme } from "naive-ui";
 import type { GlobalTheme } from "naive-ui";
 import { ref, onMounted, provide } from "vue";
+import { nextTick } from 'vue';
 
 const theme = ref<GlobalTheme | null>(null);
 const isRouterAlive = ref(true);
@@ -17,6 +18,8 @@ const changeTheme = () => {
 
 const reload = () => {
   isRouterAlive.value = !isRouterAlive.value;
+  nextTick(() => {
+  });
 };
 
 provide("reload", reload);
@@ -41,6 +44,9 @@ onMounted(() => {
           <n-layout
             :content-style="theme === null ? 'padding: 24px; background-color: #fbf9f6' : 'padding: 24px'">
             <div v-if="isRouterAlive">
+              <router-view></router-view>
+            </div>
+            <div v-else>
               <router-view></router-view>
             </div>
           </n-layout>

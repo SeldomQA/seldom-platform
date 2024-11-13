@@ -136,13 +136,18 @@ const model = ref<TEnvModel>({
 
 // 初始化项目文件列表
 const initProjectFile = async () => {
-  const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
-  if (resp.success === true) {
-    datas.fileData = treeDataFormat(resp.result.files);
-    datas.caseNumber = resp.result.case_number;
-  } else {
-    message.error(resp.error.message);
+  const projectDataJSON = sessionStorage.getItem('selectProject');
+  if (projectDataJSON) {      
+    const pdata = JSON.parse(projectDataJSON);
+    const resp = await ProjectApi.getProjectTree(pdata.id);
+    if (resp.success === true) {
+      datas.fileData = treeDataFormat(resp.result.files);
+      datas.caseNumber = resp.result.case_number;
+    } else {
+      message.error(resp.error.message);
+    }
   }
+
 };
 
 // 格式化tree数据
@@ -331,7 +336,12 @@ const cancelDialog = () => {
 onMounted(() => {
   initEnvsList();
   initProjectFile();
-  datas.projectId = sessionStorage.projectId;
+
+  const projectDataJSON = sessionStorage.getItem('selectProject');
+  if (projectDataJSON) {
+    const pdata = JSON.parse(projectDataJSON);
+    datas.projectId = pdata.id;
+  }
 });
 </script>
 

@@ -1,8 +1,7 @@
 <script lang="ts">
 import { h, defineComponent, ref, onMounted, reactive, inject } from "vue";
 import type { Component } from "vue";
-import { useStore } from 'vuex';
-import { NIcon, useMessage, SelectOption } from "naive-ui";
+import { NIcon, useMessage, SelectOption, c } from "naive-ui";
 import {
   DocumentText as DocuIcon,
   LogOutOutline as LogoutIcon,
@@ -128,12 +127,13 @@ export default defineComponent({
     };
 
     // 刷新组件
-    const reload = inject("reload");
+    const reload = inject<() => void>("reload");
 
     const changeProject = (value: string, option: SelectOption) => {
-      sessionStorage.projectId = value;
-      sessionStorage.projectName = option.label;
-      reload;
+      sessionStorage.setItem('selectProject', JSON.stringify({id: value, name: option.label}));
+      if (reload) {
+        reload();
+      }
     };
 
     const changeTheme = () => {
@@ -181,10 +181,13 @@ export default defineComponent({
 
       // 初始化选择项目列表
       initProjectList();
-      // 设置当前项目
-      const store = useStore();
-      const currentProject = store.state.currentProject;
-      datas.projectValue = currentProject.name;
+
+      const projectDataJSON = sessionStorage.getItem('selectProject');
+      if (projectDataJSON) {
+         const pdata = JSON.parse(projectDataJSON);
+        datas.projectValue = pdata.id;
+      }
+     
     });
 
     return {
