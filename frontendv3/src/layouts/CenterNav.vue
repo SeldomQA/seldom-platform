@@ -5,6 +5,7 @@ import { RouterLink } from "vue-router";
 import type { MenuOption } from "naive-ui";
 import { NIcon, useMessage  } from "naive-ui";
 import {
+  AppsOutline as ProjectIcon,
   DocumentText as DocuIcon,
   LogOutOutline as LogoutIcon,
   PersonCircle as PersonIcon,
@@ -41,7 +42,7 @@ const menuOptions: MenuOption[] = [
         { default: () => "项目配置" }
       ),
     key: "go-back-home",
-    icon: renderIcon(HomeIcon),
+    icon: renderIcon(ProjectIcon),
   },
   {
     label: () =>
