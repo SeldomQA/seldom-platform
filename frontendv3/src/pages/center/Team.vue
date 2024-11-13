@@ -172,11 +172,10 @@ onMounted(() => {
   <div class="body">
     <div class="pageheader">
       <n-space justify="space-between" class="breadcrumb-navigation">
-        <span>团队管理</span>
+        <span>团队配置</span>
         <n-breadcrumb separator=">">
-          <n-breadcrumb-item>首页</n-breadcrumb-item>
-          <n-breadcrumb-item>配置管理</n-breadcrumb-item>
-          <n-breadcrumb-item>团队管理</n-breadcrumb-item>
+          <n-breadcrumb-item>配置中心</n-breadcrumb-item>
+          <n-breadcrumb-item>团队配置</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
     </div>

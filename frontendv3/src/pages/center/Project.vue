@@ -124,9 +124,8 @@ onMounted(() => {
       <n-space justify="space-between" class="breadcrumb-navigation">
         <span>项目配置</span>
         <n-breadcrumb separator=">">
-          <n-breadcrumb-item>首页</n-breadcrumb-item>
-          <n-breadcrumb-item>配置管理</n-breadcrumb-item>
-          <n-breadcrumb-item>项目管理</n-breadcrumb-item>
+          <n-breadcrumb-item>配置中心</n-breadcrumb-item>
+          <n-breadcrumb-item>项目配置</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
     </div>
