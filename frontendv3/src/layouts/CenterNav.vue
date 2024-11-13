@@ -175,7 +175,14 @@ export default defineComponent({
 <template>
   <div class="header">
     <n-space justify="space-between">
-      <img src="../assets/seldom-platform.gif" style="height: 40px" />
+      <div>
+        <span style="float: left;">
+          <img src="../assets/seldom-platform.gif" style="height: 40px" />
+        </span>
+        <span style="float: right;">
+          <n-tag type="success"> 配置中心 </n-tag>
+        </span>
+      </div>
       <n-menu
         :options="menuOptions"
         @update:value="handleUpdateValue"

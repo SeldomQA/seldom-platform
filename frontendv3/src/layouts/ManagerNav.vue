@@ -1,17 +1,18 @@
 <script lang="ts">
 import { h, defineComponent, ref, onMounted, reactive, inject } from "vue";
 import type { Component } from "vue";
+import type { MenuOption } from "naive-ui";
 import { NIcon, useMessage, SelectOption, c } from "naive-ui";
+import { useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 import {
+  SettingsOutline as SettingIcon,
   DocumentText as DocuIcon,
   LogOutOutline as LogoutIcon,
   PersonCircle as PersonIcon,
-} from "@vicons/ionicons5";
-import { useRouter } from "vue-router";
-import { RouterLink } from "vue-router";
-import type { MenuOption } from "naive-ui";
-import {
-  HomeOutline,
+  AppsOutline as ProjectIcon,
+  CloudOutline as CloudIcon,
+  PeopleOutline as PeopleIcon,
   FolderOpenOutline,
   CalendarOutline,
 } from "@vicons/ionicons5";
@@ -28,23 +29,6 @@ const renderIcon = (icon: Component) => {
 };
 
 const menuOptions: MenuOption[] = [
-  {
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: {
-            name: "center-Project",
-            params: {
-              lang: "zh-CN",
-            },
-          },
-        },
-        { default: () => "配置中心" }
-      ),
-    key: "go-back-center",
-    icon: renderIcon(HomeOutline),
-  },
   {
     label: () =>
       h(
@@ -78,6 +62,64 @@ const menuOptions: MenuOption[] = [
       ),
     key: "go-back-task",
     icon: renderIcon(CalendarOutline),
+  },
+  {
+    label: "配置中心",
+    key: "system-setting",
+    icon: renderIcon(SettingIcon),
+    children: [
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                name: "center-Project",
+                params: {
+                  lang: "zh-CN",
+                },
+              },
+            },
+            { default: () => "项目配置" }
+          ),
+        key: "go-back-home",
+        icon: renderIcon(ProjectIcon),
+      },
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                name: "center-Env",
+                params: {
+                  lang: "zh-CN",
+                },
+              },
+            },
+            { default: () => "环境配置" }
+          ),
+        key: "go-back-env",
+        icon: renderIcon(CloudIcon),
+      },
+      {
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                name: "center-Team",
+                params: {
+                  lang: "zh-CN",
+                },
+              },
+            },
+            { default: () => "团队配置" }
+          ),
+        key: "go-back-team",
+        icon: renderIcon(PeopleIcon),
+      },
+    ],
   },
 ];
 
@@ -226,13 +268,16 @@ export default defineComponent({
 <template>
   <div class="header">
     <n-space justify="space-between">
-      <img src="../assets/seldom-platform.gif" style="height: 40px" />
-      <n-menu
-        :options="menuOptions"
-        @update:value="handleUpdateValue"
-        mode="horizontal"/>
+      <div>
+        <span style="float: left;">
+          <img src="../assets/seldom-platform.gif" style="height: 40px" />
+        </span>
+        <span style="float: right;">
+          <n-tag type="success"> 项目管理 </n-tag>
+        </span>
+      </div>
       <n-form inline :model="model" label-placement="left">
-        <n-form-item label="项目">
+        <n-form-item label="">
           <n-select
             style="width: 200px"
             :options="model.projectOptions"
@@ -243,6 +288,7 @@ export default defineComponent({
           </n-select>
         </n-form-item>
       </n-form>
+      <n-menu :options="menuOptions"  @update:value="handleUpdateValue" mode="horizontal"/>
       <n-space>
         <n-button @click="changeTheme">
           <template #default>
@@ -256,8 +302,8 @@ export default defineComponent({
             </n-icon>
             </template>
           </n-button>
-          </n-dropdown>
-        </n-space>
+        </n-dropdown>
+      </n-space>
     </n-space>
   </div>
 </template>
