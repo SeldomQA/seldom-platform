@@ -1,6 +1,7 @@
 <script lang="ts">
 import { h, defineComponent, ref, onMounted, reactive, inject } from "vue";
 import type { Component } from "vue";
+import { useStore } from 'vuex';
 import { NIcon, useMessage, SelectOption } from "naive-ui";
 import {
   DocumentText as DocuIcon,
@@ -26,7 +27,6 @@ const renderIcon = (icon: Component) => {
     });
   };
 };
-
 
 const menuOptions: MenuOption[] = [
   {
@@ -179,10 +179,14 @@ export default defineComponent({
       }
       token.value = sessionStorage.getItem("token");
 
-      //初始化选择项目下拉框里面的数据
+      // 初始化选择项目列表
       initProjectList();
-      datas.projectValue = sessionStorage.projectName;
+      // 设置当前项目
+      const store = useStore();
+      const currentProject = store.state.currentProject;
+      datas.projectValue = currentProject.name;
     });
+
     return {
       menuOptions,
       handleUpdateValue(key: string, item: MenuOption) {

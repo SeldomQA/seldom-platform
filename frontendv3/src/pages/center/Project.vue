@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import { reactive, onMounted } from "vue";
 import { useMessage, useDialog } from "naive-ui";
+import { useRouter } from "vue-router"; 
 import { SettingsOutline } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
 import ProjectForm from "@/ProjectForm.vue";
 import baseUrl from "~/config/base-url";
+import { store } from "~/store";
 
 const message = useMessage();
 const dialog = useDialog();
+const router = useRouter();
+
 
 const datas = reactive({
   loading: false,
@@ -113,6 +117,15 @@ const handleSelect = (key: string, pid: number) => {
   }
 };
 
+const navigateToProject = (project: any) => {
+
+  // 存储项目对象
+  store.dispatch('setCurrentProject', project); 
+
+  const url = `/manager/case`;
+  router.push(url);
+};
+
 onMounted(() => {
   initProjects();
 });
@@ -153,8 +166,7 @@ onMounted(() => {
                 <n-dropdown
                   trigger="hover"
                   :options="options"
-                  @select="(key) => handleSelect(key, item['id'])"
-                >
+                  @select="(key: any) => handleSelect(key, item['id'])">
                   <n-icon>
                     <SettingsOutline />
                   </n-icon>
@@ -163,30 +175,35 @@ onMounted(() => {
               <div v-if="item['path_name'] == ''">
                 <n-empty description="no cover"> </n-empty>
               </div>
-              <div v-else style="height: 100%; width: 100%">
+              <div v-else class="image-container">
                 <img
                   :src="baseUrl + '/static/images/' + item['path_name']"
-                  style="height: 100%; width: 100%"
+                  class="image"
                 />
               </div>
-              <n-descriptions label-placement="left" column="1">
-                <n-descriptions-item>
-                  <template #label> 测试目录 </template>
-                  {{ item['case_dir'] }}
-                </n-descriptions-item>
-                <n-descriptions-item>
-                  <template #label> 文件数量 </template>
-                  {{ item['test_num'] }}
-                </n-descriptions-item>
-                <n-descriptions-item>
-                  <template #label> 状态 </template>
-                  <n-tag v-if="item['is_clone'] == 0" type="info" size="small" >未克隆</n-tag>
-                  <n-tag v-else type="success" size="small">已克隆</n-tag>
-                </n-descriptions-item>
-              </n-descriptions>
               <template #action>
-                <div>
+                <n-descriptions label-placement="left" column="1">
+                  <n-descriptions-item>
+                    <template #label> 测试目录 </template>
+                    {{ item['case_dir'] }}
+                  </n-descriptions-item>
+                  <n-descriptions-item>
+                    <template #label> 文件数量 </template>
+                    {{ item['test_num'] }}
+                  </n-descriptions-item>
+                  <n-descriptions-item>
+                    <template #label> 状态 </template>
+                    <n-tag v-if= "item['is_clone'] == 0" type="info" size="small" >未克隆</n-tag>
+                    <n-tag v-else type="success" size="small">已克隆</n-tag>
+                  </n-descriptions-item>
+                </n-descriptions>
+                <!-- <div>
                   {{ item['address'] }}
+                </div> -->
+                <div class="enter-btn">
+                  <n-button size="small" type="primary" @click="navigateToProject(item)">
+                    进入
+                  </n-button>
                 </div>
               </template>
             </n-card>
@@ -223,4 +240,24 @@ onMounted(() => {
   margin-right: 20px;
 }
 
+.image-container {
+  height: 120px;
+  width: 120px;
+  display: flex; /* 使用 Flexbox 布局 */
+  align-items: center; /* 垂直居中 */
+  justify-content: center; /* 水平居中 */
+  overflow: hidden; /* 确保图片溢出部分被隐藏 */
+  margin-left: 60px;
+}
+ 
+.image {
+  height: 100%;
+  width: 100%;
+  object-fit: cover; /* 保持图片宽高比，同时填充整个容器 */
+}
+
+.enter-btn {
+  float: right;
+  margin-top: 15px;
+}
 </style>
