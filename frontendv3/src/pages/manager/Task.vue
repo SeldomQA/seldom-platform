@@ -210,10 +210,12 @@ const changeTeam = (value: string, option: SelectOption) => {
 
 // 初始化任务例表
 const initTaskList = async () => {
-  datas.query.project_id = sessionStorage.projectId;
-  if (datas.query.project_id == null || datas.query.project_id == undefined) {
-    message.warning("请选择项目");
-  } else {
+  
+  const projectDataJSON = sessionStorage.getItem('selectProject');
+  if (projectDataJSON) {
+    const pdata = JSON.parse(projectDataJSON);
+    datas.query.project_id = pdata.id;
+
     datas.loading = true;
     const resp = await TaskApi.getTaskAll(datas.query);
     if (resp.success === true) {
@@ -223,6 +225,8 @@ const initTaskList = async () => {
       message.error(resp.error.message);
     }
     datas.loading = false;
+  } else {
+    message.warning("请选择项目");
   }
 };
 
@@ -430,7 +434,7 @@ onMounted(() => {
           </div>
 
           <n-breadcrumb separator=">">
-            <n-breadcrumb-item>首页</n-breadcrumb-item>
+            <n-breadcrumb-item>项目管理</n-breadcrumb-item>
             <n-breadcrumb-item>任务管理</n-breadcrumb-item>
             <n-breadcrumb-item>任务报告</n-breadcrumb-item>
           </n-breadcrumb>
