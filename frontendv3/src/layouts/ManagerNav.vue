@@ -18,6 +18,7 @@ import {
 } from '@vicons/ionicons5';
 import UserApi from '~/request/user';
 import ProjectApi from '~/request/project';
+import projectStorage from '~/store/index';
 
 // Declare the emitted events
 const emit = defineEmits<{
@@ -40,7 +41,7 @@ const router = useRouter();
 const message = useMessage();
 const datas = reactive({
   loading: false,
-  projectValue: null,
+  projectValue: '',
 });
 const mainhtml = document.getElementsByTagName('html');
 const btnLabel = ref('深色');
@@ -171,13 +172,15 @@ const initProjectList = async () => {
       label: project.name,
     }));
   } else {
-    message.error(resp.error.message);
+    message.error(resp.error.message); 
   }
   datas.loading = false;
 };
 
-const changeProject = (value: string, option: SelectOption) => {
-  sessionStorage.setItem('selectProject', JSON.stringify({ id: value, name: option.label }));
+const changeProject = (value: number, option: any) => {
+  // 保存项目缓存
+  projectStorage.setProject(value, option.label)
+
   reload?.();
 };
 
@@ -223,12 +226,12 @@ onMounted(() => {
   const mode = localStorage.getItem('themeMode');
   btnLabel.value = mode === 'light' || mode == null ? '深色' : '浅色';
   token.value = sessionStorage.getItem('token');
+
   initProjectList();
 
-  const projectDataJSON = sessionStorage.getItem('selectProject');
-  if (projectDataJSON) {
-    const pdata = JSON.parse(projectDataJSON);
-    datas.projectValue = pdata.id;
+   const projectData = projectStorage.getProject()
+  if (projectData) {
+    datas.projectValue = String(projectData.id);
   }
 });
 

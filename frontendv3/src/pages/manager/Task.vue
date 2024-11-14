@@ -6,7 +6,6 @@ import {
   useMessage,
   useDialog,
   SelectOption,
-  FormInst,
   NSpace,
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
@@ -15,6 +14,10 @@ import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
 import TaskReport from "@/TaskReport.vue";
 import TaskModal from "@/TaskModal.vue";
+import projectStorage from '~/store/index';
+
+
+const projectId = ref<string>("");
 
 type RowData = {
   id: number;
@@ -154,7 +157,7 @@ const datas = reactive({
   query: {
     page: 1,
     size: 5,
-    project_id: null,
+    project_id: "",
     team_id: null,
     name: null,
   },
@@ -210,11 +213,8 @@ const changeTeam = (value: string, option: SelectOption) => {
 
 // 初始化任务例表
 const initTaskList = async () => {
-  
-  const projectDataJSON = sessionStorage.getItem('selectProject');
-  if (projectDataJSON) {
-    const pdata = JSON.parse(projectDataJSON);
-    datas.query.project_id = pdata.id;
+
+    datas.query.project_id = projectId.value
 
     datas.loading = true;
     const resp = await TaskApi.getTaskAll(datas.query);
@@ -225,16 +225,13 @@ const initTaskList = async () => {
       message.error(resp.error.message);
     }
     datas.loading = false;
-  } else {
-    message.warning("请选择项目");
-  }
-};
+  };
 
 // 新增编辑任务modal
 const showModalTask = ref(false);
 
 const openModalTask = (type: number) => {
-  if (sessionStorage.projectId == "") {
+  if (projectId.value == "") {
     message.warning("请选择项目");
   } else {
     switch (type) {
@@ -336,6 +333,10 @@ const columns = createColumns({
 const pagination = false;
 
 onMounted(() => {
+  const projectData = projectStorage.getProject()
+  if (projectData) {
+    projectId.value = String(projectData.id);
+  }
   initTeamList();
   initTaskList();
 });

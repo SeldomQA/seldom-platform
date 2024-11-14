@@ -15,6 +15,8 @@ import { FolderOpenOutline, LogoPython, Refresh } from "@vicons/ionicons5";
 import CaseResult from "@/CaseResult.vue";
 import CaseSync from "@/CaseSync.vue";
 import CaseSyncLog from "@/CaseSyncLog.vue";
+import projectStorage from '~/store/index';
+
 
 type RowData = {
   id: number;
@@ -136,10 +138,10 @@ const model = ref<TEnvModel>({
 
 // 初始化项目文件列表
 const initProjectFile = async () => {
-  const projectDataJSON = sessionStorage.getItem('selectProject');
-  if (projectDataJSON) {      
-    const pdata = JSON.parse(projectDataJSON);
-    const resp = await ProjectApi.getProjectTree(pdata.id);
+  const projectData = projectStorage.getProject()
+  if (projectData) {
+    const projectId = String(projectData.id)
+    const resp = await ProjectApi.getProjectTree(projectId);
     if (resp.success === true) {
       datas.fileData = treeDataFormat(resp.result.files);
       datas.caseNumber = resp.result.case_number;
@@ -337,10 +339,9 @@ onMounted(() => {
   initEnvsList();
   initProjectFile();
 
-  const projectDataJSON = sessionStorage.getItem('selectProject');
-  if (projectDataJSON) {
-    const pdata = JSON.parse(projectDataJSON);
-    datas.projectId = pdata.id;
+  const projectData = projectStorage.getProject()
+  if (projectData) {
+    datas.projectId = String(projectData.id);
   }
 });
 </script>

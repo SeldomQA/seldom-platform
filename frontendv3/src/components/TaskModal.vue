@@ -12,6 +12,7 @@ import { FolderOpenOutline, LogoPython } from "@vicons/ionicons5";
 import TeamApi from "~/request/team";
 import ProjectApi from "~/request/project";
 import TaskApi from "~/request/task";
+import projectStorage from '~/store/index';
 
 const props = defineProps({
   type: {
@@ -27,6 +28,8 @@ const props = defineProps({
 const emits = defineEmits(["close"]);
 
 const message = useMessage();
+
+const projectId = ref<string>("");
 
 type FormDatas = {
   type?: number | null;
@@ -61,7 +64,7 @@ const modalDatas = reactive<ModalDatas>({
 });
 
 const formValue = ref<FormDatas>({
-  project: sessionStorage.projectId,
+  project: projectId.value,
   name: null,
   env_id: null,
   team_id: null,
@@ -134,7 +137,7 @@ const treeDataFormat = (datas: TrespDatas[]) => {
 
 // 初始化项目文件列表
 const initProjectFile = async () => {
-  const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
+  const resp = await ProjectApi.getProjectTree(projectId.value);
   if (resp.success === true) {
     datas.fileData = treeDataFormat(resp.result.files);
   } else {
@@ -176,7 +179,7 @@ const initEnvsList = async () => {
 const handleNodeClick = (data: any) => {
   // 如果是文件返回 类&方法
   if (data.label.match(".py")) {
-    ProjectApi.getProjectCases(sessionStorage.projectId, data.full_name).then(
+    ProjectApi.getProjectCases(projectId.value, data.full_name).then(
       (resp: any) => {
         if (resp.success === true) {
           datas.caseData = resp.result;
@@ -210,7 +213,7 @@ const handleNodeClick = (data: any) => {
       return;
     }
     ProjectApi.getProjectSubdirectory(
-      sessionStorage.projectId,
+      projectId.value,
       data.full_name
     ).then((resp: any) => {
       if (resp.success === true) {
@@ -278,7 +281,7 @@ const handleSave = (e: MouseEvent) => {
       }
       let payload = {
         taskId: props.tid,
-        project: sessionStorage.projectId,
+        project: projectId.value,
         name: formValue.value.name,
         env_id: formValue.value.env_id,
         team_id: formValue.value.team_id,
@@ -310,6 +313,10 @@ const handleSave = (e: MouseEvent) => {
 };
 
 onMounted(() => {
+  const projectData = projectStorage.getProject()
+  if (projectData) {
+    projectId.value = String(projectData.id);
+  }
   initProjectFile();
   initEnvsList();
   initTeamList();

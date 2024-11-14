@@ -6,7 +6,7 @@ import { SettingsOutline } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
 import ProjectForm from "@/ProjectForm.vue";
 import baseUrl from "~/config/base-url";
-import { store } from "~/store";
+import projectStorage from '~/store/index';
 
 const message = useMessage();
 const dialog = useDialog();
@@ -119,7 +119,7 @@ const handleSelect = (key: string, pid: number) => {
 
 const navigateToProject = (project: any) => {
   // 存储当前项目信息
-  sessionStorage.setItem('selectProject', JSON.stringify({ id: project.id, name: project.name }));
+  projectStorage.setProject(project.id,  project.name)
   // 跳转项目管理
   const url = `/manager/case`;
   router.push(url);
