@@ -1,10 +1,10 @@
-<script lang="ts">
-import { h, defineComponent, ref, onMounted, reactive, inject } from "vue";
-import type { Component } from "vue";
+<script setup lang="ts">
+import { ref, reactive, onMounted, inject, h } from 'vue';
+import { useRouter, RouterLink } from 'vue-router';
 import type { MenuOption } from "naive-ui";
-import { NIcon, useMessage, SelectOption, c } from "naive-ui";
-import { useRouter } from "vue-router";
-import { RouterLink } from "vue-router";
+import { useMessage, SelectOption } from 'naive-ui';
+import { NIcon } from 'naive-ui';
+import type { Component } from 'vue';
 import {
   SettingsOutline as SettingIcon,
   DocumentText as DocuIcon,
@@ -13,255 +13,238 @@ import {
   AppsOutline as ProjectIcon,
   CloudOutline as CloudIcon,
   PeopleOutline as PeopleIcon,
-  FolderOpenOutline,
-  CalendarOutline,
-} from "@vicons/ionicons5";
-import UserApi from "~/request/user";
-import ProjectApi from "~/request/project";
+  FolderOpenOutline as FolderIcon,
+  CalendarOutline as CalendarIcon
+} from '@vicons/ionicons5';
+import UserApi from '~/request/user';
+import ProjectApi from '~/request/project';
 
+// Declare the emitted events
+const emit = defineEmits<{
+  (e: 'changeThemeSignal'): void;
+}>();
 
-const renderIcon = (icon: Component) => {
-  return () => {
-    return h(NIcon, null, {
-      default: () => h(icon),
-    });
-  };
+// Type definitions
+type TprojectOptions = {
+  value: string;
+  label: string;
 };
 
-const menuOptions: MenuOption[] = [
+type modelRef = {
+  projectOptions: TprojectOptions[];
+  // envOptions: [];
+};
+
+// Reactive state
+const router = useRouter();
+const message = useMessage();
+const datas = reactive({
+  loading: false,
+  projectValue: null,
+});
+const mainhtml = document.getElementsByTagName('html');
+const btnLabel = ref('深色');
+const localStorage = window.localStorage;
+const model = ref<modelRef>({
+  projectOptions: [],
+  // envOptions: [],
+});
+const token = ref<string | null>('');
+
+// Injected function
+const reload = inject<() => void>('reload');
+
+// Menu options
+const renderIcon = (icon: Component) => () => h(NIcon, null, { default: () => h(icon) });
+
+const menuOptions = [
   {
     label: () =>
       h(
-        RouterLink,
-        {
+        RouterLink, {
           to: {
-            name: "manager-Case",
+            name: 'manager-Case',
             params: {
-              lang: "zh-CN",
-            },
-          },
+              lang: 'zh-CN'
+            }
+          }
         },
-        { default: () => "用例管理" }
+        { default: () => '用例管理' }
       ),
-    key: "go-back-case",
-    icon: renderIcon(FolderOpenOutline),
+    key: 'go-back-case',
+    icon: renderIcon(FolderIcon),
   },
   {
     label: () =>
       h(
-        RouterLink,
-        {
+        RouterLink, {
           to: {
-            name: "manager-Task",
+            name: 'manager-Task',
             params: {
-              lang: "zh-CN",
-            },
-          },
+              lang: 'zh-CN'
+            }
+          }
         },
-        { default: () => "任务管理" }
+        { default: () => '任务管理' }
       ),
-    key: "go-back-task",
-    icon: renderIcon(CalendarOutline),
+    key: 'go-back-task',
+    icon: renderIcon(CalendarIcon),
   },
   {
-    label: "配置中心",
-    key: "system-setting",
+    label: '配置中心',
+    key: 'system-setting',
     icon: renderIcon(SettingIcon),
     children: [
       {
         label: () =>
           h(
-            RouterLink,
-            {
+            RouterLink, {
               to: {
-                name: "center-Project",
+                name: 'center-Project',
                 params: {
-                  lang: "zh-CN",
-                },
-              },
+                  lang: 'zh-CN'
+                }
+              }
             },
-            { default: () => "项目配置" }
+            { default: () => '项目配置' }
           ),
-        key: "go-back-home",
+        key: 'go-back-home',
         icon: renderIcon(ProjectIcon),
       },
       {
         label: () =>
           h(
-            RouterLink,
-            {
-              to: {
-                name: "center-Env",
+            RouterLink, {
+              to: { 
+                name: 'center-Env',
                 params: {
-                  lang: "zh-CN",
-                },
-              },
+                  lang: 'zh-CN'
+                }
+              }
             },
-            { default: () => "环境配置" }
+            { default: () => '环境配置' }
           ),
-        key: "go-back-env",
+        key: 'go-back-env',
         icon: renderIcon(CloudIcon),
       },
       {
         label: () =>
           h(
-            RouterLink,
-            {
-              to: {
-                name: "center-Team",
+            RouterLink, {
+              to: { 
+                name: 'center-Team',
                 params: {
-                  lang: "zh-CN",
-                },
-              },
+                  lang: 'zh-CN'
+                }
+              }
             },
-            { default: () => "团队配置" }
+            { default: () => '团队配置' }
           ),
-        key: "go-back-team",
+        key: 'go-back-team',
         icon: renderIcon(PeopleIcon),
       },
     ],
   },
 ];
 
-type TprojectOptions = {
-  value: string;
-  label: string;
+// 个人选项
+const  personOptions = [
+    {
+      label: '操作手册',
+      key: 'help_documentation',
+      icon: renderIcon(DocuIcon),
+    },
+    {
+      label: '退出登录',
+      key: 'logout',
+      icon: renderIcon(LogoutIcon),
+    },
+]
+
+// Methods
+const initProjectList = async () => {
+  datas.loading = true;
+  const resp = await ProjectApi.getProjects();
+  if (resp.success) {
+    model.value.projectOptions = resp.result.map((project: any) => ({
+      value: project.id,
+      label: project.name,
+    }));
+  } else {
+    message.error(resp.error.message);
+  }
+  datas.loading = false;
 };
-type modelRef = {
-  projectOptions: TprojectOptions[];
-  envOptions: [];
+
+const changeProject = (value: string, option: SelectOption) => {
+  sessionStorage.setItem('selectProject', JSON.stringify({ id: value, name: option.label }));
+  reload?.();
 };
 
-export default defineComponent({
-  emits: ["changeThemeSignal"],
-  setup(props, ctx) {
-    const router = useRouter();
-    const message = useMessage();
-    const datas = reactive({
-      loading: false,
-      projectValue: null,
-    });
-    const mainhtml = document.getElementsByTagName("html");
-    const btnLabel = ref("深色");
-    const localStorage = window.localStorage;
+const changeTheme = () => {
+  if (btnLabel.value === '深色') {
+    btnLabel.value = '浅色';
+    localStorage.setItem('themeMode', 'dark');
+  } else {
+    btnLabel.value = '深色';
+    localStorage.setItem('themeMode', 'light');
+  }
+  emit('changeThemeSignal');
+  mainhtml[0].classList.toggle('dark');
+};
 
-    const model = ref<modelRef>({
-      projectOptions: [],
-      envOptions: [],
-    });
-
-    // 获取项目列表
-    const initProjectList = async () => {
-      datas.loading = true;
-      const resp = await ProjectApi.getProjects();
-      if (resp.success === true) {
-        // datas.tableData = resp.result
-        for (let i = 0; i < resp.result.length; i++) {
-          model.value.projectOptions.push({
-            value: resp.result[i].id,
-            label: resp.result[i].name,
-          });
+const handleSelect = (key: string | number) => {
+  switch (key) {
+    case 'logout':
+      UserApi.logout({ token: token.value }).then((resp: any) => {
+        if (resp.success) {
+          sessionStorage.clear();
+          router.push('/login');
+        } else {
+          message.error(resp.error.message);
         }
-      } else {
-        message.error(resp.error.message);
-      }
-      datas.loading = false;
-    };
+      });
+      break;
+    case 'help_documentation':
+      window.open('https://github.com/SeldomQA/seldom-platform', '_blank');
+      break;
+    default:
+      break;
+  }
+};
 
-    // 刷新组件
-    const reload = inject<() => void>("reload");
+// New method: handleUpdateValue
+const handleUpdateValue = (key: string, item: MenuOption) => {
+  console.log('[onUpdate] :key=' + JSON.stringify(key) +' item = '+ JSON.stringify(item));
+};
 
-    const changeProject = (value: string, option: SelectOption) => {
-      sessionStorage.setItem('selectProject', JSON.stringify({id: value, name: option.label}));
-      if (reload) {
-        reload();
-      }
-    };
+// Lifecycle hooks
+onMounted(() => {
+  const mode = localStorage.getItem('themeMode');
+  btnLabel.value = mode === 'light' || mode == null ? '深色' : '浅色';
+  token.value = sessionStorage.getItem('token');
+  initProjectList();
 
-    const changeTheme = () => {
-      if (btnLabel.value == "深色") {
-        btnLabel.value = "浅色";
-        localStorage.setItem("themeMode", "dark");
-      } else {
-        btnLabel.value = "深色";
-        localStorage.setItem("themeMode", "light");
-      }
-      ctx.emit("changeThemeSignal");
-      mainhtml[0].classList.toggle("dark");
-    };
+  const projectDataJSON = sessionStorage.getItem('selectProject');
+  if (projectDataJSON) {
+    const pdata = JSON.parse(projectDataJSON);
+    datas.projectValue = pdata.id;
+  }
+});
 
-    const handleSelect = (key: string | number) => {
-      switch (key) {
-        case "logout":
-          UserApi.logout({ token: token.value }).then((resp: any) => {
-            if (resp.success === true) {
-              sessionStorage.clear();
-              router.push("/login");
-            } else {
-              message.error(resp.error.message);
-            }
-          });
-          break;
-        case "help_documentation":
-          window.open("https://github.com/SeldomQA/seldom-platform", "_blank");
-          break;
-        default:
-          break;
-      }
-    };
-    const token = ref<string | null>("");
-
-    onMounted(() => {
-      //深浅主题
-      const mode = localStorage.getItem("themeMode");
-      if (mode == "light" || mode == null) {
-        btnLabel.value = "深色";
-      } else {
-        btnLabel.value = "浅色";
-      }
-      token.value = sessionStorage.getItem("token");
-
-      // 初始化选择项目列表
-      initProjectList();
-
-      const projectDataJSON = sessionStorage.getItem('selectProject');
-      if (projectDataJSON) {
-         const pdata = JSON.parse(projectDataJSON);
-        datas.projectValue = pdata.id;
-      }
-     
-    });
-
-    return {
-      menuOptions,
-      handleUpdateValue(key: string, item: MenuOption) {
-        console.log("[onUpdate:value]: " + JSON.stringify(key));
-        console.log("[onUpdate:value]: " + JSON.stringify(item));
-      },
-      datas,
-      btnLabel,
-      changeTheme,
-      options: [
-        {
-          label: "操作手册",
-          key: "help_documentation",
-          icon: renderIcon(DocuIcon),
-        },
-        {
-          label: "退出登录",
-          key: "logout",
-          icon: renderIcon(LogoutIcon),
-        },
-      ],
-      token,
-      handleSelect,
-      PersonIcon,
-      model,
-      changeProject,
-      reload,
-      
-    };
-  },
+// Expose to template
+defineExpose({
+  menuOptions,
+  datas,
+  btnLabel,
+  changeTheme,
+  model,
+  changeProject,
+  handleSelect,
+  handleUpdateValue,
+  token,
+  PersonIcon,
+  personOptions
 });
 </script>
 
@@ -295,11 +278,10 @@ export default defineComponent({
             {{ btnLabel }}
           </template>
         </n-button>
-        <n-dropdown :options="options" @select="handleSelect">
+        <n-dropdown :options="personOptions" @select="handleSelect">
           <n-button>
             <template #icon>
-              <n-icon :component="PersonIcon">
-            </n-icon>
+              <n-icon :component="PersonIcon"></n-icon>
             </template>
           </n-button>
         </n-dropdown>

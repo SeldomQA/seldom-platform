@@ -1,9 +1,8 @@
-<script lang="ts">
-import { h, defineComponent, ref, onMounted, reactive, inject } from "vue";
-import type { Component } from "vue";
-import { RouterLink } from "vue-router";
-import type { MenuOption } from "naive-ui";
-import { NIcon, useMessage  } from "naive-ui";
+<script setup lang="ts">
+import { h, ref, onMounted, reactive, inject } from 'vue';
+import { useRouter, RouterLink } from 'vue-router';
+import type { MenuOption } from 'naive-ui';
+import { NIcon, useMessage } from 'naive-ui';
 import {
   AppsOutline as ProjectIcon,
   DocumentText as DocuIcon,
@@ -11,20 +10,63 @@ import {
   PersonCircle as PersonIcon,
   CloudOutline as CloudIcon,
   PeopleOutline as PeopleIcon,
-} from "@vicons/ionicons5";
-import { useRouter } from "vue-router";
-import UserApi from "~/request/user";
+} from '@vicons/ionicons5';
+import UserApi from '~/request/user';
 
+// Define the emit event
+const emit = defineEmits<{
+  (e: 'changeThemeSignal'): void;
+}>();
 
-const renderIcon = (icon: Component) => {
-  return () => {
-    return h(NIcon, null, {
-      default: () => h(icon),
-    });
-  };
+// Reactive variables
+const router = useRouter();
+const message = useMessage();
+const datas = reactive({
+  loading: false,
+  projectValue: null,
+});
+const token = ref<string | null>('');
+
+// Theme management
+const mainhtml = document.getElementsByTagName('html');
+const btnLabel = ref('深色');
+const localStorage = window.localStorage;
+
+// Theme change method
+const changeTheme = () => {
+  if (btnLabel.value === '深色') {
+    btnLabel.value = '浅色';
+    localStorage.setItem('themeMode', 'dark');
+  } else {
+    btnLabel.value = '深色';
+    localStorage.setItem('themeMode', 'light');
+  }
+  emit('changeThemeSignal');
+  mainhtml[0].classList.toggle('dark');
 };
 
-// 定义菜单
+// Method to handle menu selection (logout, etc.)
+const handleSelect = (key: string | number) => {
+  switch (key) {
+    case 'logout':
+      UserApi.logout({ token: token.value }).then((resp: any) => {
+        if (resp.success) {
+          sessionStorage.clear();
+          router.push('/login');
+        } else {
+          message.error(resp.error.message);
+        }
+      });
+      break;
+    case 'help_documentation':
+      window.open('https://github.com/SeldomQA/seldom-platform', '_blank');
+      break;
+    default:
+      break;
+  }
+};
+
+// Menu options
 const menuOptions: MenuOption[] = [
   {
     label: () =>
@@ -32,16 +74,14 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "center-Project",
-            params: {
-              lang: "zh-CN",
-            },
+            name: 'center-Project',
+            params: { lang: 'zh-CN' },
           },
         },
-        { default: () => "项目配置" }
+        { default: () => '项目配置' }
       ),
-    key: "go-back-home",
-    icon: renderIcon(ProjectIcon),
+    key: 'go-back-home',
+    icon: () => h(NIcon, null, { default: () => h(ProjectIcon) }),
   },
   {
     label: () =>
@@ -49,16 +89,14 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "center-Env",
-            params: {
-              lang: "zh-CN",
-            },
+            name: 'center-Env',
+            params: { lang: 'zh-CN' },
           },
         },
-        { default: () => "环境配置" }
+        { default: () => '环境配置' }
       ),
-    key: "go-back-env",
-    icon: renderIcon(CloudIcon),
+    key: 'go-back-env',
+    icon: () => h(NIcon, null, { default: () => h(CloudIcon) }),
   },
   {
     label: () =>
@@ -66,110 +104,46 @@ const menuOptions: MenuOption[] = [
         RouterLink,
         {
           to: {
-            name: "center-Team",
-            params: {
-              lang: "zh-CN",
-            },
+            name: 'center-Team',
+            params: { lang: 'zh-CN' },
           },
         },
-        { default: () => "团队配置" }
+        { default: () => '团队配置' }
       ),
-    key: "go-back-team",
-    icon: renderIcon(PeopleIcon),
+    key: 'go-back-team',
+    icon: () => h(NIcon, null, { default: () => h(PeopleIcon) }),
   },
-  
 ];
 
-
-export default defineComponent({
-  emits: ["changeThemeSignal"],
-  setup(props, ctx) {
-    const router = useRouter();
-    const message = useMessage();
-    const datas = reactive({
-      loading: false,
-      projectValue: null,
-    });
-
-    // 刷新组件
-    const reload =  inject("reload");
-
-    // 更新主题
-    const mainhtml = document.getElementsByTagName("html");
-    const btnLabel = ref("深色");
-    const localStorage = window.localStorage;
-    const changeTheme = () => {
-      if (btnLabel.value == "深色") {
-        btnLabel.value = "浅色";
-        localStorage.setItem("themeMode", "dark");
-      } else {
-        btnLabel.value = "深色";
-        localStorage.setItem("themeMode", "light");
-      }
-      ctx.emit("changeThemeSignal");
-      mainhtml[0].classList.toggle("dark");
-    };
-
-    const handleSelect = (key: string | number) => {
-      switch (key) {
-        case "logout":
-          UserApi.logout({ token: token.value }).then((resp: any) => {
-            if (resp.success === true) {
-              sessionStorage.clear();
-              router.push("/login");
-            } else {
-              message.error(resp.error.message);
-            }
-          });
-          break;
-        case "help_documentation":
-          window.open("https://github.com/SeldomQA/seldom-platform", "_blank");
-          break;
-        default:
-          break;
-      }
-    };
-    const token = ref<string | null>("");
-
-    onMounted(() => {
-      // 本地缓存获取主题
-      const mode = localStorage.getItem("themeMode");
-      if (mode == "light" || mode == null) {
-        btnLabel.value = "深色";
-      } else {
-        btnLabel.value = "浅色";
-      }
-      // 登录token
-      token.value = sessionStorage.getItem("token");
-    });
-
-    return {
-      datas,
-      btnLabel,
-      changeTheme,
-      options: [
-        {
-          label: "操作手册",
-          key: "help_documentation",
-          icon: renderIcon(DocuIcon),
-        },
-        {
-          label: "退出登录",
-          key: "logout",
-          icon: renderIcon(LogoutIcon),
-        },
-      ],
-      token,
-      handleSelect,
-      PersonIcon,
-      reload,
-      menuOptions,
-      handleUpdateValue(key: string, item: MenuOption) {
-        console.log("[onUpdate:value]: " + JSON.stringify(key) + JSON.stringify(item));
-      },
-    };
+// Options for the dropdown menu (help document and logout)
+const personOptions: MenuOption[] = [
+  {
+    label: '操作手册',
+    key: 'help_documentation',
+    icon: () => h(NIcon, null, { default: () => h(DocuIcon) }),
   },
+  {
+    label: '退出登录',
+    key: 'logout',
+    icon: () => h(NIcon, null, { default: () => h(LogoutIcon) }),
+  },
+];
+
+// Injected function for component reload
+const reload = inject<() => void>('reload');
+
+// Handle component mounting and initialization
+onMounted(() => {
+  const mode = localStorage.getItem('themeMode');
+  btnLabel.value = mode === 'light' || mode == null ? '深色' : '浅色';
+  token.value = sessionStorage.getItem('token');
 });
+
+// Handle menu item updates
+const handleUpdateValue = (key: string, item: MenuOption) => {
+  console.log('[onUpdate] :key=' + JSON.stringify(key) +' item = '+ JSON.stringify(item));
+};
+
 </script>
 
 <template>
@@ -193,7 +167,7 @@ export default defineComponent({
             {{ btnLabel }}
           </template>
         </n-button>
-        <n-dropdown :options="options" @select="handleSelect">
+        <n-dropdown :options="personOptions" @select="handleSelect">
           <n-button>
             <template #icon>
               <n-icon :component="PersonIcon"></n-icon>
