@@ -137,7 +137,7 @@ const handlePasswordInput = () => {
     <header>
       <div class="features">
         <div>
-          <h1>Seldom Platform.</h1>
+          <h1>Seldom Platform. <n-tag type="success" size="small" round>v2.0</n-tag></h1>
           <span style="color: #869ab8">基于Seldom框架的自动化测试平台.</span>
         </div>
         <div>
@@ -175,7 +175,7 @@ const handlePasswordInput = () => {
         </div>
         <n-divider>相关项目</n-divider>
         <div>
-          <span>@SeldomQA Team</span>
+          <span>@2024 Powered by SeldomQA Team</span>
            <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
             <n-button type="primary" quaternary>seldom</n-button>
           </a>
