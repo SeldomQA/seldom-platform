@@ -2,7 +2,7 @@
 import { ref, reactive, onMounted, inject, h } from 'vue';
 import { useRouter, RouterLink } from 'vue-router';
 import type { MenuOption } from "naive-ui";
-import { useMessage, SelectOption } from 'naive-ui';
+import { useMessage } from 'naive-ui';
 import { NIcon } from 'naive-ui';
 import type { Component } from 'vue';
 import {
@@ -41,7 +41,7 @@ const router = useRouter();
 const message = useMessage();
 const datas = reactive({
   loading: false,
-  projectValue: '',
+  projectValue: 0,
 });
 const mainhtml = document.getElementsByTagName('html');
 const btnLabel = ref('深色');
@@ -231,7 +231,7 @@ onMounted(() => {
 
    const projectData = projectStorage.getProject()
   if (projectData) {
-    datas.projectValue = String(projectData.id);
+    datas.projectValue = projectData?.id ?? 0
   }
 });
 
@@ -259,7 +259,7 @@ defineExpose({
           <img src="../assets/seldom-platform.gif" style="height: 40px" />
         </span>
         <span style="float: right;">
-          <n-tag type="success"> 项目管理 </n-tag>
+          <n-tag type="warning"> 项目管理 </n-tag>
         </span>
       </div>
       <n-form inline :model="model" label-placement="left">
