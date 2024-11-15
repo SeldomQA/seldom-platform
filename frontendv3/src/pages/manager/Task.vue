@@ -5,8 +5,8 @@ import {
   NIcon,
   useMessage,
   useDialog,
-  SelectOption,
   NSpace,
+  type ModalProps
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import { SearchOutline } from "@vicons/ionicons5";
@@ -16,10 +16,11 @@ import TaskReport from "@/TaskReport.vue";
 import TaskModal from "@/TaskModal.vue";
 import projectStorage from '~/store/index';
 
-
-const projectId = ref<string>("");
-
-type RowData = {
+// 类型定义
+/**
+ * 任务数据行类型
+ */
+interface TaskRow {
   id: number;
   name: string;
   env: string;
@@ -27,13 +28,134 @@ type RowData = {
   execute_count: number;
   status: number;
   create_time: string;
-};
+}
 
+/**
+ * 查询参数类型
+ */
+interface QueryParams {
+  page: number;
+  size: number;
+  project_id: string;
+  team_id: string | null;
+  name: string | null;
+}
+
+/**
+ * 页面数据状态类型
+ */
+interface PageState {
+  loading: boolean;
+  projectId: string;
+  caseNumber: number;
+  tableData: TaskRow[];
+  teamIdSelected: string;
+  tid: number;
+  total: number;
+  query: QueryParams;
+  taskFlag: boolean;
+}
+
+/**
+ * 模态框数据类型
+ */
+interface ModalState {
+  type?: number;
+  taskId?: number;
+  title: string;
+}
+
+/**
+ * 团队选项类型
+ */
+interface TeamOption {
+  value: string;
+  label: string;
+}
+
+/**
+ * 团队模型类型
+ */
+interface TeamModel {
+  teamOptions: TeamOption[];
+  envOptions: never[];
+}
+
+/**
+ * 团队数据类型
+ */
+interface TeamData {
+  id: string;
+  name: string;
+}
+
+/**
+ * 模态框配置类型
+ */
+interface ModalConfig {
+  segmented: ModalProps['segmented']
+}
+
+// 全局状态和工具
+const message = useMessage();
+const dialog = useDialog();
+
+// 响应式状态
+const projectId = ref<string>("");
+const showModalTask = ref(false);
+
+const model = ref<TeamModel>({
+  teamOptions: [],
+  envOptions: [],
+});
+
+/**
+ * 页面主数据状态
+ */
+const datas = reactive<PageState>({
+  loading: true,
+  projectId: "",
+  caseNumber: 0,
+  tableData: [],
+  teamIdSelected: "",
+  tid: 0,
+  total: 0,
+  query: {
+    page: 1,
+    size: 5,
+    project_id: "",
+    team_id: null,
+    name: null,
+  },
+  taskFlag: true,
+});
+
+/**
+ * 模态框数据状态
+ */
+const modalDatas = reactive<ModalState>({
+  title: "",
+  type: 1,
+});
+
+/**
+ * 模态框配置
+ */
+const modalConfig = reactive<ModalConfig>({
+  segmented: {
+    content: 'soft',
+    footer: 'soft'
+  }
+});
+
+/**
+ * 创建表格列配置
+ */
 const createColumns = ({
   play,
 }: {
-  play: (row: RowData, action: String) => void;
-}): DataTableColumns<RowData> => {
+  play: (row: TaskRow, action: string) => void;
+}): DataTableColumns<TaskRow> => {
   return [
     {
       title: "ID",
@@ -145,180 +267,158 @@ const createColumns = ({
   ];
 };
 
-
-const datas = reactive({
-  loading: true,
-  projectId: "",
-  caseNumber: 0,
-  tableData: [],
-  teamIdSelected: "",
-  tid: 0,
-  total: 0,
-  query: {
-    page: 1,
-    size: 5,
-    project_id: "",
-    team_id: null,
-    name: null,
-  },
-  taskFlag: true,
-});
-
-type ModalDatas = {
-  type?: number;
-  taskId?: number;
-  title: string;
-};
-
-const modalDatas = reactive<ModalDatas>({
-  title: "",
-  type: 1,
-});
-
-const message = useMessage();
-const dialog = useDialog();
-
-type TteamOptions = {
-  value: string;
-  label: string;
-};
-type TteamModel = {
-  teamOptions: TteamOptions[];
-  envOptions: [];
-};
-
-const model = ref<TteamModel>({
-  teamOptions: [],
-  envOptions: [],
-});
-
-// 初始化获取团队列表
+// API 方法
+/**
+ * 初始化团队列表
+ */
 const initTeamList = async () => {
-  const resp = await TeamApi.getTeamAll();
-  if (resp.success === true) {
-    for (let i = 0; i < resp.result.length; i++) {
-      model.value.teamOptions.push({
-        value: resp.result[i].id,
-        label: resp.result[i].name,
-      });
+  try {
+    const resp = await TeamApi.getTeamAll();
+    if (resp.success) {
+      model.value.teamOptions = resp.result.map((item: TeamData) => ({
+        value: item.id,
+        label: item.name,
+      }));
+    } else {
+      message.error(resp.error.message);
     }
-  } else {
-    message.error(resp.error.message);
+  } catch (error) {
+    message.error('获取团队列表失败');
+    console.error(error);
   }
 };
 
-const changeTeam = (value: string, option: SelectOption) => {
-  datas.teamIdSelected = value;
-};
-
-// 初始化任务例表
+/**
+ * 初始化任务列表
+ */
 const initTaskList = async () => {
-
-    datas.query.project_id = projectId.value
-
+  try {
+    datas.query.project_id = projectId.value;
     datas.loading = true;
+    
     const resp = await TaskApi.getTaskAll(datas.query);
-    if (resp.success === true) {
+    if (resp.success) {
       datas.tableData = resp.result;
       datas.total = resp.total;
     } else {
       message.error(resp.error.message);
     }
+  } catch (error) {
+    message.error('获取任务列表失败');
+    console.error(error);
+  } finally {
     datas.loading = false;
-  };
-
-// 新增编辑任务modal
-const showModalTask = ref(false);
-
-const openModalTask = (type: number) => {
-  if (projectId.value == "") {
-    message.warning("请选择项目");
-  } else {
-    switch (type) {
-      case 1:
-        modalDatas.title = "新增任务";
-        modalDatas.type = 1;
-        datas.tid = 0;
-        break;
-      case 2:
-        modalDatas.title = "编辑任务";
-        modalDatas.type = 2;
-        break;
-    }
-    showModalTask.value = true;
   }
 };
 
-const segmented = {
-  content: "soft",
-  footer: "soft",
+// 事件处理方法
+/**
+ * 处理团队选择变更
+ */
+const changeTeam = (value: string) => {
+  datas.teamIdSelected = value;
 };
 
-// 删除任务
-const deleteTask = (row: RowData) => {
+/**
+ * 打开任务模态框
+ */
+const openModalTask = (type: number) => {
+  if (!projectId.value) {
+    message.warning("请选择项目");
+    return;
+  }
+
+  modalDatas.type = type;
+  modalDatas.title = type === 1 ? "新增任务" : "编辑任务";
+  datas.tid = type === 1 ? 0 : datas.tid;
+  showModalTask.value = true;
+};
+
+/**
+ * 删除任务
+ */
+const deleteTask = async (row: TaskRow) => {
   dialog.warning({
     title: "警告",
     content: "检查是否有正在运行的定时任务，确定删除?",
     positiveText: "确定",
     negativeText: "不确定",
-    onPositiveClick: () => {
-      TaskApi.deleteTask(row.id.toString()).then((resp: any) => {
-        if (resp.success === true) {
-          initTaskList();
+    onPositiveClick: async () => {
+      try {
+        const resp = await TaskApi.deleteTask(row.id.toString());
+        if (resp.success) {
+          await initTaskList();
           message.success("删除任务成功！");
         } else {
           message.error(resp.error.message);
         }
-      });
-    },
-    onNegativeClick: () => {
-      message.error("不确定");
+      } catch (error) {
+        message.error('删除任务失败');
+        console.error(error);
+      }
     },
   });
 };
 
-// 运行任务
-const runTask = async (row: RowData) => {
-  const resp = await TaskApi.runningTask(row.id.toString());
-  if (resp.success === true) {
-    message.success("开始运行！");
-    initTaskList();
-  } else {
-    message.error(resp.error.message);
+/**
+ * 运行任务
+ */
+const runTask = async (row: TaskRow) => {
+  try {
+    const resp = await TaskApi.runningTask(row.id.toString());
+    if (resp.success) {
+      message.success("开始运行！");
+      await initTaskList();
+    } else {
+      message.error(resp.error.message);
+    }
+  } catch (error) {
+    message.error('运行任务失败');
+    console.error(error);
   }
 };
 
-// 显示任务报告列表
-const clickTaskName = (row: RowData) => {
+/**
+ * 显示任务报告
+ */
+const clickTaskName = (row: TaskRow) => {
   datas.tid = row.id;
   datas.taskFlag = false;
 };
 
-// 返回任务列表
+/**
+ * 返回任务列表
+ */
 const goBack = () => {
   datas.taskFlag = true;
 };
 
-// 翻页（改变页数）
-const pageChange = (page: any) => {
-  datas.query.page = page
-  initTaskList()
-}
-
-const closeModal = () => {
-  showModalTask.value = false;
+/**
+ * 处理分页变化
+ */
+const pageChange = (page: number) => {
+  datas.query.page = page;
   initTaskList();
 };
 
+/**
+ * 关闭模态框
+ */
+const closeModal = async () => {
+  showModalTask.value = false;
+  await initTaskList();
+};
+
+// 表格配置
 const columns = createColumns({
-  play(row: RowData, action: String) {
+  play(row: TaskRow, action: string) {
     switch (action) {
       case "run":
         runTask(row);
         break;
       case "edit":
-        openModalTask(2);
         datas.tid = row.id;
+        openModalTask(2);
         break;
       case "delete":
         deleteTask(row);
@@ -332,13 +432,13 @@ const columns = createColumns({
 
 const pagination = false;
 
-onMounted(() => {
-  const projectData = projectStorage.getProject()
+// 生命周期钩子
+onMounted(async () => {
+  const projectData = projectStorage.getProject();
   if (projectData) {
     projectId.value = String(projectData.id);
   }
-  initTeamList();
-  initTaskList();
+  await Promise.all([initTeamList(), initTaskList()]);
 });
 </script>
 
@@ -415,7 +515,7 @@ onMounted(() => {
         :title="modalDatas.title"
         size="huge"
         :bordered="false"
-        :segmented="segmented"
+        :segmented="modalConfig.segmented"
       >
         <TaskModal
           :type="modalDatas.type"
