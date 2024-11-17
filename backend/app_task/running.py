@@ -2,21 +2,17 @@ import time
 from xml.dom.minidom import parse
 
 from seldom import (
-    SMTP,
-    Seldom,
-    TestMainExtend
+    SMTP
 )
 from seldom.logging import log
 from seldom.utils import file
-from selenium.webdriver import ChromeOptions
-from selenium.webdriver import EdgeOptions
-from selenium.webdriver import FirefoxOptions
 
 from app_project.models import Env
 from app_task.models import TestTask, TaskReport, ReportDetails
 from app_team.models import Team
 from app_utils import background
 from app_utils.email_utila import send_email_config
+from app_utils.running_utils import configure_test_runner
 from backend.config import EmailConfig
 from backend.settings import REPORT_DIR
 
@@ -40,44 +36,9 @@ def seldom_running(test_dir, case_info, report_name, task_id):
 
     # 环境判断
     env = Env.objects.get(id=task.env_id)
-    browser_conf = None
-    if env.browser != "":
-        browser_type = env.browser
-        browser_conf = {}
-        if env.remote != "" and env.remote is not None:
-            browser_conf["command_executor"] = env.remote
-        # 设置浏览器headless模式
-        if browser_type in ["gc", "chrome"]:
-            chrome_options = ChromeOptions()
-            chrome_options.add_argument("--headless=new")
-            browser_conf["browser"] = "chrome"
-            browser_conf["options"] = chrome_options
-        elif browser_type in ["ff", "firefox"]:
-            firefox_options = FirefoxOptions()
-            firefox_options.add_argument("-headless")
-            browser_conf["browser"] = "firefox"
-            browser_conf["options"] = firefox_options
-        elif browser_type in ["edge"]:
-            edge_options = EdgeOptions()
-            edge_options.add_argument("--headless=new")
-            browser_conf["browser"] = "edge"
-            browser_conf["options"] = edge_options
 
-    if env.env == "":
-        Seldom.env = None
-    else:
-        Seldom.env = env.env
-    if env.base_url == "":
-        base_url = None
-    else:
-        base_url = env.base_url
-
-    # 1. 直接执行
-    main_extend = TestMainExtend(path=test_dir, report=report_name, rerun=env.rerun)
-    if env.test_type == "http":
-        main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url, rerun=env.rerun)
-    elif env.test_type == "web":
-        main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser_conf, rerun=env.rerun)
+    # 使用工具函数配置运行器
+    main_extend = configure_test_runner(env, test_dir, report_name)
     main_extend.run_cases(case_info)
     time.sleep(2)
 
