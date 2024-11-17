@@ -2,6 +2,8 @@
 import ProjectApi from "~/request/project";
 import { ref, onMounted, reactive } from "vue";
 import { StepsProps, useMessage } from "naive-ui";
+import projectStorage from '~/store/index';
+
 
 const datas = reactive({
   addCase: [],
@@ -19,11 +21,12 @@ const currentStatus = ref<StepsProps["status"]>("process");
 
 const loading = ref(false);
 
+const projectId = ref<string>("");
 
 // 1.拉取代码
 const syncCode = async () => {
   loading.value = true;
-  const resp = await ProjectApi.syncCode(sessionStorage.projectId.toString());
+  const resp = await ProjectApi.syncCode(projectId.value);
   if (resp.success === true) {
     currentStatus.value = "finish";
     next();
@@ -39,7 +42,7 @@ const syncCode = async () => {
 
 // 2. 同步用例
 const syncCase = async () => {
-  const resp = await ProjectApi.syncCase(sessionStorage.projectId.toString());
+  const resp = await ProjectApi.syncCase(projectId.value);
   if (resp.success === true) {
     currentStatus.value = "finish";
     next();
@@ -55,7 +58,7 @@ const syncCase = async () => {
 
 // 3. 同步结果
 const syncResult = async () => {
-  const resp = await ProjectApi.syncResult(sessionStorage.projectId.toString());
+  const resp = await ProjectApi.syncResult(projectId.value);
   if (resp.success === true) {
     datas.addCase = resp.result.add_case;
     datas.delCase = resp.result.del_case;
@@ -75,7 +78,7 @@ const syncResult = async () => {
 // 4.合并用例
 const mergeCase = async () => {
   const resp = await ProjectApi.syncMerge(
-    sessionStorage.projectId,
+    projectId.value,
     datas.req
   );
   if (resp.success === true) {
@@ -114,15 +117,19 @@ const next = () => {
 };
 
 
-
 // 关闭dialog
 const emit = defineEmits(["cancel"]);
 const cancelDialog = () => {
   emit("cancel", {});
 };
 
+
 onMounted(() => {
   datas.stepButton = "拉取"
+  const projectData = projectStorage.getProject()
+  if (projectData) {
+    projectId.value = String(projectData.id);
+  }
 });
 
 </script>
@@ -136,7 +143,6 @@ onMounted(() => {
         <n-step title="查找结果" description="" />
         <n-step title="合并结果" description="" />
       </n-steps>
-
       <div style="margin-top: 20px;">
         <n-space>
           <n-card title="新增用例" size="small" class="add-case-list">

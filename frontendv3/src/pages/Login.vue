@@ -99,7 +99,7 @@ const submitLogin = () => {
     if (resp.success === true) {
       sessionStorage.token = resp.result.token;
       sessionStorage.user = resp.result.username;
-      router.push({ path: "/main/project" });
+      router.push({ path: "/center/project" });
       message.success("登陆成功！");
     } else {
       message.error(resp.error.message);
@@ -137,7 +137,7 @@ const handlePasswordInput = () => {
     <header>
       <div class="features">
         <div>
-          <h1>Seldom Platform.</h1>
+          <h1>Seldom Platform. <n-tag type="success" size="small" round>v2.0</n-tag></h1>
           <span style="color: #869ab8">基于Seldom框架的自动化测试平台.</span>
         </div>
         <div>
@@ -173,10 +173,14 @@ const handlePasswordInput = () => {
             借助于平台的能力，可以方便的管理用例的执行、创建定时任务、展示统计结果。
           </p>
         </div>
-        <n-divider>帮助</n-divider>
+        <n-divider>相关项目</n-divider>
         <div>
+          <span>@2024 Powered by SeldomQA Team</span>
+           <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
+            <n-button type="primary" quaternary>seldom</n-button>
+          </a>
           <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
-            <n-button type="primary" quaternary>GitHub</n-button>
+            <n-button type="primary" quaternary>seldom-platform</n-button>
           </a>
           <a href="https://seldomqa.github.io/" target="_blank">
             <n-button type="info" quaternary>在线文档</n-button>

@@ -6,7 +6,6 @@ import {
   NIcon,
   useMessage,
   TreeOption,
-  SelectOption,
   NSpace,
   NButton,
 } from "naive-ui";
@@ -15,16 +14,95 @@ import { FolderOpenOutline, LogoPython, Refresh } from "@vicons/ionicons5";
 import CaseResult from "@/CaseResult.vue";
 import CaseSync from "@/CaseSync.vue";
 import CaseSyncLog from "@/CaseSyncLog.vue";
+import projectStorage from '~/store/index';
+import type { VNode } from 'vue';
 
-type RowData = {
+/**
+ * 树节点类型定义,继承 TreeOption 以兼容 naive-ui
+ */
+interface TtreeNode extends TreeOption {
+  children?: TtreeNode[];
+  full_name: string;
+  isLeaf: boolean;
+  label: string;
+  prefix?: () => VNode;
+}
+
+/**
+ * 用例数据行类型定义
+ */
+interface RowData {
   id: number;
   class_name: string;
   class_doc: string;
   case_name: string;
   case_doc: string;
   status: number;
-};
+}
 
+/**
+ * 环境选项类型定义
+ */
+interface TEnvModel {
+  envOptions: Array<{ value: string; label: string }>;
+}
+
+/**
+ * 页面主要数据状态接口
+ */
+interface PageData {
+  loading: boolean;
+  projectId: string;
+  fileData: TtreeNode[];
+  caseData: RowData[];
+  caseNumber: number;
+  defaultProps: {
+    children: string;
+    label: string;
+  };
+  env: string | null;
+  selectedCase: Record<string, any>;
+  syncCaseDialog: boolean;
+  syncLogDialog: boolean;
+  cid: number;
+}
+
+// 全局消息提示
+const message = useMessage();
+
+// 响应式状态
+const showModal = ref(false);
+const selectedTreeNode = ref<TtreeNode>();
+const caseSync = ref();
+const model = ref<TEnvModel>({
+  envOptions: [],
+});
+
+/**
+ * 页面主要数据状态
+ */
+const datas = reactive<PageData>({
+  loading: true,
+  projectId: "",
+  fileData: [],
+  caseData: [],
+  caseNumber: 0,
+  defaultProps: {
+    children: "children",
+    label: "label",
+  },
+  env: null,
+  selectedCase: {},
+  syncCaseDialog: false,
+  syncLogDialog: false,
+  cid: 0,
+});
+
+/**
+ * 创建表格列配置
+ * @param caseAction 用例操作回调函数
+ * @returns DataTableColumns 表格列配置
+ */
 const createColumns = ({
   caseAction,
 }: {
@@ -105,52 +183,34 @@ const createColumns = ({
   ];
 };
 
-const datas = reactive({
-  loading: true,
-  projectId: "",
-  fileData: [],
-  caseData: [],
-  caseNumber: 0,
-  defaultProps: {
-    children: "children",
-    label: "label",
-  },
-  env: null,
-  selectedCase: {},
-  syncCaseDialog: false,
-  syncLogDialog: false,
-  cid: 0,
-});
+// 在 createColumns 定义之后再定义 columns
+const columns = ref<DataTableColumns<RowData>>(
+  createColumns({
+    caseAction(row: RowData, action: String) {
+      switch (action) {
+        case "run":
+          runCase(row);
+          break;
+        case "report":
+          openReport(row);
+          break;
+      }
+    },
+  })
+);
 
-const selectedTreeNode = ref<TtreeNode>();
+const pagination = ref(false);
 
-const message = useMessage();
-
-type TEnvModel = {
-  envOptions: { value: string; label: string }[];
-};
-
-const model = ref<TEnvModel>({
-  envOptions: [],
-});
-
-// 初始化项目文件列表
-const initProjectFile = async () => {
-  const resp = await ProjectApi.getProjectTree(sessionStorage.projectId);
-  if (resp.success === true) {
-    datas.fileData = treeDataFormat(resp.result.files);
-    datas.caseNumber = resp.result.case_number;
-  } else {
-    message.error(resp.error.message);
-  }
-};
-
-// 格式化tree数据
-const treeDataFormat = (datas: any) => {
-  return datas.map((_: any, index: number) => {
+/**
+ * 格式化树形数据
+ * @param datas 原始数据
+ * @returns 格式化后的树形数据
+ */
+const treeDataFormat = (datas: any): TtreeNode[] => {
+  return datas.map((_: any) => {
     const label = _.label;
     const full_name = _.full_name;
-    const children = _.children;
+    const children = _.children || [];
     const isLeaf = _.is_leaf ? true : false;
     const prefix = () =>
       h(NIcon, null, {
@@ -162,11 +222,31 @@ const treeDataFormat = (datas: any) => {
       children,
       isLeaf,
       prefix,
-    };
+    } as TtreeNode;
   });
 };
 
-// 初始化环境列表
+/**
+ * 初始化项目文件树
+ */
+const initProjectFile = async () => {
+  const projectData = projectStorage.getProject()
+  if (projectData) {
+    const projectId = String(projectData.id)
+    const resp = await ProjectApi.getProjectTree(projectId);
+    if (resp.success === true) {
+      datas.fileData = treeDataFormat(resp.result.files);
+      datas.caseNumber = resp.result.case_number;
+    } else {
+      message.error(resp.error.message);
+    }
+  }
+
+};
+
+/**
+ * 初始化环境列表
+ */
 const initEnvsList = async () => {
   datas.loading = true;
   const resp = await ProjectApi.getEnvs();
@@ -183,155 +263,162 @@ const initEnvsList = async () => {
   datas.loading = false;
 };
 
-type TtreeNode = {
-  children?: TtreeNode[];
-  full_name: string;
-  isLeaf: boolean;
-  label: string;
-};
-
-// 点击项目文件
-const handleNodeClick = (data: any) => {
+/**
+ * 处理树节点点击事件
+ * @param data 被点击的节点数据
+ */
+const handleNodeClick = async (data: TtreeNode) => {
   selectedTreeNode.value = data;
-  // 如果是文件返回 类&方法
-  if (data.label.match(".py")) {
-    ProjectApi.getProjectCases(datas.projectId, data.full_name).then(
-      (resp: any) => {
-        if (resp.success === true) {
-          datas.caseData = resp.result;
-        } else {
-          message.error(resp.error.message);
-        }
-      }
-    );
-  } else {
-    // 如果目录返回下一级 目录&文件
-    if (data.children.length > 0) {
-      // 下一级不为空，直接返回
-      return;
-    }
-    ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name).then(
-      (resp: any) => {
-        if (resp.success === true) {
-          data.children = treeDataFormat(resp.result);
-          // datas.caseData = resp.result
-          // datas.initProject()
-        } else {
-          message.error(resp.error.message);
-        }
-      }
-    );
-  }
-};
-
-// 显示同步用例弹窗
-const showSync = () => {
-  if (datas.projectId === "" || datas.projectId === undefined) {
-    message.warning("请选择项目！");
-    return
-  }
-  datas.syncCaseDialog = true;
-};
-
-// 同步用例（错误）日志
-const showLog = () => {
-  if (datas.projectId === "" || datas.projectId === undefined) {
-    message.warning("请选择项目");
-    return
-  }
-  datas.syncLogDialog = true;
-};
-
-const caseSync = ref();
-
-const changeEnv = (value: string, option: SelectOption) => {
-  datas.env = value;
-};
-
-// 运行用例
-const runCase = async (row: RowData) => {
-  if (datas.env === null) {
-    message.warning("请选择执行环境");
-  } else {
-    const resp = await CaseApi.runningCase(row.id.toString(), {
-      env: datas.env,
-    });
-    if (resp.success === true) {
-      message.success("开始执行");
-    } else {
-      message.error(resp.error.message);
-    }
-  }
-};
-
-// 刷新用例（状态）
-const refreshCase = () => {
-  if (selectedTreeNode.value == null || selectedTreeNode == undefined) {
-    message.warning("请选择左侧树节点用例文件");
-  } else {
-    ProjectApi.getProjectCases(
-      datas.projectId,
-      selectedTreeNode.value.full_name
-    ).then((resp: any) => {
-      if (resp.success === true) {
-        message.success("刷新成功");
+  try {
+    if (data.label.match(".py")) {
+      const resp = await ProjectApi.getProjectCases(datas.projectId, data.full_name);
+      if (resp.success) {
         datas.caseData = resp.result;
       } else {
         message.error(resp.error.message);
       }
-    });
+    } else {
+      // 处理目录节点
+      const children = data.children || [];
+      if (children.length === 0) {
+        const resp = await ProjectApi.getProjectSubdirectory(datas.projectId, data.full_name);
+        if (resp.success) {
+          data.children = treeDataFormat(resp.result);
+        } else {
+          message.error(resp.error.message);
+        }
+      }
+    }
+  } catch (error) {
+    message.error('操作失败');
+    console.error(error);
   }
 };
 
-// 打开报告
+/**
+ * 配置树节点属性
+ */
+const nodeProps = ({ option }: { option: TreeOption }) => ({
+  onClick() {
+    handleNodeClick(option as TtreeNode);
+  },
+});
+
+/**
+ * 处理环境切换事件
+ */
+const changeEnv = (value: string) => {
+  datas.env = value as null | string;
+};
+
+/**
+ * 运行用例
+ * @param row 用例数据
+ */
+const runCase = async (row: RowData) => {
+  if (!datas.env) {
+    message.warning("请选择执行环境");
+    return;
+  }
+  
+  try {
+    const resp = await CaseApi.runningCase(row.id.toString(), {
+      env: datas.env,
+    });
+    if (resp.success) {
+      message.success("开始执行");
+    } else {
+      message.error(resp.error.message);
+    }
+  } catch (error) {
+    message.error('执行失败');
+    console.error(error);
+  }
+};
+
+/**
+ * 刷新用例列表
+ */
+const refreshCase = async () => {
+  if (!selectedTreeNode.value) {
+    message.warning("请选择左侧树节点用例文件");
+    return;
+  }
+
+  try {
+    const resp = await ProjectApi.getProjectCases(
+      datas.projectId,
+      selectedTreeNode.value.full_name
+    );
+    if (resp.success) {
+      message.success("刷新成功");
+      datas.caseData = resp.result;
+    } else {
+      message.error(resp.error.message);
+    }
+  } catch (error) {
+    message.error('刷新失败');
+    console.error(error);
+  }
+};
+
+/**
+ * 打开用例报告
+ * @param row 用例数据
+ */
 const openReport = (row: RowData) => {
-  console.log('row', row.status)
   if (row.status === 0) {
-    message.warning("请先执行用例！")
-    return
-  } else if (row.status === 1) {
-    message.warning("正在执行用例！")
-    return
+    message.warning("请先执行用例！");
+    return;
+  } 
+  if (row.status === 1) {
+    message.warning("正在执行用例！");
+    return;
   }
   datas.selectedCase = row;
   datas.cid = row.id;
   showModal.value = true;
 };
 
-const showModal = ref(false);
-
-const columns = createColumns({
-  caseAction(row: RowData, action: String) {
-    switch (action) {
-      case "run":
-        runCase(row);
-        break;
-      case "report":
-        openReport(row);
-        break;
-    }
-  },
-});
-const pagination = false;
-
-const nodeProps = ({ option }: { option: TreeOption }) => {
-  return {
-    onClick() {
-      handleNodeClick(option);
-    },
-  };
+/**
+ * 显示同步用例弹窗
+ */
+const showSync = () => {
+  if (!datas.projectId) {
+    message.warning("请选择项目！");
+    return;
+  }
+  datas.syncCaseDialog = true;
 };
 
-// 关闭弹窗回调
+/**
+ * 显示同步日志弹窗
+ */
+const showLog = () => {
+  if (!datas.projectId) {
+    message.warning("请选择项目");
+    return;
+  }
+  datas.syncLogDialog = true;
+};
+
+/**
+ * 关闭同步用例弹窗回调
+ */
 const cancelDialog = () => {
   datas.syncCaseDialog = false;
   initProjectFile();
 };
 
+// 生命周期钩子
 onMounted(() => {
   initEnvsList();
   initProjectFile();
-  datas.projectId = sessionStorage.projectId;
+
+  const projectData = projectStorage.getProject()
+  if (projectData) {
+    datas.projectId = String(projectData.id);
+  }
 });
 </script>
 
@@ -341,7 +428,7 @@ onMounted(() => {
       <n-space justify="space-between" class="breadcrumb-navigation">
         <span>用例管理</span>
         <n-breadcrumb separator=">">
-          <n-breadcrumb-item>首页</n-breadcrumb-item>
+          <n-breadcrumb-item>项目管理</n-breadcrumb-item>
           <n-breadcrumb-item>用例管理</n-breadcrumb-item>
         </n-breadcrumb>
       </n-space>
@@ -404,7 +491,6 @@ onMounted(() => {
       </div>
     </n-card>
 
-    <!-- 同步用例弹窗 -->
     <n-modal v-model:show="datas.syncCaseDialog">
       <n-card
         title="同步用例"
@@ -415,7 +501,6 @@ onMounted(() => {
       </n-card>
     </n-modal>
 
-    <!-- 同步日志弹窗 -->
     <n-modal v-model:show="datas.syncLogDialog">
       <n-card
         title="同步日志"
@@ -429,7 +514,6 @@ onMounted(() => {
       </n-card>
     </n-modal>
 
-    <!-- 查看用例运行结果弹窗 -->
     <n-modal v-model:show="showModal">
       <n-card
         title="执行结果"
