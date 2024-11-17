@@ -327,6 +327,7 @@ const runCase = async (row: RowData) => {
     });
     if (resp.success) {
       message.success("开始执行");
+      row.status = 1
     } else {
       message.error(resp.error.message);
     }
