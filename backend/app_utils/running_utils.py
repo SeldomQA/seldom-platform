@@ -1,5 +1,7 @@
-from selenium.webdriver import ChromeOptions, FirefoxOptions, EdgeOptions
 from seldom import Seldom, TestMainExtend
+from seldom.utils import cache
+from selenium.webdriver import ChromeOptions, FirefoxOptions, EdgeOptions
+
 from app_project.models import Env
 
 
@@ -46,10 +48,13 @@ def configure_test_runner(env: Env, test_dir: str, report_name: str):
     base_url = env.base_url if env.base_url != "" else None
     browser_conf = configure_browser(env)
 
+    # running pre -  is clear all cache
+    if env.is_clear_cache:
+        cache.clear()
     main_extend = TestMainExtend(path=test_dir, report=report_name, rerun=env.rerun)
     if env.test_type == "http":
         main_extend = TestMainExtend(path=test_dir, report=report_name, base_url=base_url, rerun=env.rerun)
     elif env.test_type == "web":
         main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser_conf, rerun=env.rerun)
-    
-    return main_extend 
+
+    return main_extend
