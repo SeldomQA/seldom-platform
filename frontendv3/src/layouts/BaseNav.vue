@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import type { MenuOption } from "naive-ui";
 import { useMessage, NIcon } from 'naive-ui';
 import {
-  DocumentText as DocuIcon,
+  LogoGithub as GitHubIcon,
   LogOutOutline as LogoutIcon,
   PersonCircle as PersonIcon,
 } from '@vicons/ionicons5';
@@ -31,9 +31,9 @@ const token = ref<string | null>('');
 
 const personOptions = [
   {
-    label: '操作手册',
+    label: 'GitHub',
     key: 'help_documentation',
-    icon: () => h(NIcon, null, { default: () => h(DocuIcon) }),
+    icon: () => h(NIcon, null, { default: () => h(GitHubIcon) }),
   },
   {
     label: '退出登录',
