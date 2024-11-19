@@ -421,6 +421,16 @@ onMounted(() => {
     datas.projectId = String(projectData.id);
   }
 });
+
+// 添加模态框样式配置
+const modalStyle = {
+  width: '85%'
+};
+
+const segmented = {
+  content: true,
+  footer: 'soft'
+};
 </script>
 
 <template>
@@ -492,40 +502,41 @@ onMounted(() => {
       </div>
     </n-card>
 
-    <n-modal v-model:show="datas.syncCaseDialog">
-      <n-card
-        title="同步用例"
-        style="width:800px"
-        role="dialog"
-      >
-        <CaseSync ref="caseSync"  @cancel="cancelDialog"/>
-      </n-card>
+    <!-- 同步用例弹窗 -->
+    <n-modal
+      v-model:show="datas.syncCaseDialog"
+      preset="card"
+      style="width: 800px"
+      title="同步用例"
+      :segmented="segmented"
+    >
+      <CaseSync ref="caseSync" @cancel="cancelDialog"/>
     </n-modal>
 
-    <n-modal v-model:show="datas.syncLogDialog">
-      <n-card
-        title="同步日志"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-        style="width: 85%"
-      >
-        <CaseSyncLog/>
-      </n-card>
+    <!-- 同步日志弹窗 -->
+    <n-modal
+      v-model:show="datas.syncLogDialog"
+      preset="card"
+      :style="modalStyle"
+      title="同步日志"
+      size="huge"
+      :bordered="false"
+      :segmented="segmented"
+    >
+      <CaseSyncLog />
     </n-modal>
 
-    <n-modal v-model:show="showModal">
-      <n-card
-        title="执行结果"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-        style="width: 85%"
-      >
-        <CaseResult :caseid="datas.cid" />
-      </n-card>
+    <!-- 执行结果弹窗 -->
+    <n-modal
+      v-model:show="showModal"
+      preset="card"
+      :style="modalStyle"
+      title="执行结果"
+      size="huge"
+      :bordered="false"
+      :segmented="segmented"
+    >
+      <CaseResult :caseid="datas.cid" />
     </n-modal>
 
   </div>

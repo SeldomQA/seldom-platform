@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import { useMessage } from "naive-ui";
 import { ref, onMounted } from "vue";
+import { useMessage } from "naive-ui";
 import CaseApi from "~/request/case";
 
-const props = defineProps({
-  caseid: { type: Number, required: true },
-});
-
-const message = useMessage();
-
+// 类型定义
 type TResult = {
   name: string;
   create_time: string;
@@ -16,33 +11,54 @@ type TResult = {
   system_out: string;
 };
 
+// 组件属性定义
+const props = defineProps({
+  caseid: { 
+    type: Number, 
+    required: true 
+  },
+});
+
+// 状态管理
+const message = useMessage();
 const result = ref<TResult>({
   name: "",
   create_time: "",
   run_time: "",
-  system_out: "",
+  system_out: "暂无运行日志" // 默认显示文本
 });
 
+/**
+ * 获取用例执行结果
+ * 包含报告名称、创建时间、运行时长和运行日志
+ */
 const getResult = async () => {
-  await CaseApi.getCaseResult(props.caseid.toString()).then((resp: any) => {
-    if (resp.success === true) {
+  try {
+    const resp = await CaseApi.getCaseResult(props.caseid.toString());
+    if (resp.success && resp.result) {
       result.value = resp.result;
-    } else {
-      message.error(resp.error.message);
     }
-  });
+  } catch (error) {
+    message.error('获取执行结果失败');
+    console.error(error);
+  }
 };
 
+// 生命周期钩子
 onMounted(() => {
   getResult();
 });
 </script>
 
 <template>
-  <div>
-    <n-descriptions label-placement="left">
-      <n-descriptions-item label="报告名称"
-        >{{ result.name }}
+  <div class="case-result">
+    <!-- 结果描述部分 -->
+    <n-descriptions 
+      label-placement="left"
+      class="result-info"
+    >
+      <n-descriptions-item label="报告名称">
+        {{ result.name }}
       </n-descriptions-item>
       <n-descriptions-item label="创建时间">
         {{ result.create_time }}
@@ -51,17 +67,32 @@ onMounted(() => {
         {{ result.run_time }}
       </n-descriptions-item>
     </n-descriptions>
+
+    <!-- 日志部分 -->
     <n-divider title-placement="left">运行日志</n-divider>
-    <textarea class="log-style" rows="34">
-      {{ result.system_out }}
-    </textarea>
+    <textarea 
+      class="log-style" 
+      rows="34"
+      readonly
+    >{{ result.system_out }}</textarea>
   </div>
 </template>
 
 <style scoped>
+.case-result {
+  width: 100%;
+}
+
+.result-info {
+  margin-bottom: 16px;
+}
+
 .log-style {
   width: 100%;
   border-color: gray;
-  background-color:rgb(251, 249, 246);
+  background-color: rgb(251, 249, 246);
+  padding: 12px;
+  font-family: monospace;
+  resize: none;
 }
 </style>
