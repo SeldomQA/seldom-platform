@@ -477,6 +477,7 @@ def create_env(request, env: EnvIn):
         test_type=env.test_type,
         env=env.env,
         rerun=env.rerun,
+        is_clear_cache=env.is_clear_cache,
         browser=env.browser,
         base_url=env.base_url,
         remote=env.remote,
@@ -537,6 +538,7 @@ def update_env(request, env_id: int, env: EnvIn):
         env_obj.test_type = env.test_type
         env_obj.env = env.env
         env_obj.rerun = env.rerun
+        env_obj.is_clear_cache = env.is_clear_cache
         env_obj.browser = env.browser
         env_obj.base_url = env.base_url
         env_obj.remote = env.remote

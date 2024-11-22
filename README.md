@@ -30,6 +30,14 @@
 
 ## ToDo
 
+* 支持测试类型：
+
+| 功能      |  进度 |
+| --------- | ---- |
+| API       | ✔️    |
+| Web UI    | ✔️    |
+| App UI    | ❌    |
+
 * 功能：
 
 | 功能      | 子模块   | 进度 |
@@ -40,15 +48,16 @@
 | -         | 团队配置 | ✔️    |
 | 项目管理  | 用例管理 | ✔️    |
 | -         | 任务管理 | ✔️    |
-| 定时任务  | ..       |      |
+| 定时任务  | ..       | 开发中..     |
 
 ## Project
 
 | 项目         | 说明                               | 文档                           |
 | ------------ | ---------------------------------- | ------------------------------ |
-| backend      | 后端: django + django-ninjia       | [link](./backend/README.md)    |
-| ~~frontend~~ | 前端：vue2 + element-ui (不再维护) | [link](./frontend/README.md)   |
-| frontendv3   | 前端：vue3 + naive-ui (推荐)       | [link](./frontendv3/README.md) |
+| backend      | 后端: django + django-ninjia        | [link](./backend/README.md)    |
+| frontendv3   | 前端：vue3 + naive-ui               | [link](./frontendv3/README.md) |
+| ~~frontend~~ | 前端：vue2 + element-ui (不再维护)   | [link](./frontend/README.md)   |
+
 
 > __注：__
 > `frontend` 和 `frontendv3` 是两套并行开发前端项目，frontend 不再维护，推荐使用 frontendv3。

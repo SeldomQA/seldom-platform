@@ -18,6 +18,7 @@ class EnvIn(Schema):
     test_type: str
     env: Optional[str] = None
     rerun: int = None
+    is_clear_cache: bool = False
     browser: Optional[str] = None
     base_url: Optional[str] = None
     remote: Optional[str] = None
