@@ -181,7 +181,7 @@ onMounted(() => {
                 />
               </div>
               <template #action>
-                <n-descriptions label-placement="left" column="1">
+                <n-descriptions label-placement="left" :column="1">
                   <n-descriptions-item>
                     <template #label> 测试目录 </template>
                     {{ item['case_dir'] }}
@@ -192,13 +192,10 @@ onMounted(() => {
                   </n-descriptions-item>
                   <n-descriptions-item>
                     <template #label> 状态 </template>
-                    <n-tag v-if= "item['is_clone'] == 0" type="info" size="small" >未克隆</n-tag>
+                    <n-tag v-if="item['is_clone'] == 0" type="info" size="small">未克隆</n-tag>
                     <n-tag v-else type="success" size="small">已克隆</n-tag>
                   </n-descriptions-item>
                 </n-descriptions>
-                <!-- <div>
-                  {{ item['address'] }}
-                </div> -->
                 <div class="enter-btn">
                   <n-button size="small" type="primary" @click="navigateToProject(item)">
                     进入
