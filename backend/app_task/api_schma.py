@@ -1,6 +1,7 @@
-from typing import Any, Union
+from datetime import datetime
+from typing import Union
+
 from ninja import Schema
-from datetime import datetime, timedelta, date, time
 
 
 class TaskIn(Schema):

@@ -1,9 +1,9 @@
-from ninja import Router
-from app_utils.response import response, Error
-from django.contrib.auth.models import User
 from django.contrib import auth
-from django.contrib.sessions.models import Session
+from django.contrib.auth.models import User
+from ninja import Router
+
 from app_user.api_schema import RegisterIn, LoginIn, LogoutIn
+from app_utils.response import response, Error
 from app_utils.token import TokenMethod
 
 router = Router(tags=["user"])

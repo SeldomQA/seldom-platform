@@ -4,15 +4,17 @@ date: 2022-03-20
 function: 分页器
 """
 from typing import List, Any
+
 from django.db.models import QuerySet
-from ninja.pagination import PaginationBase
 from ninja import Field, Schema
+from ninja.pagination import PaginationBase
 
 
 class CustomPagination(PaginationBase):
     """
     自定义分页器
     """
+
     class Input(Schema):
         page: int = Field(1, gt=0)
         size: int = 6

@@ -5,8 +5,9 @@ function:团队管理
 """
 from django.shortcuts import get_object_or_404
 from ninja import Router
-from app_team.models import Team
+
 from app_team.api_schma import TeamIn
+from app_team.models import Team
 from app_utils.response import response, model_to_dict
 
 router = Router(tags=["team"])
@@ -14,6 +15,9 @@ router = Router(tags=["team"])
 
 @router.post('/create')
 def create_team(request, team: TeamIn):
+    """
+    创建团队
+    """
     team_obj = Team.objects.create(
         name=team.name,
         email=team.email

@@ -48,7 +48,7 @@ def configure_test_runner(env: Env, test_dir: str, report_name: str):
     base_url = env.base_url if env.base_url != "" else None
     browser_conf = configure_browser(env)
 
-    # running pre -  is clear all cache
+    # running pre -   is clear all cache
     if env.is_clear_cache:
         cache.clear()
     main_extend = TestMainExtend(path=test_dir, report=report_name, rerun=env.rerun)
