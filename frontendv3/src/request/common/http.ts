@@ -81,8 +81,12 @@ function commonRequest(
 
   return makeRequest(requestType, url, dataOrParam, responseType, additionalHeader)
     .then((resp) => {
-      if (isLoading) loadingBar.finish();
-      if (resp.data?.success === false) return Promise.reject(resp.data);
+      if (isLoading) {
+        loadingBar.finish();
+      }
+      if (!resp.data || typeof resp.data.success !== 'boolean') {
+        return Promise.reject(resp.data);
+      }
       return resp.data;
     })
     .catch((error) => {
