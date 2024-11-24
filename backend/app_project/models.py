@@ -35,6 +35,7 @@ class Env(models.Model):
     test_type = models.CharField("环境值", max_length=20, null=True, default="http")
     env = models.CharField("环境值", max_length=50, null=True, default="")
     rerun = models.IntegerField("重跑次数", default=0)
+    is_clear_cache = models.BooleanField("是否清除缓存", default=False)
     browser = models.CharField("环境值", max_length=20, null=True, default="")
     base_url = models.CharField("URL", max_length=200, null=True, default="")
     remote = models.CharField("remote", max_length=200, null=True, default="")
