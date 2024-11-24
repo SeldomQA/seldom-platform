@@ -9,7 +9,11 @@ import {
   type ModalProps
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
-import { SearchOutline } from "@vicons/ionicons5";
+import {
+  SearchOutline as SearchIcon,
+  ArrowBack as BackIcon,
+  List as ListIcon
+} from "@vicons/ionicons5";
 import TaskApi from "~/request/task";
 import TeamApi from "~/request/team";
 import TaskReport from "@/TaskReport.vue";
@@ -480,7 +484,7 @@ onMounted(async () => {
                 <n-button type="primary" @click="initTaskList">
                   <template #icon>
                     <n-icon>
-                      <SearchOutline />
+                      <SearchIcon />
                     </n-icon>
                   </template>
                   搜索
@@ -530,8 +534,20 @@ onMounted(async () => {
       <div class="pageheader">
         <n-space justify="space-between" class="breadcrumb-navigation">
           <div>
-            <n-button quaternary @click="goBack">返回</n-button>
-            <span>任务报告</span>
+            <n-button strong secondary type="primary" size="small" @click="goBack">
+              <template #icon>
+                <n-icon>
+                  <BackIcon />
+                </n-icon>
+              </template>
+              返回
+            </n-button>
+          </div>
+          <div>
+            <!-- 显示任务的名称 -->
+            <n-tag>
+              【{{ datas.tableData.find(item => item.id === datas.tid)?.name }}】- 报告列表
+            </n-tag>
           </div>
 
           <n-breadcrumb separator=">">

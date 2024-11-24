@@ -1,6 +1,6 @@
 from django.db import models
+
 from app_project.models import Project
-from app_case.models import TestCase
 
 
 class TestTask(models.Model):
@@ -43,7 +43,7 @@ class TaskReport(models.Model):
     failure = models.IntegerField("失败用例", default=0)
     skipped = models.IntegerField("跳过用例", default=0)
     tests = models.IntegerField("总用例数", default=0)
-    run_time = models.CharField("运行时长",  max_length=100, default="0")
+    run_time = models.CharField("运行时长", max_length=100, default="0")
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
 
     def __str__(self):

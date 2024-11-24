@@ -93,11 +93,17 @@ onMounted(() => {
           <img src="../assets/seldom-platform.gif" style="height: 40px" />
         </span>
         <span style="float: right;">
-          <n-tag :type="tag.type">{{ tag.text }}</n-tag>
+          <n-menu :options="menuOptions" @update:value="handleUpdateValue" mode="horizontal"/>
+        </span>
+        <span style="float: right; height: 50px;">
+          <n-divider vertical style="height: 30px;"/>
+        </span>
+        <span style="float: right;">
+          <n-tag round size="small" :type="tag.type">{{ tag.text }}</n-tag>
         </span>
       </div>
       <slot name="project-select"></slot>
-      <n-menu :options="menuOptions" @update:value="handleUpdateValue" mode="horizontal"/>
+      
       <n-space>
         <n-button @click="changeTheme">
           <template #default>

@@ -1,4 +1,5 @@
 from itertools import chain
+
 from django.http import JsonResponse
 
 
@@ -30,6 +31,7 @@ class Error:
     CASE_AUDIT_FAIL = {"20041": "没有权限审核用例"}
     CASE_AUDIT_NULL = {"20042": "没有审核通过的用例"}
     CASE_DIR_ERROR = {"20043": "用例目录不存在"}
+    CASE_RUNNING_ERROR = {"20044": "用例正在执行中"}
 
     ENV_IS_NULL = {"10041": "查询环境为空"}
 

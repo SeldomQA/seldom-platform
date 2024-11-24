@@ -1,6 +1,7 @@
-import time
-from django.core import signing
 import hashlib
+import time
+
+from django.core import signing
 from django.core.cache import cache
 
 # token组成、配置
@@ -11,6 +12,9 @@ TIME_OUT = 720 * 60  # 720min
 
 
 class TokenMethod:
+    """
+    Token method
+    """
 
     @staticmethod
     def encrypt(obj):
