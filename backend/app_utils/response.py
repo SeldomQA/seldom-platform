@@ -28,6 +28,8 @@ class Error:
     FILE_TYPE_ERROR = {"10031": "文件类型错误"}
     FILE_SIZE_ERROR = {"10032": "超出文件大小"}
 
+    TEAM_EMAIL_ERROR = {"10041": "邮箱格式错误"}
+
     CASE_AUDIT_FAIL = {"20041": "没有权限审核用例"}
     CASE_AUDIT_NULL = {"20042": "没有审核通过的用例"}
     CASE_DIR_ERROR = {"20043": "用例目录不存在"}

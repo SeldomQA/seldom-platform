@@ -11,7 +11,7 @@ from app_project.models import Env
 from app_task.models import TestTask, TaskReport, ReportDetails
 from app_team.models import Team
 from app_utils import background
-from app_utils.email_utila import send_email_config
+from app_utils.email_utils import send_email_config
 from app_utils.running_utils import configure_test_runner
 from backend.config import EmailConfig
 from backend.settings import REPORT_DIR

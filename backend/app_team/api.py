@@ -8,7 +8,8 @@ from ninja import Router
 
 from app_team.api_schma import TeamIn
 from app_team.models import Team
-from app_utils.response import response, model_to_dict
+from app_utils.email_utils import validate_email
+from app_utils.response import response, Error, model_to_dict
 
 router = Router(tags=["team"])
 
@@ -18,6 +19,9 @@ def create_team(request, team: TeamIn):
     """
     创建团队
     """
+    if validate_email(team.email) is False:
+        return response(error=Error.TEAM_EMAIL_ERROR)
+
     team_obj = Team.objects.create(
         name=team.name,
         email=team.email
@@ -51,6 +55,9 @@ def update_team(request, team_id: int, team: TeamIn):
     """
     通过团队Id更新团队
     """
+    if validate_email(team.email) is False:
+        return response(error=Error.TEAM_EMAIL_ERROR)
+
     team_obj = get_object_or_404(Team, pk=team_id)
     team_obj.name = team.name
     team_obj.email = team.email
