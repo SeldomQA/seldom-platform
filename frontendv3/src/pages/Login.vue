@@ -138,7 +138,7 @@ const handlePasswordInput = () => {
       <div class="features">
         <div>
           <h1>Seldom Platform. <n-tag type="success" size="small" round>v2.0</n-tag></h1>
-          <span style="color: #869ab8">基于Seldom框架的自动化测试平台.</span>
+          <span style="color: #869ab8">基于Seldom框架编写你的自动化测试用例，剩下的事情交给平台.</span>
         </div>
         <div>
           <img src="../assets/login-bg.png" alt="" style="width: 60%;">

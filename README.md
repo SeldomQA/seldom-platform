@@ -1,8 +1,8 @@
 # seldom-platform
 
-> Based on the seldom formwork test platform.
+> Write your automated test cases based on Seldom framework and leave the rest to the platform.
 
-基于seldom框架的测试平台。 
+基于Seldom框架编写你的自动化测试用例，剩下的事情交给平台.
 
 >  这根传统的测试平台非常不一样，传统的测试平台创建用例是非常低效的，也非常不灵活。但是，平台的优势在于维护测试用例的用例的管理，定时任务，以及结果的可视化管理。selenium-platform可以解析seldom框架编写的自动化用例。~ 这是一个完美的方案。
 
