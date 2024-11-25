@@ -33,8 +33,12 @@ const createColumns = ({
       key: "name",
     },
     {
-      title: "团队邮箱",
+      title: "邮箱",
       key: "email",
+    },
+    {
+      title: "创建时间",
+      key: "create_time",
     },
     {
       title: "更新时间",
