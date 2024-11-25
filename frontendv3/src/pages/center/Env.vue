@@ -106,11 +106,9 @@ onMounted(() => {
             >
             <template #header> {{ item['name'] }} </template>
             <template #header-extra>
-              <n-button circle size="small">
-                <template #icon>
-                  <CloudOutline />
-                </template>
-              </n-button>
+              <n-icon size="25">
+                <CloudOutline />
+              </n-icon>
             </template>
             <n-descriptions id="thing-desc" label-placement="left" :column="1">
               <n-descriptions-item v-if="item['test_type']" label="类型">
