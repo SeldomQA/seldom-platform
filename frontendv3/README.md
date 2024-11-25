@@ -67,7 +67,7 @@ export default baseUrl;
 
 打包完成后，可以配置nginx服务，指定打包的 `dist/` 目录即可。
 
-```nginx
+```conf
 server {
     listen     80;
     server_name  seldom.testpub.cn;
@@ -86,6 +86,11 @@ server {
     gzip_vary on;
     gzip_disable "MSIE [1-6]\.";
     gzip_proxied any;
+
+    # 默认路由
+    location / {
+      try_files $uri $uri/ /index.html;
+    }
 
     # 后端服务
     location /api/ {
