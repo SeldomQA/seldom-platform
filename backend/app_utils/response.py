@@ -36,6 +36,7 @@ class Error:
     CASE_RUNNING_ERROR = {"20044": "用例正在执行中"}
 
     ENV_IS_NULL = {"10041": "查询环境为空"}
+    ENV_IN_USE = {"10042": "此环境被任务使用"}
 
     TASK_ID_NULL = {"10056": "任务ID不能为空"}
 

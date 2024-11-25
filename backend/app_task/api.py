@@ -2,6 +2,7 @@ import threading
 import time
 from typing import List
 
+from django.shortcuts import get_object_or_404
 from ninja import Router
 from ninja.pagination import paginate
 from seldom.utils import file
@@ -80,7 +81,7 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
     if name is not None and name != "":
         query["name__contains"] = name
 
-    tasks = TestTask.objects.filter(**query).order_by("-create_time")[:1000]
+    tasks = TestTask.objects.filter(**query, is_delete=False).order_by("-create_time")[:1000]
 
     task_list = []
     for task in tasks:
@@ -128,7 +129,11 @@ def delete_task(request, task_id: int):
     """
     删除任务
     """
-    task_obj = TestTask.objects.get(id=task_id).delete()
+    # 更新删除状态
+    task_obj = get_object_or_404(TestTask, pk=task_id)
+    task_obj.is_delete = True
+    task_obj.save()
+    # 删除关联
     TaskCaseRelevance.objects.filter(task=task_obj).delete()
 
     return response()

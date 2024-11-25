@@ -20,6 +20,7 @@ from seldom.utils import file
 from app_case.models import TestCase, TestCaseTemp
 from app_project.api_schma import ProjectIn, EnvIn, MergeCase
 from app_project.models import Project, Env
+from app_task.models import TestTask
 from app_utils.git_utils import LocalGitResource
 from app_utils.module_utils import clear_test_modules
 from app_utils.project_utils import get_hash, copytree
@@ -517,6 +518,10 @@ def delete_env(request, env_id: int):
     """
     删除环境
     """
+    task = TestTask.objects.filter(env_id=env_id, is_delete=False)
+    if len(task) > 0:
+        return response(error=Error.ENV_IN_USE)
+
     try:
         env = Env.objects.get(id=env_id)
         env.is_delete = True
