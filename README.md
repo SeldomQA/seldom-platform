@@ -64,9 +64,7 @@
 
 ## Online experience
 
-体验地址：http://seldom.testpub.cn/  （暂无法访问）
-
-* QQ官方交流群：948994709
+体验地址：http://seldom.testpub.cn/  （__请添加微信，获得体验账号__）
 
 * 微信（WeChat）
 
@@ -75,6 +73,9 @@
 <div style="display: flex;justify-content: space-between;width: 100%">
     <p><img alt="微信" src="wechat.jpg" style="width: 250px;height: 100%" ></p>
 </div>
+
+
+* QQ官方交流群：948994709
 
 ## Function
 
