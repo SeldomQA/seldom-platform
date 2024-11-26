@@ -14,6 +14,9 @@ def register(request, params: RegisterIn):
     """
     用户注册
     """
+    # 增加注册限制（体验平台）
+    return response(error=Error.REGISTER_RESTRICT)
+
     username = params.username
     password = params.password
     password2 = params.password2

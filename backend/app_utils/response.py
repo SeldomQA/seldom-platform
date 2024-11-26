@@ -18,6 +18,7 @@ class Error:
 
     USER_ID_NULL = {"40010": "用户id不存在"}
     PERMISSION_DENIED = {"40011": "没有操作权限"}
+    REGISTER_RESTRICT = {"40012": "未开放注册, 联系作者获取体验账号"}
 
     PROJECT_ID_NULL = {"10020": "项目id不存在"}
     PROJECT_OBJECT_NULL = {"10021": "通过id查询项目不存在"}
