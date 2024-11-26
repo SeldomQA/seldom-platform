@@ -77,8 +77,15 @@ Superuser created successfully.
 配置文件启动（参考`uwsgi.ini`文件）
 
 ```shell
-> uwsgi --ini uwsgi.ini
+> uwsgi --ini uwsgi.ini &
 ```
+
+### 更多部署配置
+
+* Supervisor管理后端进程（待补充）
+* Web测试服务需要使用 docker-selenium
+
+[点击查看](./docs/deploy.md)
 
 ## 查看接口
 
