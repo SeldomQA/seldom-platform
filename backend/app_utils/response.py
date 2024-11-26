@@ -17,6 +17,7 @@ class Error:
     JSON_TYPE_ERROR = {"30030": "JSON格式错误"}
 
     USER_ID_NULL = {"40010": "用户id不存在"}
+    PERMISSION_DENIED = {"40011": "没有操作权限"}
 
     PROJECT_ID_NULL = {"10020": "项目id不存在"}
     PROJECT_OBJECT_NULL = {"10021": "通过id查询项目不存在"}
