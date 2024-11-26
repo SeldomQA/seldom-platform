@@ -3,6 +3,7 @@ author: @bugmaster
 data: 2020-06-11
 function: api接口
 """
+from django.contrib.auth.models import User
 from ninja import NinjaAPI
 from ninja.security import HttpBearer
 
@@ -11,7 +12,7 @@ from app_project.api import router as project_router
 from app_task.api import router as task_router
 from app_team.api import router as team_router
 from app_user.api import router as user_router
-from app_utils.token import TokenMethod
+from app_utils.token import CustomToken
 
 
 class InvalidToken(Exception):
@@ -22,29 +23,47 @@ class InvalidToken(Exception):
 class GlobalAuth(HttpBearer):
 
     def authenticate(self, request, token):
-        token_method = TokenMethod()
+        """
+        验证token
+        :param request: 请求对象
+        :param token: token字符串
+        :return: token/None
+        """
+        token_method = CustomToken()
         is_token = token_method.check_token(token)
         if is_token is False:
             raise InvalidToken
-        else:
+
+        # 从token中获取用户信息并添加到request中
+        try:
+            user_info = token_method.get_token_info(token)
+            user_id = user_info.get("user_id")
+            user = User.objects.get(id=user_id)
+            request.user = user
             return token
+        except Exception:
+            raise InvalidToken
 
 
-# api = NinjaAPI(auth=GlobalAuth())
-api = NinjaAPI()
+# 启用全局认证
+api = NinjaAPI(auth=GlobalAuth())
 
 
-# 自定义异常，改变出现错误时返回值
+# 自定义异常处理
 @api.exception_handler(InvalidToken)
 def on_invalid_token(request, exc):
     """无效token返回类型 """
-    return api.create_response(request, {"detail": "Invalid token supplied"}, status=401)
+    return api.create_response(
+        request,
+        {"code": 401, "message": "Invalid token or token expired", "result": None},
+        status=401
+    )
 
 
-@api.get('/ping')
+@api.get('/ping', auth=None)
 def api_check(request):
     """
-    健康检查接口
+    健康检查接口 - 不需要认证
     """
     return {"result": "ok"}
 

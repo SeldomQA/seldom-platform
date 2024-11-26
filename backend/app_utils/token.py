@@ -1,81 +1,95 @@
-import hashlib
-import time
-
-from django.core import signing
+from datetime import datetime, timedelta
+from typing import Optional, Dict
+import jwt
+from django.contrib.auth.models import User
 from django.core.cache import cache
 
-# token组成、配置
-HEADER = {'typ': 'JWP', 'alg': 'default'}
-KEY = 'HUANG_XIA_HAN'
-SALT = 'seldomplatform'
-TIME_OUT = 720 * 60  # 720min
+SECRET_KEY = "seldom-platform-007"  # 建议放到配置文件中
 
 
-class TokenMethod:
+class CustomToken:
     """
-    Token method
+    自定义token类
     """
 
-    @staticmethod
-    def encrypt(obj):
-        """加密"""
-        value = signing.dumps(obj, key=KEY, salt=SALT)
-        value = signing.b64_encode(value.encode()).decode()
-        return value
+    def __init__(self):
+        self.secret = SECRET_KEY
+        self.expire_hours = 1  # token 过期时间(小时)
+        self.blacklist_prefix = "token_blacklist_"
 
-    @staticmethod
-    def decrypt(src):
-        """解密"""
-        src = signing.b64_decode(src.encode()).decode()
-        raw = signing.loads(src, key=KEY, salt=SALT)
-        return raw
+    def create_token(self, user_id: int, username: str) -> str:
+        """
+        生成token
+        :param user_id: 用户id
+        :param username: 用户名
+        :return: token字符串
+        """
+        user = User.objects.get(id=user_id)
+        payload = {
+            "user_id": user_id,
+            "username": username,
+            "permissions": [perm.codename for perm in user.user_permissions.all()],
+            "exp": datetime.utcnow() + timedelta(hours=self.expire_hours),
+            "iat": datetime.utcnow()
+        }
 
-    def create_token(self, username):
-        """
-        生成token信息
-        """
-        # 1. 加密头信息
-        header = self.encrypt(HEADER)
-        # 2. 构造Payload
-        payload = {"username": username, "iat": time.time()}
-        payload = self.encrypt(payload)
-        # 3. 生成签名
-        md5 = hashlib.md5()
-        md5.update(("%s.%s" % (header, payload)).encode())
-        signature = md5.hexdigest()
-        token = "%s.%s.%s" % (header, payload, signature)
-        # 存储到缓存中
-        cache.set(username, token, TIME_OUT)
+        token = jwt.encode(payload, self.secret, algorithm="HS256")
         return token
 
-    def delete_token(self, token):
+    def check_token(self, token: str) -> bool:
         """
-        删除token
+        验证token
+        :param token: token字符串
+        :return: bool
         """
-        username = self.get_username(token)
-        cache.delete(username)
+        try:
+            # 先检查是否在黑名单中
+            if self.is_blacklisted(token):
+                return False
+                
+            jwt.decode(token, self.secret, algorithms=["HS256"])
+            return True
+        except jwt.ExpiredSignatureError:
+            return False
+        except jwt.InvalidTokenError:
+            return False
 
-    def get_payload(self, token):
+    def get_token_info(self, token: str) -> Optional[Dict]:
         """
-        获取参数
+        获取token中的信息
+        :param token: token字符串
+        :return: dict/None
         """
-        payload = str(token).split('.')[1]
-        payload = self.decrypt(payload)
-        return payload
+        try:
+            payload = jwt.decode(token, self.secret, algorithms=["HS256"])
+            return payload
+        except:
+            return None
 
-    def get_username(self, token):
+    def invalidate_token(self, token: str) -> None:
         """
-        通过token获取用户名
+        使token失效（加入黑名单）
+        :param token: token字符串
         """
-        payload = self.get_payload(token)
-        return payload['username']
+        try:
+            # 获取token的过期时间
+            payload = jwt.decode(token, self.secret, algorithms=["HS256"])
+            exp = datetime.fromtimestamp(payload['exp'])
+            now = datetime.utcnow()
+            
+            # 计算剩余有效时间（秒）
+            ttl = int((exp - now).total_seconds())
+            
+            if ttl > 0:
+                # 将token加入黑名单，过期时间与token原过期时间一致
+                cache.set(f"{self.blacklist_prefix}{token}", True, ttl)
+        except jwt.InvalidTokenError:
+            pass
 
-    def check_token(self, token):
+    def is_blacklisted(self, token: str) -> bool:
         """
-        检查token是否有效
+        检查token是否在黑名单中
+        :param token: token字符串
+        :return: bool
         """
-        username = self.get_username(token)
-        last_token = cache.get(username)
-        if last_token:
-            return last_token == token
-        return False
+        return cache.get(f"{self.blacklist_prefix}{token}", False)

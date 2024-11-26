@@ -14,6 +14,19 @@ axios.defaults.baseURL = baseUrl;
 axios.defaults.headers.post["X-Requested-With"] = "XMLHttpRequest";
 axios.defaults.timeout = 300000;
 
+axios.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export interface TNomalObject {
   [key: string]: any;
 }
@@ -39,7 +52,12 @@ function makeRequest(
   responseType: string,
   additionalHeader: TNomalObject = {}
 ) {
-  const headers = { ...additionalHeader };
+  const token = sessionStorage.getItem('token');
+  const headers = { 
+    ...additionalHeader,
+    Authorization: token ? `Bearer ${token}` : ''
+  };
+
   const config: AxiosRequestConfig = {
     headers,
     responseType: responseType === "blob" ? "blob" : "json",

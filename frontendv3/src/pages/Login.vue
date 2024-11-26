@@ -90,21 +90,30 @@ const signupRules: FormRules = {
 };
 
 // 用户登录
-const submitLogin = () => {
+const submitLogin = async () => {
   if (signinForm.value.username == null || signinForm.value.password == null) {
     message.error("用户名或密码不能为空！");
     return;
   }
-  UserApi.login(signinForm.value).then((resp: any) => {
-    if (resp.success === true) {
-      sessionStorage.token = resp.result.token;
-      sessionStorage.user = resp.result.username;
-      router.push({ path: "/center/project" });
-      message.success("登陆成功！");
+
+  try {
+    const resp = await UserApi.login(signinForm.value);
+    if (resp.success) {
+      // 存储到 sessionStorage
+      sessionStorage.setItem('token', resp.result.token);
+      sessionStorage.setItem('user', resp.result.username);
+      message.success("登录成功！");
+      
+      // 等待消息显示后再跳转
+      setTimeout(() => {
+        router.push('/center/project');
+      }, 500);
     } else {
       message.error(resp.error.message);
     }
-  });
+  } catch (error) {
+    message.error('登录失败，请稍后重试');
+  }
 };
 
 // 用户注册

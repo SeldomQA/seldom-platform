@@ -11,6 +11,7 @@ class Error:
     USER_OR_PAWD_ERROR = {"10011": "用户名密码错误"}
     PAWD_ERROR = {"10012": "两次密码不一致"}
     USER_HAS_REGISTERED = {"10013": "用户已注册"}
+    LOGIN_ERROR = {"10014": "用户名登录错误"}
 
     PARAMS_TYPE_ERROR = {"30020": "参数类型错误"}
     JSON_TYPE_ERROR = {"30030": "JSON格式错误"}
