@@ -5,6 +5,7 @@ import type { MenuOption } from "naive-ui";
 import { useMessage, NIcon } from 'naive-ui';
 import {
   LogoGithub as GitHubIcon,
+  DocumentTextOutline as DocIcon,
   LogOutOutline as LogoutIcon,
   PersonCircle as PersonIcon,
 } from '@vicons/ionicons5';
@@ -32,8 +33,13 @@ const token = ref<string | null>('');
 const personOptions = [
   {
     label: 'GitHub',
-    key: 'help_documentation',
+    key: 'github',
     icon: () => h(NIcon, null, { default: () => h(GitHubIcon) }),
+  },
+  {
+    label: '使用手册',
+    key: 'help_documentation',
+    icon: () => h(NIcon, null, { default: () => h(DocIcon) }),
   },
   {
     label: '退出登录',
@@ -66,8 +72,11 @@ const handleSelect = (key: string | number) => {
         }
       });
       break;
-    case 'help_documentation':
+    case 'github':
       window.open('https://github.com/SeldomQA/seldom-platform', '_blank');
+      break;
+    case 'help_documentation':
+      window.open('https://www.yuque.com/chongshi/raflru/ghot2m', '_blank');
       break;
     default:
       break;
