@@ -28,29 +28,31 @@
 
 ![](./img/seldom-platform-code.png)
 
-## ToDo
+## 功能支持
 
 * 支持测试类型：
 
-| 功能      |  进度 |
+| 测试类型     |  支持 |
 | --------- | ---- |
 | API       | ✔️    |
 | Web UI    | ✔️    |
-| App UI    | ❌    |
+| App UI    | ❌（暂不支持）    |
 
-* 功能：
+* 功能开发进度：
 
 | 功能      | 子模块   | 进度 |
 | --------- | -------- | ---- |
 | 登录&注册 | -        | ✔️    |
+|  -       | 用户权限控制 | 开发中..    |
 | 配置中心  | 项目配置 | ✔️    |
 | -         | 环境配置 | ✔️    |
 | -         | 团队配置 | ✔️    |
 | 项目管理  | 用例管理 | ✔️    |
+| -        | 用例标签 | 开发中...    |
 | -         | 任务管理 | ✔️    |
 | 定时任务  | ..       | 开发中..     |
 
-## Project
+## 项目说明
 
 | 项目         | 说明                               | 文档                           |
 | ------------ | ---------------------------------- | ------------------------------ |
@@ -62,13 +64,17 @@
 > __注：__
 > `frontend` 和 `frontendv3` 是两套并行开发前端项目，frontend 不再维护，推荐使用 frontendv3。
 
-## Online experience
+### 相关文档
+
+[《seldom-platform平台使用手册》](https://www.yuque.com/chongshi/raflru/ghot2m)
+
+[《seldom-platform开发&部署》](https://www.yuque.com/chongshi/raflru/uxp8h7)
+
+## 在线体验
 
 体验地址：http://seldom.testpub.cn/  （__请添加微信，获得体验账号__）
 
 * 微信（WeChat）
-
-> 欢迎添加微信，交流和反馈问题。
 
 <div style="display: flex;justify-content: space-between;width: 100%">
     <p><img alt="微信" src="wechat.jpg" style="width: 250px;height: 100%" ></p>
@@ -76,7 +82,3 @@
 
 
 * QQ官方交流群：948994709
-
-## Function
-
-[《seldom-platform平台使用手册》](https://www.yuque.com/chongshi/raflru/ghot2m)
