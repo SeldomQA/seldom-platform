@@ -71,7 +71,7 @@ export default baseUrl;
 server {
     listen     80;
     server_name  seldom.testpub.cn;
-    
+
     # 前端打包
     root /home/app/seldom-platform/frontendv3/dist;
     index index.html index.htm;
@@ -87,12 +87,23 @@ server {
     gzip_disable "MSIE [1-6]\.";
     gzip_proxied any;
 
-    # 默认路由
+    # 前端
     location / {
       try_files $uri $uri/ /index.html;
     }
 
-    # 后端服务
+    # 后端django admin管理系统
+    location /admin/ {
+      proxy_pass http://127.0.0.1:8003;
+      proxy_pass_request_headers on;
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-Port $server_port;
+    }
+
+    # 后端 django-ninja API
     location /api/ {
       proxy_pass http://127.0.0.1:8003;
       proxy_pass_request_headers      on;
@@ -105,7 +116,7 @@ server {
       expires 30d;
       autoindex on;
       add_header Cache-Control private;
-      alias /home/app/seldom-platform/backend/static;
+      alias /home/app/seldom-platform/backend/staticfiles;  #django admin静态资源
     }
 
 }
