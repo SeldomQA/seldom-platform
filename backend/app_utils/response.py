@@ -3,6 +3,13 @@ from itertools import chain
 from django.http import JsonResponse
 
 
+class ErrorCode:
+    """错误码"""
+    SYSTEM_ERROR = (50000, "系统错误")
+    TOKEN_INVALID = (40001, "Token无效或已过期")
+    PERMISSION_DENIED = (40011, "没有操作权限")
+
+
 class Error:
     """
     子定义错误码与错误信息
@@ -88,3 +95,20 @@ def response(success: bool = True, error: dict = None, result=None):
         resp["result"] = result
 
     return JsonResponse(resp)
+
+
+def resp_error_dict(error: tuple) -> dict:
+    """
+    response error data
+    :param error:
+    :return:
+    """
+    resp = {
+        "success": False,
+        "error": {
+            "code": error[0],
+            "message": error[1]
+        },
+        "result": []
+    }
+    return resp

@@ -26,6 +26,7 @@ from app_utils.module_utils import clear_test_modules
 from app_utils.project_utils import get_hash, copytree
 from app_utils.response import response, Error, model_to_dict
 from backend.settings import BASE_DIR, REPORT_DIR
+from app_utils.permission import check_permissions, PROJECT_PERMISSIONS, ENV_PERMISSIONS
 
 logger = logging.getLogger('myapp')
 
@@ -36,14 +37,11 @@ router = Router(tags=["project"])
 
 
 @router.post('/create')
+@check_permissions(PROJECT_PERMISSIONS["CREATE"])
 def create_project(request, project: ProjectIn):
     """
     创建项目
     """
-    # 检查用户权限
-    if not request.user.has_perm('project.add_project'):
-        return response(error=Error.PERMISSION_DENIED)
-
     # 设置项目默认图片
     if project.cover_name == "" and project.path_name == "":
         project.cover_name = "seldom_logo.png"
@@ -107,13 +105,11 @@ def get_project(request, project_id: int):
 
 
 @router.put('/{project_id}/')
+@check_permissions(PROJECT_PERMISSIONS["CHANGE"])
 def update_project(request, project_id: int, project: ProjectIn):
     """
     通过项目ID更新项目
     """
-    if not request.user.has_perm('project.change_project'):
-        return response(error=Error.PERMISSION_DENIED)
-
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.name = project.name
     project_obj.address = project.address
@@ -125,13 +121,11 @@ def update_project(request, project_id: int, project: ProjectIn):
 
 
 @router.delete('/{project_id}/')
+@check_permissions(PROJECT_PERMISSIONS["DELETE"])
 def delete_project(request, project_id: int):
     """
     通过项目ID删除项目
     """
-    if not request.user.has_perm('project.delete_project'):
-        return response(error=Error.PERMISSION_DENIED)
-
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.is_delete = True
     project_obj.save()
@@ -479,13 +473,11 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
 
 
 @router.post('/env')
+@check_permissions(ENV_PERMISSIONS["CREATE"])
 def create_env(request, env: EnvIn):
     """
     创建环境
     """
-    if not request.user.has_perm('project.add_env'):
-        return response(error=Error.PERMISSION_DENIED)
-
     project_obj = Env.objects.create(
         name=env.name,
         test_type=env.test_type,
@@ -527,13 +519,11 @@ def get_env_list(request):
 
 
 @router.delete('/env/{env_id}/')
+@check_permissions(ENV_PERMISSIONS["DELETE"])
 def delete_env(request, env_id: int):
     """
     删除环境
     """
-    if not request.user.has_perm('project.delete_env'):
-        return response(error=Error.PERMISSION_DENIED)
-
     task = TestTask.objects.filter(env_id=env_id, is_delete=False)
     if len(task) > 0:
         return response(error=Error.ENV_IN_USE)
@@ -549,13 +539,11 @@ def delete_env(request, env_id: int):
 
 
 @router.put('/env/{env_id}/')
+@check_permissions(ENV_PERMISSIONS["CHANGE"])
 def update_env(request, env_id: int, env: EnvIn):
     """
     更新环境
     """
-    if not request.user.has_perm('project.change_env'):
-        return response(error=Error.PERMISSION_DENIED)
-
     try:
         env_obj = Env.objects.get(id=env_id)
         env_obj.name = env.name

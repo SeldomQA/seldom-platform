@@ -5,6 +5,7 @@ function: api接口
 """
 from django.contrib.auth.models import User
 from ninja import NinjaAPI
+from ninja.errors import HttpError
 from ninja.security import HttpBearer
 
 from app_case.api import router as case_router
@@ -12,6 +13,8 @@ from app_project.api import router as project_router
 from app_task.api import router as task_router
 from app_team.api import router as team_router
 from app_user.api import router as user_router
+from app_utils.response import ErrorCode
+from app_utils.response import resp_error_dict
 from app_utils.token import CustomToken
 
 
@@ -55,8 +58,26 @@ def on_invalid_token(request, exc):
     """无效token返回类型 """
     return api.create_response(
         request,
-        {"code": 401, "message": "Invalid token or token expired", "result": None},
-        status=401
+        resp_error_dict(ErrorCode.TOKEN_INVALID),
+        status=200
+    )
+
+
+@api.exception_handler(HttpError)
+def on_http_error(request, exc):
+    """处理HTTP错误"""
+    error = ErrorCode.SYSTEM_ERROR
+    try:
+        http_status = exc.args[0]
+        if http_status == 200:
+            error = exc.args[1]
+    except BaseException:
+        pass
+
+    return api.create_response(
+        request,
+        resp_error_dict(error),
+        status=200
     )
 
 
