@@ -107,7 +107,7 @@ const submitLogin = async () => {
       // 等待消息显示后再跳转
       setTimeout(() => {
         router.push('/center/project');
-      }, 500);
+      }, 300);
     } else {
       message.error(resp.error.message);
     }
