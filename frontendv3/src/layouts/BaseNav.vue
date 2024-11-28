@@ -29,6 +29,7 @@ const mainhtml = document.getElementsByTagName('html');
 const btnLabel = ref('深色');
 const localStorage = window.localStorage;
 const token = ref<string | null>('');
+const username = ref(sessionStorage.getItem('user') || 'unknown');
 
 const personOptions = [
   {
@@ -91,6 +92,7 @@ onMounted(() => {
   const mode = localStorage.getItem('themeMode');
   btnLabel.value = mode === 'light' || mode == null ? '深色' : '浅色';
   token.value = sessionStorage.getItem('token');
+  username.value = sessionStorage.getItem('user') || 'unknown';
 });
 </script>
 
@@ -124,6 +126,7 @@ onMounted(() => {
             <template #icon>
               <n-icon :component="PersonIcon"></n-icon>
             </template>
+            {{ username }}
           </n-button>
         </n-dropdown>
       </n-space>
