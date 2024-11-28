@@ -5,6 +5,7 @@ from ninja import Router
 from app_user.api_schema import RegisterIn, LoginIn, LogoutIn
 from app_utils.response import response, Error
 from app_utils.token import CustomToken
+from backend.settings import ALLOW_REGISTRATION
 
 router = Router(tags=["user"])
 
@@ -15,7 +16,8 @@ def register(request, params: RegisterIn):
     用户注册
     """
     # 增加注册限制（体验平台）
-    return response(error=Error.REGISTER_RESTRICT)
+    if ALLOW_REGISTRATION is False:
+        return response(error=Error.REGISTER_RESTRICT)
 
     username = params.username
     password = params.password
