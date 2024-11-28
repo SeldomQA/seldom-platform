@@ -4,51 +4,59 @@ from django.http import JsonResponse
 
 
 class ErrorCode:
-    """错误码"""
+    """通用错误码"""
+    SUCCESS = (20000, "")
     SYSTEM_ERROR = (50000, "系统错误")
     TOKEN_INVALID = (40001, "Token无效或已过期")
-    PERMISSION_DENIED = (40011, "没有操作权限")
+    PERMISSION_DENIED = (4002, "没有操作权限")
+
+    # 参数相关错误 (3000x)
+    PARAMS_TYPE_ERROR = (30002, "参数类型错误")
+    JSON_TYPE_ERROR = (30003, "JSON格式错误")
 
 
 class Error:
     """
-    子定义错误码与错误信息
+    自定义错误码与错误信息
+    格式: (错误码, 错误信息)
     """
-    USER_OR_PAWD_NULL = {"10010": "用户名密码为空"}
-    USER_OR_PAWD_ERROR = {"10011": "用户名密码错误"}
-    PAWD_ERROR = {"10012": "两次密码不一致"}
-    USER_HAS_REGISTERED = {"10013": "用户已注册"}
-    LOGIN_ERROR = {"10014": "用户名登录错误"}
+    # 用户相关错误 (100xx)
+    USER_OR_PAWD_NULL = (10010, "用户名密码为空")
+    USER_OR_PAWD_ERROR = (10011, "用户名密码错误")
+    PAWD_ERROR = (10012, "两次密码不一致")
+    USER_HAS_REGISTERED = (10013, "用户已注册")
+    LOGIN_ERROR = (10014, "用户名登录错误")
+    USER_ID_NULL = (40010, "用户id不存在")
+    REGISTER_RESTRICT = (40012, "未开放注册, 联系作者获取体验账号")
 
-    PARAMS_TYPE_ERROR = {"30020": "参数类型错误"}
-    JSON_TYPE_ERROR = {"30030": "JSON格式错误"}
+    # 项目相关错误 (100xx)
+    PROJECT_ID_NULL = (10020, "项目id不存在")
+    PROJECT_OBJECT_NULL = (10021, "通过id查询项目不存在")
+    PROJECT_DELETE_ERROR = (10023, "项目删除失败")
+    PROJECT_ADDRESS_ERROR = (10024, "项目地址无法访问")
+    PROJECT_CLONE_ERROR = (10025, "项目克隆失败")
+    PROJECT_DIR_NULL = (10026, "项目测试目录不存在")
+    PROJECT_PULL_ERROR = (10027, "项目拉取失败")
 
-    USER_ID_NULL = {"40010": "用户id不存在"}
-    PERMISSION_DENIED = {"40011": "没有操作权限"}
-    REGISTER_RESTRICT = {"40012": "未开放注册, 联系作者获取体验账号"}
+    # 文件相关错误 (100xx)
+    FILE_TYPE_ERROR = (10031, "文件类型错误")
+    FILE_SIZE_ERROR = (10032, "超出文件大小")
 
-    PROJECT_ID_NULL = {"10020": "项目id不存在"}
-    PROJECT_OBJECT_NULL = {"10021": "通过id查询项目不存在"}
-    PROJECT_DELETE_ERROR = {"10023": "项目删除失败"}
-    PROJECT_ADDRESS_ERROR = {"10024": "项目地址无法访问"}
-    PROJECT_CLONE_ERROR = {"10025": "项目克隆失败"}
-    PROJECT_DIR_NULL = {"10026": "项目测试目录不存在"}
-    PROJECT_PULL_ERROR = {"10027": "项目拉取失败"}
+    # 团队相关错误 (100xx)
+    TEAM_EMAIL_ERROR = (10041, "邮箱格式错误")
 
-    FILE_TYPE_ERROR = {"10031": "文件类型错误"}
-    FILE_SIZE_ERROR = {"10032": "超出文件大小"}
+    # 用例相关错误 (200xx)
+    CASE_AUDIT_FAIL = (20041, "没有权限审核用例")
+    CASE_AUDIT_NULL = (20042, "没有审核通过的用例")
+    CASE_DIR_ERROR = (20043, "用例目录不存在")
+    CASE_RUNNING_ERROR = (20044, "用例正在执行中")
 
-    TEAM_EMAIL_ERROR = {"10041": "邮箱格式错误"}
+    # 环境相关错误 (100xx)
+    ENV_IS_NULL = (10041, "查询环境为空")
+    ENV_IN_USE = (10042, "此环境被任务使用")
 
-    CASE_AUDIT_FAIL = {"20041": "没有权限审核用例"}
-    CASE_AUDIT_NULL = {"20042": "没有审核通过的用例"}
-    CASE_DIR_ERROR = {"20043": "用例目录不存在"}
-    CASE_RUNNING_ERROR = {"20044": "用例正在执行中"}
-
-    ENV_IS_NULL = {"10041": "查询环境为空"}
-    ENV_IN_USE = {"10042": "此环境被任务使用"}
-
-    TASK_ID_NULL = {"10056": "任务ID不能为空"}
+    # 任务相关错误 (100xx)
+    TASK_ID_NULL = (10056, "任务ID不能为空")
 
 
 def model_to_dict(instance: object) -> dict:
@@ -67,17 +75,16 @@ def model_to_dict(instance: object) -> dict:
     return data
 
 
-def response(success: bool = True, error: dict = None, result=None):
+def response(success: bool = True, error: tuple = None, result=None):
     """
     自定义接口返回格式
     """
-    if error is None:
-        error_code = ""
-        error_msg = ""
-    else:
+    error_code = ErrorCode.SUCCESS[0]
+    error_msg = ErrorCode.SUCCESS[1]
+    if error is not None:
         success = False
-        error_code = list(error.keys())[0]
-        error_msg = list(error.values())[0]
+        error_code = error[0]
+        error_msg = error[1]
 
     resp = {
         "success": success,
@@ -100,8 +107,8 @@ def response(success: bool = True, error: dict = None, result=None):
 def resp_error_dict(error: tuple) -> dict:
     """
     response error data
-    :param error:
-    :return:
+    :param error: (错误码, 错误信息)
+    :return: 错误响应字典
     """
     resp = {
         "success": False,
@@ -109,6 +116,6 @@ def resp_error_dict(error: tuple) -> dict:
             "code": error[0],
             "message": error[1]
         },
-        "result": []
+        "result": {}
     }
     return resp
