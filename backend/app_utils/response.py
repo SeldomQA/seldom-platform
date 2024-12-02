@@ -8,7 +8,7 @@ class ErrorCode:
     SUCCESS = (20000, "")
     SYSTEM_ERROR = (50000, "系统错误")
     TOKEN_INVALID = (40001, "Token无效或已过期")
-    PERMISSION_DENIED = (4002, "没有操作权限")
+    PERMISSION_DENIED = (40002, "没有操作权限")
 
     # 参数相关错误 (3000x)
     PARAMS_TYPE_ERROR = (30002, "参数类型错误")

@@ -59,7 +59,7 @@ def on_invalid_token(request, exc):
     return api.create_response(
         request,
         resp_error_dict(ErrorCode.TOKEN_INVALID),
-        status=200
+        status=401
     )
 
 
