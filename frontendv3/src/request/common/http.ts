@@ -111,8 +111,8 @@ function commonRequest(
       if (isLoading) loadingBar.finish();
       if (axios.isAxiosError(error) && error.response) {
         if (error.response.status === 401) {
-          message.error("token失效");
-          sessionStorage.removeItem("token");
+          message.error("登录已过期，请重新登录");
+          window.location.href = '/login';
         }
       }
       console.error("Error:", error);
