@@ -201,7 +201,7 @@ onMounted(() => {
 
 <style scoped>
 .class-list {
-  min-height: 600px;
+  height: 800px;
   overflow-y: scroll;
 }
 
