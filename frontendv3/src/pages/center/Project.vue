@@ -2,7 +2,13 @@
 import { reactive, onMounted } from "vue";
 import { useMessage, useDialog } from "naive-ui";
 import { useRouter } from "vue-router"; 
-import { SettingsOutline } from "@vicons/ionicons5";
+import {
+  SettingsOutline,
+  GitBranch,
+  FolderOpenOutline,
+  DocumentTextOutline,
+  BowlingBallOutline
+ } from "@vicons/ionicons5";
 import ProjectApi from "~/request/project";
 import ProjectForm from "@/ProjectForm.vue";
 import baseUrl from "~/config/base-url";
@@ -119,10 +125,15 @@ const handleSelect = (key: string, pid: number) => {
 
 const navigateToProject = (project: any) => {
   // 存储当前项目信息
-  projectStorage.setProject(project.id,  project.name)
-  // 跳转项目管理
-  const url = `/manager/case`;
-  router.push(url);
+  projectStorage.setProject(project.id, project.name);
+  
+  // 使用 router.resolve 获取完整的路由信息
+  const routeData = router.resolve({
+    path: '/manager/case'
+  });
+  
+  // 在新页面打开
+  window.open(routeData.href, '_blank');
 };
 
 onMounted(() => {
@@ -183,15 +194,45 @@ onMounted(() => {
               <template #action>
                 <n-descriptions label-placement="left" :column="1">
                   <n-descriptions-item>
-                    <template #label> 测试目录 </template>
+                    <template #label>
+                      <n-icon size="16" style="top: 4px;">
+                        <GitBranch />
+                      </n-icon>
+                      Git 地址
+                    </template>
+                    <a 
+                      :href="item['address']" 
+                      target="_blank" 
+                      style="color: #18a058; text-decoration: none;"
+                    >
+                      访问
+                    </a>
+                  </n-descriptions-item>
+                  <n-descriptions-item>
+                    <template #label>
+                      <n-icon size="16" style="top: 4px;">
+                        <FolderOpenOutline />
+                      </n-icon>
+                      测试目录
+                    </template>
                     {{ item['case_dir'] }}
                   </n-descriptions-item>
                   <n-descriptions-item>
-                    <template #label> 文件数量 </template>
+                    <template #label>
+                      <n-icon size="16" style="top: 4px;">
+                        <DocumentTextOutline />
+                      </n-icon>
+                      文件数量
+                    </template>
                     {{ item['test_num'] }}
                   </n-descriptions-item>
                   <n-descriptions-item>
-                    <template #label> 状态 </template>
+                    <template #label>
+                      <n-icon size="16" style="top: 4px;">
+                        <BowlingBallOutline />
+                      </n-icon>
+                      克隆状态
+                    </template>
                     <n-tag v-if="item['is_clone'] == 0" type="info" size="small">未克隆</n-tag>
                     <n-tag v-else type="success" size="small">已克隆</n-tag>
                   </n-descriptions-item>
