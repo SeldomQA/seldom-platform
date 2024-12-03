@@ -6,8 +6,8 @@ function:团队管理
 from django.shortcuts import get_object_or_404
 from ninja import Router
 
-from app_team.api_schma import TeamIn
 from app_team.models import Team
+from app_team.schema import TeamIn
 from app_utils.email_utils import validate_email
 from app_utils.response import response, Error, model_to_dict
 

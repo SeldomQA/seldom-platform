@@ -18,15 +18,15 @@ from seldom import TestMainExtend
 from seldom.utils import file
 
 from app_case.models import TestCase, TestCaseTemp
-from app_project.api_schma import ProjectIn, EnvIn, MergeCase
 from app_project.models import Project, Env
+from app_project.schema import ProjectIn, EnvIn, MergeCase
 from app_task.models import TestTask
 from app_utils.git_utils import LocalGitResource
 from app_utils.module_utils import clear_test_modules
+from app_utils.permission import check_permissions, PROJECT_PERMISSIONS, ENV_PERMISSIONS
 from app_utils.project_utils import get_hash, copytree
 from app_utils.response import response, Error, model_to_dict
 from backend.settings import BASE_DIR, REPORT_DIR
-from app_utils.permission import check_permissions, PROJECT_PERMISSIONS, ENV_PERMISSIONS
 
 logger = logging.getLogger('myapp')
 

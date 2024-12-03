@@ -9,9 +9,9 @@ from seldom.utils import file
 
 from app_case.models import TestCase
 from app_project.models import Project, Env
-from app_task.api_schma import TaskIn, TaskOut, ReportOut, ReportIn
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_task.running import seldom_running
+from app_task.schema import TaskIn, TaskOut, ReportOut, ReportIn
 from app_team.models import Team
 from app_utils.git_utils import LocalGitResource
 from app_utils.module_utils import clear_test_modules

@@ -1,6 +1,6 @@
-from typing import Any
-from ninja import Schema
 from enum import Enum
+
+from ninja import Schema
 
 
 class EnvType(str, Enum):
@@ -11,5 +11,4 @@ class EnvType(str, Enum):
 
 class RunCaseIn(Schema):
     """运行测试用例入参"""
-    env: int   # 环境ID, 从Env表查询
-
+    env: int  # 环境ID, 从Env表查询

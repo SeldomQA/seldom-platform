@@ -1,8 +1,8 @@
+from app_user.schema import RegisterIn, LoginIn, LogoutIn
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from ninja import Router
 
-from app_user.api_schema import RegisterIn, LoginIn, LogoutIn
 from app_utils.response import response, Error
 from app_utils.token import CustomToken
 from backend.settings import ALLOW_REGISTRATION

@@ -7,9 +7,9 @@ from django.shortcuts import get_object_or_404
 from ninja import Router
 from seldom.utils import file
 
-from app_case.api_schma import RunCaseIn
 from app_case.models import TestCase, CaseResult
 from app_case.running import seldom_running
+from app_case.schema import RunCaseIn
 from app_project.models import Project
 from app_utils.git_utils import LocalGitResource
 from app_utils.module_utils import clear_test_modules
