@@ -13,7 +13,7 @@ class TestTask(models.Model):
     env_id = models.IntegerField("环境ID", null=True)
     team_id = models.IntegerField("团队ID", null=True)
     email = models.CharField("发送告警邮箱", max_length=100, null=True)
-    timed = models.CharField("定时任务", max_length=50, null=True, default="")
+    timed = models.CharField("定时任务", max_length=500, null=True, default="")
     execute_count = models.IntegerField("执行次数", null=True, default=0)
     is_delete = models.BooleanField("删除", null=True, default=False)
     create_time = models.DateTimeField("创建时间", auto_now_add=True)

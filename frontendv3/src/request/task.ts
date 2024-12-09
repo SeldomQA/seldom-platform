@@ -23,7 +23,7 @@ class TaskApi {
   }
 
   runningTask(tid: string) {
-    return request.post("/api/task/" + tid + "/running");
+    return request.get("/api/task/" + tid + "/running");
   }
 
   addTimed(tid: string, data: TNomalObject) {
@@ -40,6 +40,10 @@ class TaskApi {
 
   getReportResult(rid: string, data: TNomalObject) {
     return request.post("/api/task/report/" + rid + "/results", data);
+  }
+
+  createTimed(data: any) {
+    return request.post("/api/task/timed/create", data);
   }
 }
 

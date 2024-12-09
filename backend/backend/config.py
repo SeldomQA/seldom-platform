@@ -1,6 +1,10 @@
 """
 配置文件
 """
+# 定时任务服务
+TIMED_SERVER = "http://127.0.0.1:8000"
+# 本机服务
+THIS_SERVER = "http://127.0.0.1:8003"
 
 
 class EmailConfig:

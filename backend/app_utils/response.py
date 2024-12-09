@@ -56,7 +56,10 @@ class Error:
     ENV_IN_USE = (10042, "此环境被任务使用")
 
     # 任务相关错误 (100xx)
-    TASK_ID_NULL = (10056, "任务ID不能为空")
+    TASK_ID_NULL = (10051, "任务ID不能为空")
+    TIMED_ADD_FAILED = (10052, "定时任务添加失败")
+    TIMED_UPDATE_FAILED = (10053, "定时任务开关失败")
+    TIMED_DEL_FAILED = (10054, "定时任务删除失败")
 
 
 def model_to_dict(instance: object) -> dict:

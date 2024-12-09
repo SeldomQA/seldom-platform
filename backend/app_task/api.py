@@ -1,7 +1,10 @@
+import json
+import logging
 import threading
 import time
 from typing import List
 
+import requests
 from django.shortcuts import get_object_or_404
 from ninja import Router
 from ninja.pagination import paginate
@@ -11,12 +14,13 @@ from app_case.models import TestCase
 from app_project.models import Project, Env
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_task.running import seldom_running
-from app_task.schema import TaskIn, TaskOut, ReportOut, ReportIn
+from app_task.schema import *
 from app_team.models import Team
 from app_utils.git_utils import LocalGitResource
 from app_utils.module_utils import clear_test_modules
 from app_utils.pagination import CustomPagination
 from app_utils.response import response, model_to_dict, Error
+from backend.config import THIS_SERVER, TIMED_SERVER
 
 router = Router(tags=["task"])
 
@@ -99,6 +103,14 @@ def get_task_list(request, project_id: int, team_id: str = None, name: str = Non
         except Team.DoesNotExist:
             task_dict["team"] = ""
 
+        if task_dict["timed"] == "":
+            task_dict["timed_status"] = ""
+            task_dict["timed_conf"] = {}
+        else:
+            timed = json.loads(task_dict["timed"])
+            task_dict["timed_status"] = timed["status"]
+            task_dict["timed_conf"] = timed["cron_job"]
+
         task_list.append(task_dict)
 
     return task_list
@@ -139,7 +151,7 @@ def delete_task(request, task_id: int):
     return response()
 
 
-@router.post("/{task_id}/running")
+@router.get("/{task_id}/running", auth=None)
 def running_task(request, task_id: int):
     """
     运行任务
@@ -227,3 +239,84 @@ def get_result_list(request, report_id: int, result: ReportIn):
             result_list.append(result_dict)
 
     return response(result=result_list)
+
+
+@router.post('/timed/create')
+def create_timed(request, timed: TimedIn):
+    """
+    创建定时任务
+    """
+    url = f"{TIMED_SERVER}/scheduler/cron/add_job"
+    cron_job = {
+        "job_id": f"cron_task_{timed.task_id}",
+        "url": f"{THIS_SERVER}/api/task/{timed.task_id}/running",
+        "second": timed.second,
+        "minute": timed.minute,
+        "hour": timed.hour,
+        "day": timed.day,
+        "month": timed.month,
+        "day_of_week": timed.day_of_week
+    }
+    print("url__>", url)
+    print("cron_job__>", cron_job)
+    resp = requests.post(url=url, json=cron_job)
+    if resp.status_code != 200:
+        logging.error("add crontab job fail")
+        return response(error=Error.TIMED_ADD_FAILED)
+
+    task_obj = TestTask.objects.get(id=timed.task_id)
+    task_obj.timed = json.dumps({
+        "status": "running",
+        "cron_job": cron_job
+    })
+    task_obj.save()
+
+    return response()
+
+
+@router.put('/timed/switch')
+def switch_timed(request, task_id: int):
+    """
+    暂停/恢复定时任务
+    """
+    task_obj = TestTask.objects.get(id=task_id)
+    timed = json.loads(task_obj.timed)
+    status = timed["status"]
+    if status == "running":
+        new_status = "pause"
+        url = f"{TIMED_SERVER}/scheduler/pause_job?job_id=cron_task_{task_id}"
+    else:
+        new_status = "running"
+        url = f"{TIMED_SERVER}/scheduler/resume_job?job_id=cron_task_{task_id}"
+
+    resp = requests.put(url=url)
+    if resp.status_code != 200:
+        logging.error("pause/resume crontab job fail")
+        return response(error=Error.TIMED_UPDATE_FAILED)
+
+    timed["status"] = new_status
+    task_obj.timed = json.dumps({
+        "status": timed["status"],
+        "cron_job": timed["cron_job"]
+    })
+    task_obj.save()
+
+    return response()
+
+
+@router.put('/timed/delete')
+def delete_timed(request, task_id: int):
+    """
+    删除定时任务
+    """
+    url = f"{TIMED_SERVER}/scheduler/remove_job?job_id=cron_task_{task_id}"
+    resp = requests.delete(url=url)
+    if resp.status_code != 200:
+        logging.error("delete crontab job fail")
+        return response(error=Error.TIMED_DEL_FAILED)
+
+    task_obj = TestTask.objects.get(id=task_id)
+    task_obj.timed = ""
+    task_obj.save()
+
+    return response()
