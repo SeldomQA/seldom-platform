@@ -257,9 +257,12 @@ def create_timed(request, timed: TimedIn):
         "month": timed.month,
         "day_of_week": timed.day_of_week
     }
-    print("url__>", url)
-    print("cron_job__>", cron_job)
-    resp = requests.post(url=url, json=cron_job)
+    logging.info(f"add timed task:[url]{url}, [cron_job]{cron_job}")
+    try:
+        resp = requests.post(url=url, json=cron_job)
+    except requests.exceptions.ConnectionError:
+        return response(error=Error.TIMED_TASK_FAILED)
+
     if resp.status_code != 200:
         logging.error("add crontab job fail")
         return response(error=Error.TIMED_ADD_FAILED)
@@ -288,8 +291,11 @@ def switch_timed(request, task_id: int):
     else:
         new_status = "running"
         url = f"{TIMED_SERVER}/scheduler/resume_job?job_id=cron_task_{task_id}"
+    try:
+        resp = requests.put(url=url)
+    except requests.exceptions.ConnectionError:
+        return response(error=Error.TIMED_TASK_FAILED)
 
-    resp = requests.put(url=url)
     if resp.status_code != 200:
         logging.error("pause/resume crontab job fail")
         return response(error=Error.TIMED_UPDATE_FAILED)
@@ -310,7 +316,12 @@ def delete_timed(request, task_id: int):
     删除定时任务
     """
     url = f"{TIMED_SERVER}/scheduler/remove_job?job_id=cron_task_{task_id}"
-    resp = requests.delete(url=url)
+
+    try:
+        resp = requests.delete(url=url)
+    except requests.exceptions.ConnectionError:
+        return response(error=Error.TIMED_TASK_FAILED)
+    
     if resp.status_code != 200:
         logging.error("delete crontab job fail")
         return response(error=Error.TIMED_DEL_FAILED)
