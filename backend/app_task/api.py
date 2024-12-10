@@ -310,7 +310,7 @@ def switch_timed(request, task_id: int):
     return response()
 
 
-@router.put('/timed/delete')
+@router.delete('/timed/delete')
 def delete_timed(request, task_id: int):
     """
     删除定时任务
@@ -321,7 +321,7 @@ def delete_timed(request, task_id: int):
         resp = requests.delete(url=url)
     except requests.exceptions.ConnectionError:
         return response(error=Error.TIMED_TASK_FAILED)
-    
+
     if resp.status_code != 200:
         logging.error("delete crontab job fail")
         return response(error=Error.TIMED_DEL_FAILED)
