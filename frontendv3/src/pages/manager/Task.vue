@@ -6,7 +6,9 @@ import {
   useMessage,
   useDialog,
   NSpace,
-  type ModalProps
+  NTag,
+  type ModalProps,
+  NSwitch
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
 import {
@@ -19,6 +21,7 @@ import TeamApi from "~/request/team";
 import TaskReport from "@/TaskReport.vue";
 import TaskModal from "@/TaskModal.vue";
 import projectStorage from '~/store/index';
+import TaskTimed from "@/TaskTimed.vue";
 
 // 类型定义
 /**
@@ -32,6 +35,17 @@ interface TaskRow {
   execute_count: number;
   status: number;
   create_time: string;
+  timed_status: string;
+  timed_conf: {
+    job_id?: string;
+    url?: string;
+    second?: string;
+    minute?: string;
+    hour?: string;
+    day?: string;
+    month?: string;
+    day_of_week?: string;
+  };
 }
 
 /**
@@ -58,6 +72,7 @@ interface PageState {
   total: number;
   query: QueryParams;
   taskFlag: boolean;
+  timedDialog: boolean;
 }
 
 /**
@@ -132,6 +147,7 @@ const datas = reactive<PageState>({
     name: null,
   },
   taskFlag: true,
+  timedDialog: false,
 });
 
 /**
@@ -196,16 +212,64 @@ const createColumns = ({
       title: "状态",
       key: "status",
       render(row) {
-        if (row.status === 0) {
-          return "未执行";
-        } else if (row.status === 1) {
-          return "执行中";
-        } else if (row.status === 2) {
-          return "已执行";
-        } else {
-          return "未知";
-        }
+        const statusMap: Record<number, { type: 'default' | 'success' | 'warning' | 'error', text: string }> = {
+          0: { type: 'default', text: '未执行' },
+          1: { type: 'warning', text: '执行中' },
+          2: { type: 'success', text: '已执行' },
+        };
+        const status = statusMap[row.status] || { type: 'error', text: '未知' };
+        return h(
+          NTag,
+          {
+            type: status.type,
+            size: 'small',
+          },
+          { default: () => status.text }
+        );
       },
+    },
+    {
+      title: "定时",
+      key: "timed_status",
+      render(row) {
+        if (!row.timed_status) {
+          return h('div', null, [
+            h(NTag, { type: 'default', size: 'small' }, { default: () => '未设置' })
+          ]);
+        }
+
+        const active = row.timed_status === 'running';
+        
+        return h('div', null, [
+          h(NSpace, { align: 'center' }, {
+            default: () => [
+              h(NSwitch, {
+                value: active,
+                disabled: !row.timed_status,
+                onUpdateValue: async (value) => {
+                  try {
+                    const resp = await TaskApi.switchTimed(row.id.toString());
+                    if (resp.success) {
+                      message.success(value ? '定时任务已启动' : '定时任务已暂停');
+                      initTaskList(); // 刷新列表
+                    } else {
+                      message.error(resp.error?.message || '操作失败');
+                    }
+                  } catch (error) {
+                    message.error('操作失败');
+                  }
+                }
+              }),
+            ]
+          }),
+          // 显示 cron 表达式
+          row.timed_conf?.minute ? h(
+            'div',
+            { style: 'font-size: 12px; margin-top: 4px; color: #666;' },
+            `${row.timed_conf.minute} ${row.timed_conf.hour} ${row.timed_conf.day} ${row.timed_conf.month} ${row.timed_conf.day_of_week}`
+          ) : null
+        ]);
+      }
     },
     {
       title: "创建",
@@ -231,16 +295,17 @@ const createColumns = ({
                 },
                 { default: () => "运行" }
               ),
-              // h(
-              //   NButton,
-              //   {
-              //     type: "info",
-              //     strong: true,
-              //     secondary: true,
-              //     onClick: () => play(row, "set"),
-              //   },
-              //   { default: () => "定时" }
-              // ),
+              h(
+                NButton,
+                {
+                  type: "warning",
+                  strong: true,
+                  secondary: true,
+                  size: "small",
+                  onClick: () => play(row, "timed"),
+                },
+                { default: () => "定时" }
+              ),
               h(
                 NButton,
                 {
@@ -413,6 +478,13 @@ const closeModal = async () => {
   await initTaskList();
 };
 
+/**
+ * 关闭定时任务弹窗
+ */
+const closeTimedModal = () => {
+  datas.timedDialog = false;
+};
+
 // 表格配置
 const columns = createColumns({
   play(row: TaskRow, action: string) {
@@ -429,6 +501,10 @@ const columns = createColumns({
         break;
       case "clickTaskName":
         clickTaskName(row);
+        break;
+      case "timed":
+        datas.tid = row.id;
+        datas.timedDialog = true;
         break;
     }
   },
@@ -525,6 +601,25 @@ onMounted(async () => {
           :type="modalDatas.type"
           :tid="datas.tid"
           @close="closeModal"
+        />
+      </n-modal>
+
+      <n-modal
+        v-model:show="datas.timedDialog"
+        preset="card"
+        style="width: 600px"
+        title="定时任务"
+        :bordered="false"
+        :segmented="{
+          content: true,
+          footer: true
+        }"
+      >
+        <TaskTimed
+          :task-id="datas.tid"
+          :timed-conf="datas.tableData.find(item => item.id === datas.tid)?.timed_conf"
+          @cancel="closeTimedModal"
+          @refresh="initTaskList"
         />
       </n-modal>
 

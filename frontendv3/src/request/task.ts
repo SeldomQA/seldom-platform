@@ -29,9 +29,13 @@ class TaskApi {
   addTimed(tid: string, data: TNomalObject) {
     return request.post("/api/task/" + tid + "/timed", data);
   }
+  
+  switchTimed(taskId: string) {
+    return request.put(`/api/task/timed/switch?task_id=${taskId}`);
+  }
 
-  deleteTimed(tid: string) {
-    return request.del("/api/task/" + tid + "/timed");
+  deleteTimed(taskId: string) {
+    return request.del(`/api/task/timed/delete?task_id=${taskId}`);
   }
 
   getReportAll(data: TNomalObject) {
