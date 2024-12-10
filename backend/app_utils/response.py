@@ -57,10 +57,11 @@ class Error:
 
     # 任务相关错误 (100xx)
     TASK_ID_NULL = (10051, "任务ID不能为空")
-    TIMED_ADD_FAILED = (10052, "定时任务添加失败")
-    TIMED_UPDATE_FAILED = (10053, "定时任务开关失败")
-    TIMED_DEL_FAILED = (10054, "定时任务删除失败")
-    TIMED_TASK_FAILED = (10055, "定时任务服务报错")
+    TASK_RUNNING = (10052, "任务正在运行中")
+    TIMED_ADD_FAILED = (10053, "定时任务添加失败")
+    TIMED_UPDATE_FAILED = (10054, "定时任务开关失败")
+    TIMED_DEL_FAILED = (10055, "定时任务删除失败")
+    TIMED_TASK_FAILED = (10056, "定时任务服务报错")
 
 
 def model_to_dict(instance: object) -> dict:

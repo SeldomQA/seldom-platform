@@ -158,6 +158,8 @@ def running_task(request, task_id: int):
     """
     # 保存定时任务格式
     task = TestTask.objects.get(id=task_id)
+    if task.status == 1:
+        return response(error=Error.TASK_RUNNING)
 
     relevance = TaskCaseRelevance.objects.filter(task_id=task_id)
     case_list = []
