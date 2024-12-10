@@ -266,7 +266,7 @@ const createColumns = ({
           row.timed_conf?.minute ? h(
             'div',
             { style: 'font-size: 12px; margin-top: 4px; color: #666;' },
-            `${row.timed_conf.minute} ${row.timed_conf.hour} ${row.timed_conf.day} ${row.timed_conf.month} ${row.timed_conf.day_of_week}`
+            `${row.timed_conf.second} ${row.timed_conf.minute} ${row.timed_conf.hour} ${row.timed_conf.day} ${row.timed_conf.month} ${row.timed_conf.day_of_week}`
           ) : null
         ]);
       }
