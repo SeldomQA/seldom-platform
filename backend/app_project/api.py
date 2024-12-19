@@ -15,6 +15,7 @@ from ninja import Router
 from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
+from seldom.logging import log
 from seldom.utils import file
 
 from app_case.models import TestCase, TestCaseTemp
@@ -221,6 +222,12 @@ def sync_project_case(request, project_id: int):
     for seldom in seldom_case:
         case_hash = get_hash(f"""{project_id}.{seldom["file"]}.{seldom["class"]["name"]}.{seldom["method"]["name"]}""")
         if case_hash not in case_hash_list:
+            try:
+                label = seldom["method"]["label"]
+            except KeyError as msg:
+                log.error(msg)
+                label = ""
+
             case_hash_list.append(case_hash)
             TestCaseTemp.objects.create(
                 project_id=project_id,
@@ -229,6 +236,7 @@ def sync_project_case(request, project_id: int):
                 class_doc=seldom["class"]["doc"],
                 case_name=seldom["method"]["name"],
                 case_doc=seldom["method"]["doc"],
+                label=label,
                 case_hash=case_hash
             )
 
@@ -259,7 +267,8 @@ def async_project_result(request, project_id: int):
                 "class_doc": temp.class_doc,
                 "case_name": temp.case_name,
                 "case_doc": temp.case_doc,
-                "case_hash": temp.case_hash
+                "case_hash": temp.case_hash,
+                "label": temp.label,
             })
 
     # 项目用例表找出已删除的用例
@@ -274,7 +283,8 @@ def async_project_result(request, project_id: int):
                 "class_doc": project.class_doc,
                 "case_name": project.case_name,
                 "case_doc": project.case_doc,
-                "case_hash": project.case_hash
+                "case_hash": project.case_hash,
+                "label": project.label,
             })
 
     return response(result={"project_id": project_id, "add_case": add_case, "del_case": del_case})
@@ -298,7 +308,8 @@ def async_project_merge(request, project_id: int, param: MergeCase):
             class_doc=case["class_doc"],
             case_name=case["case_name"],
             case_doc=case["case_doc"],
-            case_hash=case["case_hash"]
+            case_hash=case["case_hash"],
+            label=case["label"]
         )
 
     # 删除用例

@@ -13,6 +13,7 @@ class TestCaseTemp(models.Model):
     class_doc = models.TextField("类描述", null=True, blank=True, default="")
     case_name = models.CharField("方法名", max_length=200, null=False, default="")
     case_doc = models.TextField("方法描述", null=True, blank=True, default="")
+    label = models.TextField("用例标签", null=True, blank=True, default="")
     case_hash = models.CharField("用例hash", max_length=200, null=False, default="")
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
 
@@ -30,6 +31,7 @@ class TestCase(models.Model):
     class_doc = models.TextField("类描述", null=True, blank=True, default="")
     case_name = models.CharField("方法名", max_length=200, null=False, default="")
     case_doc = models.TextField("方法描述", null=True, blank=True, default="")
+    label = models.TextField("用例标签", null=True, blank=True, default="")
     status = models.IntegerField("状态", default=0)  # 0未执行、1执行中、2已执行
     case_hash = models.CharField("用例hash", max_length=200, null=False, default="")
     create_time = models.DateTimeField("创建时间", auto_now_add=True)
