@@ -163,7 +163,7 @@ const createColumns = ({
         return h(
           NTag,
           {
-            type: 'info',
+            type: 'warning',
             size: 'small',
           },
           { default: () => labelText }
