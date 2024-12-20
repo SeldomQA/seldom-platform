@@ -122,6 +122,18 @@ const createColumns = ({
     {
       title: "测试类描述",
       key: "class_doc",
+      render(row) {
+        const classDocText = row.class_doc || '无描述';
+        return h(
+          'span',
+          {
+            style: {
+              color: '#8B8BA8'
+            }
+          },
+          classDocText
+        );
+      }
     },
     {
       title: "测试方法",
@@ -130,18 +142,29 @@ const createColumns = ({
     {
       title: "测试方法描述",
       key: "case_doc",
+      render(row) {
+        const caseDocText = row.case_doc || '无描述';
+        return h(
+          'span',
+          {
+            style: {
+              color: '#8B8BA8'
+            }
+          },
+          caseDocText
+        );
+      }
     },
     {
       title: "标签",
       key: "label",
       render(row) {
-        // 假设 label 字段的值为你想要显示的标签文本
         const labelText = row.label || '无标签';
         return h(
           NTag,
           {
-            type: 'info', // 默认标签类型
-            size: 'small',   // 标签大小
+            type: 'info',
+            size: 'small',
           },
           { default: () => labelText }
         );
