@@ -23,8 +23,9 @@
 ```bash
 > python manage.py makemigrations
 > python manage.py migrate
+> python manage.py collectstatic  # 迁移静态资源: static -> staticfiles
 
-> python .\manage.py createsuperuser
+> python .\manage.py createsuperuser  # 创建管理员账号
 用户名 (leave blank to use 'user'): guest
 电子邮件地址: guest@gmail.com
 Password:
