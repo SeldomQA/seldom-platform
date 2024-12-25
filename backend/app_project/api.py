@@ -22,7 +22,7 @@ from app_case.models import TestCase, TestCaseTemp
 from app_project.models import Project, Env
 from app_project.schema import ProjectIn, EnvIn, MergeCase
 from app_task.models import TestTask
-from app_utils.git_utils import LocalGitResource
+from app_utils.git_utils import LocalGitResource, is_valid_git_repo_url
 from app_utils.module_utils import clear_test_modules
 from app_utils.permission import check_permissions, PROJECT_PERMISSIONS, ENV_PERMISSIONS
 from app_utils.project_utils import get_hash, copytree
@@ -57,15 +57,7 @@ def create_project(request, project: ProjectIn):
         project_case_dir = project.case_dir
 
     # 检查项目地址是否可用
-    if project.address.startswith("http") is False:
-        return response(error=Error.PROJECT_ADDRESS_ERROR)
-
-    try:
-        resp = requests.get(project.address)
-        if resp.status_code != 200:
-            return response(error=Error.PROJECT_ADDRESS_ERROR)
-    except BaseException as msg:
-        logger.error(msg)
+    if is_valid_git_repo_url(project.address) is False:
         return response(error=Error.PROJECT_ADDRESS_ERROR)
 
     project_obj = Project.objects.create(
@@ -114,6 +106,9 @@ def update_project(request, project_id: int, project: ProjectIn):
     """
     通过项目ID更新项目
     """
+    if is_valid_git_repo_url(project.address) is False:
+        return response(error=Error.PROJECT_ADDRESS_ERROR)
+
     project_obj = get_object_or_404(Project, pk=project_id)
     project_obj.name = project.name
     project_obj.address = project.address

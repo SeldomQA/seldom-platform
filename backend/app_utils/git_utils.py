@@ -1,8 +1,28 @@
 import os
+import re
 
 from seldom.utils import file
 
 from backend.settings import BASE_DIR
+
+
+def is_valid_git_repo_url(url: str) -> bool:
+    # 检查 HTTP/HTTPS URL
+    http_regex = re.compile(r'^https?://(?:[a-zA-Z0-9\-]+\.)+[a-zA-Z]{2,6}(?:/[^\s]*)?$')
+    if http_regex.match(url):
+        return True
+    
+    # 检查 Git 协议 URL
+    git_protocol_regex = re.compile(r'^git://[^/]+/(.+)$')
+    if git_protocol_regex.match(url):
+        return True
+    
+    # 检查 SSH URL
+    ssh_regex = re.compile(r'^git@([^:]+):(.+)$')
+    if ssh_regex.match(url):
+        return True
+
+    return False
 
 
 class LocalGitResource:
