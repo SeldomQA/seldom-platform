@@ -26,12 +26,15 @@ from app_utils.module_utils import clear_test_modules
 from app_utils.permission import check_permissions, PROJECT_PERMISSIONS, ENV_PERMISSIONS
 from app_utils.project_utils import get_hash, copytree
 from app_utils.response import response, Error, model_to_dict
-from backend.settings import BASE_DIR, REPORT_DIR
+from backend.settings import BASE_DIR, REPORT_DIR, DEBUG
 
 logger = logging.getLogger('myapp')
 
 # upload image
-IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
+if DEBUG is True:
+    IMAGE_DIR = os.path.join(BASE_DIR, "static", "images")
+else:
+    IMAGE_DIR = os.path.join(BASE_DIR, "staticfiles", "images")
 
 router = Router(tags=["project"])
 
@@ -53,16 +56,16 @@ def create_project(request, project: ProjectIn):
         project_case_dir = project.case_dir
 
     # 检查项目地址是否可用
-    if project.address.startswith("http") is False:
-        return response(error=Error.PROJECT_ADDRESS_ERROR)
-
-    try:
-        resp = requests.get(project.address)
-        if resp.status_code != 200:
-            return response(error=Error.PROJECT_ADDRESS_ERROR)
-    except BaseException as msg:
-        logger.error(msg)
-        return response(error=Error.PROJECT_ADDRESS_ERROR)
+    # if project.address.startswith("http") is False:
+    #     return response(error=Error.PROJECT_ADDRESS_ERROR)
+    #
+    # try:
+    #     resp = requests.get(project.address)
+    #     if resp.status_code != 200:
+    #         return response(error=Error.PROJECT_ADDRESS_ERROR)
+    # except BaseException as msg:
+    #     logger.error(msg)
+    #     return response(error=Error.PROJECT_ADDRESS_ERROR)
 
     project_obj = Project.objects.create(
         name=project.name,
