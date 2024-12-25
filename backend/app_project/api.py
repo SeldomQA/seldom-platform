@@ -194,7 +194,7 @@ def sync_project_case(request, project_id: int):
     project = get_object_or_404(Project, pk=project_id)
 
     local = LocalGitResource(project.name, project.address)
-    project_root_dir = local.git_project_dir(suffix=project.run_version)
+    project_root_dir = local.git_project_dir()
 
     project_test_dir = file.join(project_root_dir, project.case_dir)
     if os.path.isdir(project_test_dir) is False:
