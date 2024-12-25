@@ -30,6 +30,7 @@ const datas = reactive<SyncData>({
 const message = useMessage();
 const currentRef = ref<number | null>(1);
 const currentStatus = ref<StepsProps["status"]>("process");
+const currentResult = ref(false);
 const loading = ref(false);
 const projectId = ref<string>("");
 
@@ -103,6 +104,7 @@ const syncResult = async () => {
       next();
       currentStatus.value = "process";
       datas.stepButton = "合并";
+      currentResult.value = true; // Set to true on success
     } else {
       message.error(resp.error.message);
       currentStatus.value = "error";
@@ -192,7 +194,7 @@ onMounted(() => {
       </n-steps>
 
       <!-- 用例列表 -->
-      <div class="case-lists">
+      <div v-if="currentResult" class="case-lists">
         <n-space>
           <!-- 新增用例列表 -->
           <n-card title="新增用例" size="small" class="add-case-list">

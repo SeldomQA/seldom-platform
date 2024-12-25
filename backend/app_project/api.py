@@ -8,7 +8,6 @@ import logging
 import os
 import subprocess
 
-import requests
 from django.shortcuts import get_object_or_404
 from ninja import File
 from ninja import Router
@@ -429,7 +428,7 @@ def get_project_file_cases(request, project_id: int, file_name: str, label_name:
     # 如果是文件，直接取文件的类、方法
     if ".py" not in file_name:
         return response(error=Error.FILE_NAME_ERROR)
-  
+
     if label_name is not None:
         file_cases = TestCase.objects.filter(
             project_id=project_id,
