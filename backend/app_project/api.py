@@ -422,23 +422,31 @@ def get_project_files(request, project_id: int):
 
 
 @router.get('/{project_id}/cases')
-def get_project_file_cases(request, project_id: int, file_name: str):
+def get_project_file_cases(request, project_id: int, file_name: str, label_name: str = None):
     """
     获取文件下面的测试用例
     """
     # 如果是文件，直接取文件的类、方法
-    if ".py" in file_name:
+    if ".py" not in file_name:
+        return response(error=Error.FILE_NAME_ERROR)
+  
+    if label_name is not None:
+        file_cases = TestCase.objects.filter(
+            project_id=project_id,
+            file_name=file_name[0:-3],
+            label__contains=label_name
+        )
+    else:
         file_cases = TestCase.objects.filter(
             project_id=project_id,
             file_name=file_name[0:-3]
         )
-        case_list = []
-        for case in file_cases:
-            case_list.append(model_to_dict(case))
 
-        return response(result=case_list)
+    case_list = []
+    for case in file_cases:
+        case_list.append(model_to_dict(case))
 
-    return response()
+    return response(result=case_list)
 
 
 @router.get('/{project_id}/subdirectory')

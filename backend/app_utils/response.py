@@ -41,6 +41,7 @@ class Error:
     # 文件相关错误 (100xx)
     FILE_TYPE_ERROR = (10031, "文件类型错误")
     FILE_SIZE_ERROR = (10032, "超出文件大小")
+    FILE_NAME_ERROR = (10033, "文件名错误")
 
     # 团队相关错误 (100xx)
     TEAM_EMAIL_ERROR = (10041, "邮箱格式错误")
