@@ -59,8 +59,12 @@ class ProjectApi {
     return request.get("/api/project/" + pid + "/files");
   }
 
-  getProjectCases(pid: string, file_name: string) {
-    return request.get("/api/project/" + pid + "/cases", { file_name });
+  getProjectCases(pid: string, file_name: string, label?: string) {
+    const params: Record<string, any> = { file_name };
+    if (label) {
+      params.label_name = label;
+    }
+    return request.get("/api/project/" + pid + "/cases", params);
   }
 
   getProjectSubdirectory(pid: string, file_name: string) {

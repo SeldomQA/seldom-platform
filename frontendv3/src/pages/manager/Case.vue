@@ -11,7 +11,12 @@ import {
   NTag
 } from "naive-ui";
 import type { DataTableColumns } from "naive-ui";
-import { FolderOpenOutline, LogoPython, Refresh } from "@vicons/ionicons5";
+import {
+  FolderOpenOutline,
+  LogoPython,
+  Refresh,
+  SearchOutline
+} from "@vicons/ionicons5";
 import CaseResult from "@/CaseResult.vue";
 import CaseSync from "@/CaseSync.vue";
 import CaseSyncLog from "@/CaseSyncLog.vue";
@@ -79,6 +84,8 @@ const caseSync = ref();
 const model = ref<TEnvModel>({
   envOptions: [],
 });
+
+const labelInput = ref("");
 
 /**
  * 页面主要数据状态
@@ -384,6 +391,33 @@ const runCase = async (row: RowData) => {
 };
 
 /**
+ * 根据标签查询用例
+ */
+const byLabelCase = async () => {
+  if (!selectedTreeNode.value) {
+    message.warning("请选择左侧树节点用例文件");
+    return;
+  }
+
+  try {
+    const resp = await ProjectApi.getProjectCases(
+      datas.projectId,
+      selectedTreeNode.value.full_name,
+      labelInput.value
+    );
+    if (resp.success) {
+      message.success("查询成功");
+      datas.caseData = resp.result;
+    } else {
+      message.error(resp.error.message);
+    }
+  } catch (error) {
+    message.error('查询失败');
+    console.error(error);
+  }
+};
+
+/**
  * 刷新用例列表
  */
 const refreshCase = async () => {
@@ -400,6 +434,7 @@ const refreshCase = async () => {
     if (resp.success) {
       message.success("刷新成功");
       datas.caseData = resp.result;
+      labelInput.value = "";
     } else {
       message.error(resp.error.message);
     }
@@ -518,11 +553,31 @@ const segmented = {
       </div>
       <n-space justify="space-between" align="center">
         <h3>用例列表</h3>
-        <n-button strong secondary type="primary" size="small" @click="refreshCase">
-          <template #icon>
-            <Refresh />
-          </template>
-        </n-button>
+        <n-form inline :model="model" label-placement="left">
+          <n-form-item label="标签" label-placement="left">
+            <n-input
+              v-model:value="labelInput"
+              placeholder="请输入标签名称"
+              size="small"
+            ></n-input>
+          </n-form-item>
+          <n-form-item label-placement="left">
+            <n-button type="primary" @click="byLabelCase" size="small">
+              <template #icon>
+                <n-icon>
+                  <SearchOutline />
+                </n-icon>
+              </template>
+              搜索
+            </n-button>
+            <span style="width: 10px;"></span>
+            <n-button strong secondary type="primary" size="small" @click="refreshCase">
+              <template #icon>
+                <Refresh />
+              </template>
+            </n-button>
+          </n-form-item>
+        </n-form>
       </n-space>
       <div>
         <n-grid x-gap="16" :cols="5">
