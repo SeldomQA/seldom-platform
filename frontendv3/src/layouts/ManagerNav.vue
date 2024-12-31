@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, inject, h } from 'vue';
-import { RouterLink } from 'vue-router';
-import { NIcon } from 'naive-ui';
+import { ref, reactive, onMounted, inject, h, watch } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
+import { NIcon, NMenu } from 'naive-ui';
 import type { MenuOption } from 'naive-ui';
 import {
   SettingsOutline as SettingIcon,
@@ -43,7 +43,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => '用例管理' }
       ),
-    key: 'go-back-case',
+    key: 'manager-Case',
     icon: renderIcon(FolderIcon),
   },
   {
@@ -60,7 +60,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => '任务管理' }
       ),
-    key: 'go-back-task',
+    key: 'manager-Task',
     icon: renderIcon(CalendarIcon),
   },
   {
@@ -82,7 +82,7 @@ const menuOptions: MenuOption[] = [
             },
             { default: () => '项目配置' }
           ),
-        key: 'go-back-home',
+        key: 'center-Project',
         icon: renderIcon(ProjectIcon),
       },
       {
@@ -99,7 +99,7 @@ const menuOptions: MenuOption[] = [
             },
             { default: () => '环境配置' }
           ),
-        key: 'go-back-env',
+        key: 'center-Env',
         icon: renderIcon(CloudIcon),
       },
       {
@@ -116,7 +116,7 @@ const menuOptions: MenuOption[] = [
             },
             { default: () => '团队配置' }
           ),
-        key: 'go-back-team',
+        key: 'center-Team',
         icon: renderIcon(PeopleIcon),
       },
     ],
@@ -130,6 +130,13 @@ const datas = reactive({
 
 const model = ref<modelRef>({
   projectOptions: [],
+});
+
+const selectedKey = ref<string | null>(null);
+const route = useRoute();
+
+watch(route, (newRoute: any) => {
+  selectedKey.value = newRoute.name as string;
 });
 
 const reload = inject<() => void>('reload');
@@ -157,13 +164,16 @@ onMounted(() => {
   if (projectData) {
     datas.projectValue = projectData?.id ?? 0;
   }
+  selectedKey.value = route.name as string;
 });
 </script>
 
 <template>
   <BaseNav 
     :menu-options="menuOptions"
-    :tag="{ type: 'warning', text: '项目管理' }">
+    :tag="{ type: 'warning', text: '项目管理' }"
+    :selectedKey="selectedKey"
+  >
     <template #project-select>
       <n-form inline :model="model" label-placement="left">
         <n-form-item label="">

@@ -20,7 +20,8 @@ const props = defineProps<{
   tag: {
     type: string,
     text: string
-  }
+  },
+  selectedKey: string | null // Add selectedKey prop
 }>();
 
 const router = useRouter();
@@ -104,7 +105,7 @@ onMounted(() => {
           <img src="../assets/seldom-platform.gif" style="height: 40px" />
         </span>
         <span style="float: right;">
-          <n-menu :options="menuOptions" @update:value="handleUpdateValue" mode="horizontal"/>
+          <n-menu :options="menuOptions" @update:value="handleUpdateValue" mode="horizontal" v-model:value="props.selectedKey" />
         </span>
         <span style="float: right; height: 50px;">
           <n-divider vertical style="height: 30px;"/>
@@ -132,4 +133,4 @@ onMounted(() => {
       </n-space>
     </n-space>
   </div>
-</template> 
+</template>

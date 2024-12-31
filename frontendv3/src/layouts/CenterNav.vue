@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { h } from 'vue';
-import { RouterLink } from 'vue-router';
-import { NIcon } from 'naive-ui';
+import { h, ref, onMounted, watch } from 'vue';
+import { RouterLink, useRoute } from 'vue-router';
+import { NIcon, NMenu } from 'naive-ui';
 import type { MenuOption } from 'naive-ui';
 import {
   AppsOutline as ProjectIcon,
@@ -27,7 +27,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => '项目配置' }
       ),
-    key: 'go-back-home',
+    key: 'center-Project',
     icon: renderIcon(ProjectIcon),
   },
   {
@@ -42,7 +42,7 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => '环境配置' }
       ),
-    key: 'go-back-env',
+    key: 'center-Env',
     icon: renderIcon(CloudIcon),
   },
   {
@@ -57,14 +57,27 @@ const menuOptions: MenuOption[] = [
         },
         { default: () => '团队配置' }
       ),
-    key: 'go-back-team',
+    key: 'center-Team',
     icon: renderIcon(PeopleIcon),
   },
 ];
+
+const selectedKey = ref<string | null>(null);
+const route = useRoute();
+
+watch(route, (newRoute) => {
+  selectedKey.value = newRoute.name as string;
+});
+
+onMounted(() => {
+  selectedKey.value = route.name as string;
+});
 </script>
 
 <template>
   <BaseNav 
     :menu-options="menuOptions"
-    :tag="{ type: 'success', text: '配置中心' }" />
+    :tag="{ type: 'success', text: '配置中心' }"
+    :selectedKey="selectedKey" 
+  />
 </template>
