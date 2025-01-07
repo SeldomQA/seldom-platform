@@ -187,7 +187,7 @@ def async_project_code(request, project_id: int):
 
 
 @router.get("/{project_id}/sync_case")
-def sync_project_case(request, project_id: int):
+def sync_project_case(request, project_id: int, sync_mode: str = None):
     """
     第二步：同步项目用例
     """
@@ -210,7 +210,10 @@ def sync_project_case(request, project_id: int):
     SeldomTestLoader.collectCaseList = []
 
     main_extend = TestMainExtend(path=project_test_dir)
-    seldom_case = main_extend.collect_cases(warning=True)
+    if sync_mode is None:
+        sync_mode = "data"
+
+    seldom_case = main_extend.collect_cases(warning=True, level=sync_mode)
 
     TestCaseTemp.objects.filter(project=project).delete()
 
