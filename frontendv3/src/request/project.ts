@@ -22,8 +22,8 @@ class ProjectApi {
     return request.get("/api/project/" + pid + "/sync_code");
   }
 
-  syncCase(pid: string) {
-    return request.get("/api/project/" + pid + "/sync_case");
+  syncCase(pid: string, sync_mode: string) {
+    return request.get("/api/project/" + pid + "/sync_case", { sync_mode });
   }
 
   syncResult(pid: string) {
