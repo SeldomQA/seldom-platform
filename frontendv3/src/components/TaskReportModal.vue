@@ -124,72 +124,65 @@ onMounted(() => {
             <div v-if="datas.caseDetails?.doc">
               <h4>doc</h4>
               <n-input
-                class="log-bg"
                 type="textarea"
                 :rows="2"
                 placeholder="null"
                 :value="datas.caseDetails?.doc"
-                readonly
+                status="success"
               />
             </div>
             
             <div v-if="datas.caseDetails?.system_err">
               <h4>system err</h4>
               <n-input
-                class="log-bg"
                 type="textarea"
                 :rows="10"
                 placeholder="null"
                 :value="datas.caseDetails?.system_err"
-                readonly
+                status="error"
               />
             </div>
             
             <div v-if="datas.caseDetails?.system_out">
               <h4>system out</h4>
               <n-input
-                class="log-bg"
                 type="textarea"
                 :rows="10"
                 placeholder="null"
                 :value="datas.caseDetails?.system_out"
-                readonly
+                status="success"
               />
             </div>
             
             <div v-if="datas.caseDetails?.failure_out">
               <h4>failure</h4>
               <n-input
-                class="log-bg"
                 type="textarea"
                 :rows="10"
                 placeholder="null"
                 :value="datas.caseDetails?.failure_out"
-                readonly
+                status="warning"
               />
             </div>
             
             <div v-if="datas.caseDetails?.error_out">
               <h4>error</h4>
               <n-input
-                class="log-bg"
                 type="textarea"
                 :rows="10"
                 placeholder="null"
                 :value="datas.caseDetails?.error_out"
-                readonly
+                status="error"
               />
             </div>
             
             <div v-if="datas.caseDetails?.skipped_message">
               <h4>skipped message</h4>
               <n-input
-                class="log-bg"
                 type="textarea"
                 :rows="2"
                 placeholder="null"
                 :value="datas.caseDetails?.skipped_message"
-                readonly
               />
             </div>
           </template>
@@ -203,10 +196,6 @@ onMounted(() => {
 .class-list {
   height: 800px;
   overflow-y: scroll;
-}
-
-.log-bg {
-  background-color: #FBF9F6;
 }
 
 .empty-state {

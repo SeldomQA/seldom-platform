@@ -46,25 +46,17 @@ onMounted(() => {
 
 <template>
   <div class="case-sync-log">
-    <textarea 
-      class="log-style" 
+    <n-input
+      v-model:value="result.log"
+      type="textarea"
       rows="40"
-      readonly
-    >{{ result.log }}</textarea>
+      status="warning"
+    ></n-input>
   </div>
 </template>
 
 <style scoped>
 .case-sync-log {
   width: 100%;
-}
-
-.log-style {
-  width: 100%;
-  border-color: gray;
-  background-color: rgb(251, 249, 246);
-  padding: 12px;
-  font-family: monospace;
-  resize: none;
 }
 </style>

@@ -70,11 +70,13 @@ onMounted(() => {
 
     <!-- 日志部分 -->
     <n-divider title-placement="left">运行日志</n-divider>
-    <textarea 
-      class="log-style" 
+    <n-input
+      v-model:value="result.system_out"
+      type="textarea"
       rows="34"
-      readonly
-    >{{ result.system_out }}</textarea>
+      status="warning"
+    >
+    </n-input>
   </div>
 </template>
 
@@ -87,12 +89,4 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.log-style {
-  width: 100%;
-  border-color: gray;
-  background-color: rgb(251, 249, 246);
-  padding: 12px;
-  font-family: monospace;
-  resize: none;
-}
 </style>
