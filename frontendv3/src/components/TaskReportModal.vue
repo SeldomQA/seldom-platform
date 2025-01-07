@@ -83,7 +83,6 @@ onMounted(() => {
       <n-gi span="1">
         <div class="class-list">
           <n-data-table
-            class="table"
             :columns="[
               {
                 title: '用例列表',
@@ -92,7 +91,7 @@ onMounted(() => {
             ]"
             :data="datas.resultData"
             :row-props="caseRowClick"
-            height="500"
+            :max-height="750"
             :bordered="false"
           />
         </div>
