@@ -581,7 +581,7 @@ const segmented = {
       </n-space>
       <div>
         <n-grid x-gap="16" :cols="5">
-          <n-gi>
+          <n-gi span="1">
             <n-tree
               class="filetree"
               block-line
@@ -589,6 +589,8 @@ const segmented = {
               :data="datas.fileData"
               key-field="label"
               :node-props="nodeProps"
+              virtual-scroll
+              style="height: 500px"
             />
           </n-gi>
           <n-gi span="4">

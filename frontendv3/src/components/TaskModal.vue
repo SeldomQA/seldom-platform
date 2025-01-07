@@ -405,7 +405,7 @@ onMounted(initData);
       </n-form-item>
     </n-form>
     <n-divider title-placement="left"> 选择用例 </n-divider>
-    <div style="height: 500px">
+    <div>
       <n-grid x-gap="16" :cols="8">
         <n-gi span="2">
           <n-tree
@@ -415,6 +415,8 @@ onMounted(initData);
             :data="datas.fileData"
             key-field="label"
             :node-props="nodeProps"
+            virtual-scroll
+            style="height: 500px"
           />
         </n-gi>
         <n-gi span="6">
@@ -436,5 +438,9 @@ onMounted(initData);
 <style scoped>
 .transfer-style {
   height: 500px;
+}
+
+.filetree {
+  border: solid 1px var(--n-border-color);
 }
 </style>
