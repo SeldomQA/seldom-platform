@@ -69,9 +69,9 @@ def login(request, data: LoginIn):
                 "permissions": [perm.codename for perm in user.user_permissions.all()]
             })
         else:
-            return response(error=Error.LOGIN_ERROR)
+            return response(error=Error.LOGIN_PAWD_ERROR)
     except User.DoesNotExist:
-        return response(error=Error.LOGIN_ERROR)
+        return response(error=Error.LOGIN_USSER_ERROR)
 
 
 @router.post("/logout", auth=None)

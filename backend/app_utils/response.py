@@ -25,7 +25,8 @@ class Error:
     USER_OR_PAWD_ERROR = (10011, "用户名密码错误")
     PAWD_ERROR = (10012, "两次密码不一致")
     USER_HAS_REGISTERED = (10013, "用户已注册")
-    LOGIN_ERROR = (10014, "用户名登录错误")
+    LOGIN_USSER_ERROR = (10014, "用户名错误")
+    LOGIN_PAWD_ERROR = (10015, "密码错误")
     USER_ID_NULL = (40010, "用户id不存在")
     REGISTER_RESTRICT = (40012, "未开放注册, 联系作者获取体验账号")
 
