@@ -10,10 +10,20 @@ services:
       - REDIS_HOST=your_redis_host 
     depends_on:
       - selenium 
- 
+
   selenium:
     image: selenium/standalone-chrome:latest 
     ports:
       - "4444:4444"
       - "7900:7900"
     shm_size: '2gb'
+
+  redis: 
+    image: redis:latest
+    ports: 
+      - "6379:6379"
+    volumes: 
+      - redis-data:/data
+ 
+volumes: 
+  redis-data:
