@@ -12,19 +12,23 @@
 ![](./architecture.png)
 
 
+__三个步骤：__
+
 🐍 **seldom**
 
-> 通过seldom框架编写自动化测试用例。
+> 1. 通过seldom框架编写自动化测试用例。
 
 ![](./img/seldom-code.png)
 
 🌐 **Github/gitee托管项目代码**
 
+> 2. 通过git管理自动化测试脚本
+
 ![](./img/github.png)
 
 💻 **seldom-platfrom**
 
-> 通过seldom-platfrom平台解析用例，执行、查看结果、定时任务...
+> 3. 通过seldom-platfrom平台解析用例，执行、查看结果、定时任务...
 
 ![](./img/seldom-platform-code.png)
 
@@ -62,11 +66,10 @@
 | ------------ | ---------------------------------- | ------------------------------ |
 | backend      | 后端: django + django-ninjia        | [link](./backend/README.md)    |
 | frontendv3   | 前端：vue3 + naive-ui               | [link](./frontendv3/README.md) |
-| ~~frontend~~ | 前端：vue2 + element-ui (不再维护)   | [link](./frontend/README.md)   |
 
 
 > __注：__
-> `frontend` 和 `frontendv3` 是两套并行开发前端项目，frontend 不再维护，推荐使用 frontendv3。
+>  `frontendv3` 是基于Vue3编写的前端，旧版包含的有frontend是基于Vue2编写。
 
 ### 相关文档
 
