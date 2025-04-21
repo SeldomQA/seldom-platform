@@ -1,0 +1,19 @@
+version: '3.11'
+
+services:
+  backend:
+    image: seldom-backend:latest 
+    ports:
+      - "8005:8000"
+    environment:
+      - DATABASE_URL=your_db_url 
+      - REDIS_HOST=your_redis_host 
+    depends_on:
+      - selenium 
+ 
+  selenium:
+    image: selenium/standalone-chrome:latest 
+    ports:
+      - "4444:4444"
+      - "7900:7900"
+    shm_size: '2gb'

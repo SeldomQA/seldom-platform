@@ -25,7 +25,7 @@ RUN pip install uwsgi
 COPY . /app/
 
 # Expose the port the app runs on
-EXPOSE 8005
+EXPOSE 8000
 
 # Run the application
 CMD ["uwsgi", "--http", "0.0.0.0:8000", "--chdir", "/app", "--wsgi-file", "backend/wsgi.py", "--master", "--processes", "4", "--threads", "2"]
