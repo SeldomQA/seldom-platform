@@ -184,7 +184,7 @@ const handlePasswordInput = () => {
         </div>
         <n-divider>相关项目</n-divider>
         <div>
-          <span>@2024 Powered by SeldomQA Team</span>
+          <span>@2025 Powered by SeldomQA Team</span>
            <a href="https://github.com/SeldomQA/seldom-platform" target="_blank">
             <n-button type="primary" quaternary>seldom</n-button>
           </a>
