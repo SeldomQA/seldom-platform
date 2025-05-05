@@ -22,6 +22,10 @@ def create_team(request, team: TeamIn):
     if validate_email(team.email) is False:
         return response(error=Error.TEAM_EMAIL_ERROR)
 
+    team_obj = Team.objects.filter(name=team.name, email=team.email)
+    if len(team_obj) > 0:
+        return response(error=Error.TEAM_EXIST_ERROR)
+
     team_obj = Team.objects.create(
         name=team.name,
         email=team.email

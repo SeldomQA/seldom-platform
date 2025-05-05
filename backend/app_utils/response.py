@@ -46,6 +46,7 @@ class Error:
 
     # 团队相关错误 (100xx)
     TEAM_EMAIL_ERROR = (10041, "邮箱格式错误")
+    TEAM_EXIST_ERROR = (10042, "创建团队已经存在")
 
     # 用例相关错误 (200xx)
     CASE_AUDIT_FAIL = (20041, "没有权限审核用例")
