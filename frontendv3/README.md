@@ -54,6 +54,13 @@ switch (mode) {
 
 export default baseUrl;
 ```
+## 测试
+
+* 运行E2E测试
+
+```shell
+> npm run test:e2e
+```
 
 ## 部署
 
