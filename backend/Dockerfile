@@ -17,8 +17,6 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.doubanio.com/simple/
-RUN python manage.py makemigrations
-RUN python manage.py migrate
 
 # Install uwsgi
 RUN pip install uwsgi
@@ -30,4 +28,6 @@ COPY . /app/
 EXPOSE 8000
 
 # Run the application
-CMD ["uwsgi", "--http", "0.0.0.0:8000", "--chdir", "/app", "--wsgi-file", "backend/wsgi.py", "--master", "--processes", "4", "--threads", "2"]
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
