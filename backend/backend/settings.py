@@ -152,7 +152,7 @@ REPORT_DIR = os.path.join(BASE_DIR, "reports")
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://host.docker.internal:6379/1",
+        "LOCATION": "redis://172.17.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
