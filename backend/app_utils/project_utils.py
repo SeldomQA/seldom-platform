@@ -43,6 +43,6 @@ def copytree(source_dir: str, target_dir: str) -> None:
             raise
 
     # 删除
-    shutil.rmtree(target_dir, onerror=handle_remove_read_only)
+    shutil.rmtree(target_dir, onexc=handle_remove_read_only)
     # 复制
     shutil.copytree(source_dir, target_dir)
