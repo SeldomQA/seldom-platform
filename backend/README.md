@@ -56,7 +56,7 @@ Superuser created successfully.
 > python manage.py runserver
 ```
 
-### 部署运行
+### 传统部署运行
 
 > 部署事项：
 > 1. uwsgi 仅支持在Linux上安装，用pip安装。
@@ -72,7 +72,7 @@ Superuser created successfully.
 * 命令启动
 
 ```shell
-> uwsgi --http 127.0.0.1:8080 --chdir /home/app/seldom-platform/backend/ --wsgi-file backend/wsgi.py --master --processes 4 --threads 2
+> uwsgi --http 127.0.0.1:8000 --chdir /home/app/seldom-platform/backend/ --wsgi-file backend/wsgi.py --master --processes 4 --threads 2
 ```
 
 配置文件启动（参考`uwsgi.ini`文件）
@@ -95,3 +95,39 @@ Superuser created successfully.
 ![](./api.png)
 
 * 健康检查接口：http://localhost:8000/api/ping
+
+
+### docker部署：
+
+1. 将后端打包成镜像：
+
+```bash
+cd seldom-platform/backend/
+docker build -t seldom-backend .
+```
+
+2. 启动容器：
+
+```bash
+docker run -d --name seldom-backend -p 8000:8000 seldom-backend
+```
+
+3. `setting.py` 修改Redis的地址
+
+```py
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://host.docker.internal:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+```
+
+
+4. [可选]使用docker-compose 启动
+```shell
+docker-compose up -d
+```

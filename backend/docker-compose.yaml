@@ -4,7 +4,7 @@ services:
   backend:
     image: seldom-backend:latest 
     ports:
-      - "8005:8000"
+      - "8000:8000"
     environment:
       - DATABASE_URL=your_db_url 
       - REDIS_HOST=your_redis_host 
