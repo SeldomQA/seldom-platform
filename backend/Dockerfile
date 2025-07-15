@@ -19,7 +19,7 @@ RUN pip install --upgrade pip -i https://pypi.doubanio.com/simple/
 RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.doubanio.com/simple/
 
 # Install uwsgi
-RUN pip install uwsgi
+RUN pip install uwsgi -i https://pypi.doubanio.com/simple/
 
 # Copy the project files
 COPY . /app/
