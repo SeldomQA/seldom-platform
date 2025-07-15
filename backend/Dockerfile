@@ -15,7 +15,7 @@ WORKDIR /app
 
 # Install Python dependencies
 COPY requirements.txt /app/
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip -i https://pypi.doubanio.com/simple/
 RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.doubanio.com/simple/
 
 # Install uwsgi
