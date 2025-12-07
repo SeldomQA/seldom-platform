@@ -35,10 +35,17 @@ def copytree(source_dir: str, target_dir: str) -> None:
         :param exc:
         :return:
         """
-        excvalue = exc[1]
-        if func in (os.rmdir, os.remove, os.unlink) and excvalue.errno == errno.EACCES:
+        # exc 是一个异常对象，不是元组
+        if isinstance(exc, PermissionError) and func in (os.rmdir, os.remove, os.unlink):
             os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
             func(path)
+        elif isinstance(exc, tuple) and len(exc) > 1:
+            excvalue = exc[1]
+            if func in (os.rmdir, os.remove, os.unlink) and hasattr(excvalue, 'errno') and excvalue.errno == errno.EACCES:
+                os.chmod(path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)  # 0777
+                func(path)
+            else:
+                raise exc[1] from exc[0]
         else:
             raise
 

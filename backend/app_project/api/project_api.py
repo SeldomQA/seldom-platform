@@ -311,8 +311,12 @@ def async_project_merge(request, project_id: int, param: MergeCase):
 
     # 删除用例
     for case in del_case:
-        test_case = TestCase.objects.get(project=project, case_hash=case["case_hash"])
-        test_case.delete()
+        try:
+            test_case = TestCase.objects.get(project=project, case_hash=case["case_hash"])
+            test_case.delete()
+        except TestCase.DoesNotExist:
+            # 如果测试用例不存在，则忽略
+            pass
 
     local = LocalGitResource(project.name, project.address)
     project_root_dir = local.git_project_dir()
