@@ -2,9 +2,8 @@ import json
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from django.http import Http404
-from django.core.exceptions import ObjectDoesNotExist
-from app_team.models import Team
-from app_team.schema import TeamIn
+from app_project.models import Team
+from app_project.schema import TeamIn
 
 
 class TeamAPITestCase(TestCase):
@@ -20,8 +19,7 @@ class TeamAPITestCase(TestCase):
 
     def test_create_team(self):
         """测试创建团队"""
-        from app_team.api import create_team
-        from app_team.schema import TeamIn
+        from app_project.api.team_api import create_team
         
         # 创建团队输入数据
         team_in = TeamIn(
@@ -33,7 +31,7 @@ class TeamAPITestCase(TestCase):
         request = MagicMock()
         
         # 调用API函数
-        with patch('app_team.api.validate_email', return_value=True):
+        with patch('app_project.api.team_api.validate_email', return_value=True):
             response = create_team(request, team=team_in)
         
         # 验证响应
@@ -48,8 +46,7 @@ class TeamAPITestCase(TestCase):
 
     def test_create_team_invalid_email(self):
         """测试创建团队时邮箱格式错误"""
-        from app_team.api import create_team
-        from app_team.schema import TeamIn
+        from app_project.api.team_api import create_team
         
         # 创建团队输入数据（邮箱格式错误）
         team_in = TeamIn(
@@ -61,7 +58,7 @@ class TeamAPITestCase(TestCase):
         request = MagicMock()
         
         # 调用API函数
-        with patch('app_team.api.validate_email', return_value=False):
+        with patch('app_project.api.team_api.validate_email', return_value=False):
             response = create_team(request, team=team_in)
         
         # 验证响应
@@ -72,8 +69,7 @@ class TeamAPITestCase(TestCase):
 
     def test_create_team_duplicate(self):
         """测试创建重复团队"""
-        from app_team.api import create_team
-        from app_team.schema import TeamIn
+        from app_project.api.team_api import create_team
         
         # 创建团队输入数据（与已有团队相同）
         team_in = TeamIn(
@@ -85,7 +81,7 @@ class TeamAPITestCase(TestCase):
         request = MagicMock()
         
         # 调用API函数
-        with patch('app_team.api.validate_email', return_value=True):
+        with patch('app_project.api.team_api.validate_email', return_value=True):
             response = create_team(request, team=team_in)
         
         # 验证响应
@@ -96,7 +92,7 @@ class TeamAPITestCase(TestCase):
 
     def test_get_teams(self):
         """测试获取团队列表"""
-        from app_team.api import get_teams
+        from app_project.api.team_api import get_teams
         
         # 创建模拟请求
         request = MagicMock()
@@ -113,7 +109,7 @@ class TeamAPITestCase(TestCase):
 
     def test_get_team(self):
         """测试获取单个团队"""
-        from app_team.api import get_team
+        from app_project.api.team_api import get_team
         
         # 创建模拟请求
         request = MagicMock()
@@ -129,7 +125,7 @@ class TeamAPITestCase(TestCase):
 
     def test_get_team_not_found(self):
         """测试获取不存在的团队"""
-        from app_team.api import get_team
+        from app_project.api.team_api import get_team
         
         # 创建模拟请求
         request = MagicMock()
@@ -140,8 +136,7 @@ class TeamAPITestCase(TestCase):
 
     def test_update_team(self):
         """测试更新团队"""
-        from app_team.api import update_team
-        from app_team.schema import TeamIn
+        from app_project.api.team_api import update_team
         
         # 创建团队更新输入数据
         team_in = TeamIn(
@@ -153,7 +148,7 @@ class TeamAPITestCase(TestCase):
         request = MagicMock()
         
         # 调用API函数
-        with patch('app_team.api.validate_email', return_value=True):
+        with patch('app_project.api.team_api.validate_email', return_value=True):
             response = update_team(request, team_id=self.team.id, team=team_in)
         
         # 验证响应
@@ -169,8 +164,7 @@ class TeamAPITestCase(TestCase):
 
     def test_update_team_invalid_email(self):
         """测试更新团队时邮箱格式错误"""
-        from app_team.api import update_team
-        from app_team.schema import TeamIn
+        from app_project.api.team_api import update_team
         
         # 创建团队更新输入数据（邮箱格式错误）
         team_in = TeamIn(
@@ -182,7 +176,7 @@ class TeamAPITestCase(TestCase):
         request = MagicMock()
         
         # 调用API函数
-        with patch('app_team.api.validate_email', return_value=False):
+        with patch('app_project.api.team_api.validate_email', return_value=False):
             response = update_team(request, team_id=self.team.id, team=team_in)
         
         # 验证响应
@@ -193,7 +187,7 @@ class TeamAPITestCase(TestCase):
 
     def test_delete_team(self):
         """测试删除团队"""
-        from app_team.api import delete_team
+        from app_project.api.team_api import delete_team
         
         # 创建模拟请求
         request = MagicMock()

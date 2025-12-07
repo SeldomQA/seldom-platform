@@ -6,15 +6,15 @@ function:团队管理
 from django.shortcuts import get_object_or_404
 from ninja import Router
 
-from app_team.models import Team
-from app_team.schema import TeamIn
+from app_project.models import Team
+from app_project.schema import TeamIn
 from app_utils.email_utils import validate_email
 from app_utils.response import response, Error, model_to_dict
 
 router = Router(tags=["team"])
 
 
-@router.post('/create')
+@router.post('/team/create')
 def create_team(request, team: TeamIn):
     """
     创建团队
@@ -33,7 +33,7 @@ def create_team(request, team: TeamIn):
     return response(result=model_to_dict(team_obj))
 
 
-@router.get('/list')
+@router.get('/team/list')
 def get_teams(request):
     """
     获取团队列表
@@ -45,7 +45,7 @@ def get_teams(request):
     return response(result=team_list)
 
 
-@router.get('/{team_id}/')
+@router.get('/team/{team_id}/')
 def get_team(request, team_id: int):
     """
     通过团队Id查询团队
@@ -54,7 +54,7 @@ def get_team(request, team_id: int):
     return response(result=model_to_dict(team_obj))
 
 
-@router.put('/{team_id}/')
+@router.put('/team/{team_id}/')
 def update_team(request, team_id: int, team: TeamIn):
     """
     通过团队Id更新团队
@@ -69,7 +69,7 @@ def update_team(request, team_id: int, team: TeamIn):
     return response(result=model_to_dict(team_obj))
 
 
-@router.delete('/{team_id}/')
+@router.delete('/team/{team_id}/')
 def delete_team(request, team_id: int):
     """
     通过团队Id删除团队

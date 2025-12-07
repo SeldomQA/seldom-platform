@@ -26,6 +26,12 @@ class EnvIn(Schema):
     app_info: Optional[str] = "{}"
 
 
+class TeamIn(Schema):
+    """团队入参"""
+    name: str
+    email: str
+
+
 class MergeCase(Schema):
     """合并用例"""
     add_case: list

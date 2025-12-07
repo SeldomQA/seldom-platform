@@ -8,7 +8,7 @@ import requests
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_project.models import Project, Env
 from app_case.models import TestCase as AppCase
-from app_team.models import Team
+from app_project.models import Team
 
 
 class TaskAPITestCase(TestCase):

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from app_task.models import TestTask, TaskReport, ReportDetails
 from app_project.models import Env
-from app_team.models import Team
+from app_project.models import Team
 
 
 @admin.register(TestTask)
