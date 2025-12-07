@@ -155,6 +155,14 @@ CACHES = {
         "LOCATION": "redis://172.17.0.1:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # When Redis is unreachable, fail fast and avoid long blocking timeouts.
+            # socket_connect_timeout/socket_timeout in seconds make connections return quickly.
+            "CONNECTION_POOL_KWARGS": {
+                "socket_connect_timeout": 5,
+                "socket_timeout": 2,
+            },
+            # Ignore exceptions from Redis backend (don't raise on connection errors).
+            "IGNORE_EXCEPTIONS": True,
         }
     }
 }

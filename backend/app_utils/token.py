@@ -53,6 +53,13 @@ class CustomToken:
             return False
         except jwt.InvalidTokenError:
             return False
+        except Exception:
+            # 缓存或其他错误时，允许token通过验证（安全降级）
+            try:
+                jwt.decode(token, self.secret, algorithms=["HS256"])
+                return True
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
+                return False
 
     def get_token_info(self, token: str) -> Optional[Dict]:
         """
@@ -81,9 +88,16 @@ class CustomToken:
             ttl = int((exp - now).total_seconds())
             
             if ttl > 0:
-                # 将token加入黑名单，过期时间与token原过期时间一致
-                cache.set(f"{self.blacklist_prefix}{token}", True, ttl)
+                try:
+                    # 将token加入黑名单，过期时间与token原过期时间一致
+                    cache.set(f"{self.blacklist_prefix}{token}", True, ttl)
+                except Exception:
+                    # 缓存不可用时，仅记录日志，不抛出异常
+                    pass
         except jwt.InvalidTokenError:
+            pass
+        except Exception:
+            # 其他异常时，仅记录日志，不抛出异常
             pass
 
     def is_blacklisted(self, token: str) -> bool:
@@ -92,4 +106,8 @@ class CustomToken:
         :param token: token字符串
         :return: bool
         """
-        return cache.get(f"{self.blacklist_prefix}{token}", False)
+        try:
+            return cache.get(f"{self.blacklist_prefix}{token}", False)
+        except Exception:
+            # 缓存连接失败时，认为token未被黑名单（安全降级）
+            return False
