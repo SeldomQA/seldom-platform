@@ -8,11 +8,11 @@ from seldom.logging import log
 from seldom.utils import file
 
 from app_project.models import Env
-from app_task.models import TestTask, TaskReport, ReportDetails
 from app_project.models import Team
+from app_task.models import TestTask, TaskReport, ReportDetails
 from app_utils import background
 from app_utils.email_utils import send_email_config
-from app_utils.running_utils import configure_test_runner
+from app_utils.running_utils import configure_test_runner, update_test_task_status
 from backend.config import EmailConfig
 from backend.settings import REPORT_DIR
 
@@ -31,8 +31,7 @@ def seldom_running(test_dir, case_info, report_name, task_id):
     :return:
     """
     task = TestTask.objects.get(id=task_id)
-    task.status = 1
-    task.save()
+    update_test_task_status(task_id, 1)
 
     # 环境判断
     env = Env.objects.get(id=task.env_id)
@@ -123,10 +122,7 @@ def seldom_running(test_dir, case_info, report_name, task_id):
                 skipped_message=skipped_message,
             )
         # 修改状态（2-已运行）
-        test_case = TestTask.objects.get(id=task_id)
-        test_case.status = 2
-        test_case.execute_count += 1
-        test_case.save()
+        update_test_task_status(task_id, 2, is_done=True)
 
         # 删除报告文件
         # os.remove(report_path)

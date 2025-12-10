@@ -2,7 +2,9 @@ from seldom import Seldom, TestMainExtend
 from seldom.utils import cache
 from selenium.webdriver import ChromeOptions, FirefoxOptions, EdgeOptions
 
+from app_case.models import TestCase
 from app_project.models import Env
+from app_task.models import TestTask
 
 
 def configure_browser(env: Env):
@@ -58,3 +60,28 @@ def configure_test_runner(env: Env, test_dir: str, report_name: str):
         main_extend = TestMainExtend(path=test_dir, report=report_name, browser=browser_conf, rerun=env.rerun)
 
     return main_extend
+
+
+def update_test_case_status(case_id: int, status: int):
+    """
+    更新测试用例状态
+    :param case_id: 测试用例ID
+    :param status: 状态值 (0=未执行, 1=执行中, 2=已执行)
+    """
+    test_case = TestCase.objects.get(id=case_id)
+    test_case.status = status
+    test_case.save()
+
+
+def update_test_task_status(task_id: int, status: int, is_done: bool = False):
+    """
+    更新测试任务状态
+    :param task_id: 测试任务ID
+    :param status: 状态值 (0=未执行, 1=执行中, 2=已执行)
+    :param is_done: 是否完成
+    """
+    test_task = TestTask.objects.get(id=task_id)
+    test_task.status = status
+    if is_done:
+        test_task.execute_count += 1
+    test_task.save()

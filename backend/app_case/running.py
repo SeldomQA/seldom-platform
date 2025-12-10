@@ -7,7 +7,7 @@ from seldom.logging import log
 from app_case.models import TestCase, CaseResult
 from app_project.models import Env
 from app_utils import background
-from app_utils.running_utils import configure_test_runner
+from app_utils.running_utils import configure_test_runner, update_test_case_status
 from backend.settings import REPORT_DIR
 
 # Use 10 background threads.
@@ -83,9 +83,7 @@ def seldom_running(test_dir: str, case_info: list, report_name: str, case_id: in
             run_time=run_time,
         )
         # 修改状态
-        test_case = TestCase.objects.get(id=case_id)
-        test_case.status = 2
-        test_case.save()
+        update_test_case_status(case_id, 2)
 
         # 删除报告文件
         # os.remove(report_path)
