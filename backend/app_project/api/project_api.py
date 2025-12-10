@@ -14,13 +14,11 @@ from ninja import Router
 from ninja.files import UploadedFile
 from seldom import SeldomTestLoader
 from seldom import TestMainExtend
-from seldom.logging import log
 from seldom.utils import file
 
 from app_case.models import TestCase, TestCaseTemp
 from app_project.models import Project
 from app_project.schema import ProjectIn, MergeCase
-from app_task.models import TestTask
 from app_utils.git_utils import LocalGitResource, is_valid_git_repo_url
 from app_utils.module_utils import clear_test_modules
 from app_utils.permission import check_permissions, PROJECT_PERMISSIONS
@@ -294,22 +292,8 @@ def async_project_merge(request, project_id: int, param: MergeCase):
     """
     project = get_object_or_404(Project, pk=project_id)
 
-    # 添加用例
-    add_case = param.add_case
-    del_case = param.del_case
-    for case in add_case:
-        TestCase.objects.create(
-            project=project,
-            file_name=case["file_name"],
-            class_name=case["class_name"],
-            class_doc=case["class_doc"],
-            case_name=case["case_name"],
-            case_doc=case["case_doc"],
-            case_hash=case["case_hash"],
-            label=case["label"]
-        )
-
     # 删除用例
+    del_case = param.del_case
     for case in del_case:
         try:
             test_case = TestCase.objects.get(project=project, case_hash=case["case_hash"])
@@ -317,6 +301,22 @@ def async_project_merge(request, project_id: int, param: MergeCase):
         except TestCase.DoesNotExist:
             # 如果测试用例不存在，则忽略
             pass
+
+    # 添加用例
+    add_case = param.add_case
+    for case in add_case:
+        TestCase.objects.get_or_create(
+            project=project,
+            case_hash=case["case_hash"],
+            defaults={
+                "file_name": case["file_name"],
+                "class_name": case["class_name"],
+                "class_doc": case["class_doc"],
+                "case_name": case["case_name"],
+                "case_doc": case["case_doc"],
+                "label": case["label"]
+            }
+        )
 
     local = LocalGitResource(project.name, project.address)
     project_root_dir = local.git_project_dir()
@@ -490,6 +490,3 @@ def get_project_subdirectory(request, project_id: int, file_name: str):
         case_name.append(case_level_two)
 
     return response(result=case_name)
-
-
-
