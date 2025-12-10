@@ -12,10 +12,10 @@ from seldom.utils import file
 
 from app_case.models import TestCase
 from app_project.models import Project, Env
+from app_project.models import Team
 from app_task.models import TestTask, TaskCaseRelevance, TaskReport, ReportDetails
 from app_task.running import seldom_running
 from app_task.schema import *
-from app_project.models import Team
 from app_utils.git_utils import LocalGitResource
 from app_utils.module_utils import clear_test_modules
 from app_utils.pagination import CustomPagination
@@ -58,11 +58,14 @@ def get_task(request, task_id: int):
 
     case_list = []
     for c in cases:
-        case_obj = TestCase.objects.get(case_hash=c)
-        case_list.append({
-            "key": case_obj.case_hash,
-            "label": case_obj.class_name + "." + case_obj.case_name
-        })
+        try:
+            case_obj = TestCase.objects.get(case_hash=c)
+            case_list.append({
+                "key": case_obj.case_hash,
+                "label": case_obj.class_name + "." + case_obj.case_name
+            })
+        except TestCase.DoesNotExist as e:
+            pass
     task_dict = model_to_dict(task_obj)
 
     env = Env.objects.get(id=task_obj.env_id)
