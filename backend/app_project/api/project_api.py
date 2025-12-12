@@ -293,14 +293,8 @@ def async_project_merge(request, project_id: int, param: MergeCase):
     project = get_object_or_404(Project, pk=project_id)
 
     # 删除用例
-    del_case = param.del_case
-    for case in del_case:
-        try:
-            test_case = TestCase.objects.get(project=project, case_hash=case["case_hash"])
-            test_case.delete()
-        except TestCase.DoesNotExist:
-            # 如果测试用例不存在，则忽略
-            pass
+    case_hashes = [case["case_hash"] for case in param.del_case]
+    TestCase.objects.filter(project=project, case_hash__in=case_hashes).delete()
 
     # 添加用例
     add_case = param.add_case

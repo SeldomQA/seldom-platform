@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 """
-@File    : env_api.py
-@Date    : 2024-04-08
+author: @bugmaster
+date: 2024-04-08
+function: 环境管理
 """
-from django.shortcuts import get_object_or_404
 from ninja import Router
 
-from app_project.models import Project, Env
+from app_project.models import Env
 from app_project.schema import EnvIn
 from app_task.models import TestTask
 from app_utils.permission import check_permissions, ENV_PERMISSIONS
