@@ -4,16 +4,18 @@
 
 ## 主要技术栈
 
-* django
-* django-ninja
-* seldom
+* python 3.14
+* django-ninja 1.5.1
+* seldom 3.14
 
 ## 安装
 
 ### 安装依赖库
 
+uv管理环境：https://docs.astral.sh/uv/
+
 ```shell
-> pip install -r requirements.txt
+> uv pip install .
 ```
 
 ### 执行数据库同步(可选)
@@ -96,7 +98,6 @@ Superuser created successfully.
 
 * 健康检查接口：http://localhost:8000/api/ping
 
-
 ### docker部署：
 
 1. 将后端打包成镜像：
@@ -126,8 +127,8 @@ CACHES = {
 }
 ```
 
-
 4. [可选]使用docker-compose 启动
+
 ```shell
 docker-compose up -d
 ```
