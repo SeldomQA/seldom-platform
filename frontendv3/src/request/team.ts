@@ -3,23 +3,23 @@ import { TNomalObject } from "./common/http";
 
 class TeamApi {
   createTeam(data: TNomalObject) {
-    return request.post("/api/team/create", data);
+    return request.post("/api/project/team/create", data);
   }
 
   getTeamAll(data?: TNomalObject) {
-    return request.get("/api/team/list", data);
+    return request.get("/api/project/team/list", data);
   }
 
   getTeamDetails(tid: string) {
-    return request.get("/api/team/" + tid + "/");
+    return request.get("/api/project/team/" + tid + "/");
   }
 
   updateTeam(tid: string, data: TNomalObject) {
-    return request.put("/api/team/" + tid + "/", data);
+    return request.put("/api/project/team/" + tid + "/", data);
   }
 
   deleteTeam(tid: string) {
-    return request.del("/api/team/" + tid + "/");
+    return request.del("/api/project/team/" + tid + "/");
   }
 }
 
