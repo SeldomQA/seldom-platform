@@ -226,7 +226,7 @@ const createColumns = ({
                   type: "primary",
                   onClick: () => caseAction(row, "report"),
                 },
-                { default: () => "查看" }
+                { default: () => "日志" }
               ),
             ],
           }
@@ -309,6 +309,10 @@ const initEnvsList = async () => {
         value: resp.result[i].id,
         label: resp.result[i].name,
       });
+    }
+    // 默认选中第一个环境
+    if (resp.result.length > 0) {
+      datas.env = resp.result[0].id;
     }
   } else {
     message.error(resp.error.message);
@@ -533,19 +537,26 @@ const segmented = {
             <n-button @click="showLog" style="left: 10px;">日志</n-button>
           </div>
           <n-form inline label-placement="left">
-            <n-form-item label="环境">
-              <n-select
-                style="width: 200px"
-                :options="model.envOptions"
-                placeholder="选择环境"
+            <n-form-item label="运行环境">
+              <n-radio-group 
+                v-model:value="datas.env" 
                 @update:value="changeEnv"
+                style="width: 200px"
               >
-              </n-select>
+                <n-space>
+                  <n-radio 
+                    v-for="option in model.envOptions" 
+                    :key="option.value" 
+                    :value="option.value"
+                  >
+                    {{ option.label }}
+                  </n-radio>
+                </n-space>
+              </n-radio-group>
             </n-form-item>
             <n-form-item label="用例">
-              <n-tag type="info" style="margin-right: 12px">{{
-                datas.caseNumber
-              }}</n-tag>
+              <n-tag type="info" style="margin-right: 12px">{{ datas.caseNumber }}
+              </n-tag>
               条
             </n-form-item>
           </n-form>
