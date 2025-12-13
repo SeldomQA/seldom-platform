@@ -171,6 +171,8 @@ onMounted(() => {
               class="card-style"
               content-style="padding: 24px; height:50%;"
               hoverable
+              @click="navigateToProject(item)"
+              style="cursor: pointer;"
             >
               <template #header-extra>
                 <n-dropdown
@@ -237,11 +239,6 @@ onMounted(() => {
                     <n-tag v-else type="success" size="small">已克隆</n-tag>
                   </n-descriptions-item>
                 </n-descriptions>
-                <div class="enter-btn">
-                  <n-button size="small" type="primary" @click="navigateToProject(item)">
-                    进入
-                  </n-button>
-                </div>
               </template>
             </n-card>
           </div>

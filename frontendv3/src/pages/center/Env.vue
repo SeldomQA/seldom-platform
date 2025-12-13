@@ -102,7 +102,6 @@ onMounted(() => {
               :title="item['name']"
               class="card-style"
               content-style="padding: 24px; height:50%;"
-              hoverable
             >
             <template #header> {{ item['name'] }} </template>
             <template #header-extra>
