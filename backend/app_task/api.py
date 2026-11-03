@@ -261,7 +261,7 @@ def create_timed(request, timed: TimedIn):
     }
     logging.info(f"add timed task:[url]{url}, [cron_job]{cron_job}")
     try:
-        resp = requests.post(url=url, json=cron_job)
+        resp = requests.post(url=url, json=cron_job, timeout=30)
     except requests.exceptions.ConnectionError:
         return response(error=Error.TIMED_TASK_FAILED)
 
@@ -294,7 +294,7 @@ def switch_timed(request, task_id: int):
         new_status = "running"
         url = f"{TIMED_SERVER}/scheduler/resume_job?job_id=cron_task_{task_id}"
     try:
-        resp = requests.put(url=url)
+        resp = requests.put(url=url, timeout=30)
     except requests.exceptions.ConnectionError:
         return response(error=Error.TIMED_TASK_FAILED)
 
@@ -320,7 +320,7 @@ def delete_timed(request, task_id: int):
     url = f"{TIMED_SERVER}/scheduler/remove_job?job_id=cron_task_{task_id}"
 
     try:
-        resp = requests.delete(url=url)
+        resp = requests.delete(url=url, timeout=30)
     except requests.exceptions.ConnectionError:
         return response(error=Error.TIMED_TASK_FAILED)
 
